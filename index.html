@@ -47,7 +47,32 @@
 
         .text-green { color: #10b981; font-weight: bold; margin-top: 10px;}
         .text-red { color: #ef4444; font-weight: bold; margin-top: 10px;}
-        .upline-box { font-size: 12px; color: #94a3b8; margin-top: 10px; }
+        
+        .input-group {
+            margin-top: 15px;
+            text-align: left;
+            display: none;
+        }
+        .input-group label {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .input-group input {
+            width: 90%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #475569;
+            background-color: #0f172a;
+            color: white;
+            font-size: 14px;
+        }
+        .input-group input:read-only {
+            background-color: #334155;
+            color: #a78bfa;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -60,9 +85,10 @@
         <button class="btn" id="connectWalletBtn">Connect Wallet</button>
         <p class="text-green" id="walletAddress"></p>
 
-        <!-- Upline Display -->
-        <div class="upline-box" id="uplineBox" style="display: none;">
-            Your Upline: <span id="uplineAddressDisplay" style="color: #a78bfa;"></span>
+        <!-- Upline Input Box -->
+        <div class="input-group" id="uplineGroup">
+            <label>Referral / Upline Address:</label>
+            <input type="text" id="uplineInput" placeholder="Enter valid Upline Address">
         </div>
 
         <!-- Register Button -->
@@ -74,32 +100,25 @@
     </div>
 
     <script>
-        // 🔴 YAHAN APNA CONTRACT ADDRESS AUR CREATOR WALLET ADDRESS DAALEIN 🔴
+        // Aapka Contract Address
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
-        const DEFAULT_UPLINE = "0x0000000000000000000000000000000000000000"; // Ise badal kar apna Creator Wallet Address daal dijiye
-        
         const CONTRACT_ABI = [
             "function register(address _upline) external payable"
         ];
 
         let provider, signer, contract, userAddress;
-        let finalUplineAddress = DEFAULT_UPLINE;
 
         const connectBtn = document.getElementById('connectWalletBtn');
         const registerBtn = document.getElementById('registerBtn');
         const copyRefBtn = document.getElementById('copyRefBtn');
         const walletAddressDisplay = document.getElementById('walletAddress');
         const statusMsg = document.getElementById('statusMsg');
-        const uplineBox = document.getElementById('uplineBox');
-        const uplineAddressDisplay = document.getElementById('uplineAddressDisplay');
+        const uplineGroup = document.getElementById('uplineGroup');
+        const uplineInput = document.getElementById('uplineInput');
 
-        // Extract Referral from URL
+        // URL me se referral nikalne ka code
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
-
-        if (refFromUrl && refFromUrl.length === 42 && refFromUrl.startsWith("0x")) {
-            finalUplineAddress = refFromUrl;
-        }
 
         // 1. Connect Wallet Logic
         connectBtn.addEventListener('click', async () => {
@@ -116,8 +135,14 @@
                     walletAddressDisplay.innerText = "Connected: " + userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
                     connectBtn.style.display = "none"; 
                     
-                    uplineAddressDisplay.innerText = finalUplineAddress.substring(0, 6) + "..." + finalUplineAddress.substring(finalUplineAddress.length - 4);
-                    uplineBox.style.display = "block";
+                    // Show Upline Input Box
+                    uplineGroup.style.display = "block";
+                    
+                    // Agar link me Referral valid hai, to usko box me daal kar Lock kar do
+                    if (refFromUrl && refFromUrl.length === 42 && refFromUrl.startsWith("0x")) {
+                        uplineInput.value = refFromUrl;
+                        uplineInput.readOnly = true; 
+                    }
                     
                     registerBtn.style.display = "block"; 
                     copyRefBtn.style.display = "block"; 
@@ -132,8 +157,24 @@
             }
         });
 
-        // 2. Register Logic
+        // 2. Register Logic (Strict Check ke sath)
         registerBtn.addEventListener('click', async () => {
+            const finalUplineAddress = uplineInput.value.trim();
+
+            // Check: Bina Upline ke register nahi hone dega
+            if (!finalUplineAddress || finalUplineAddress.length !== 42 || !finalUplineAddress.startsWith("0x")) {
+                statusMsg.innerText = "Error: Please enter a valid Referral Upline Address!";
+                statusMsg.className = "text-red";
+                return;
+            }
+
+            // Check: Koi khud ki hi link se join na kar le
+            if (finalUplineAddress.toLowerCase() === userAddress.toLowerCase()) {
+                statusMsg.innerText = "Error: You cannot be your own Upline!";
+                statusMsg.className = "text-red";
+                return;
+            }
+
             try {
                 statusMsg.innerText = "Waiting for transaction approval...";
                 statusMsg.className = "text-green";
@@ -149,6 +190,7 @@
                 statusMsg.innerText = "Registration Successful! Welcome to PolTitan!";
                 statusMsg.className = "text-green";
                 registerBtn.style.display = "none"; 
+                uplineGroup.style.display = "none";
 
             } catch (error) {
                 console.error("Transaction failed", error);
