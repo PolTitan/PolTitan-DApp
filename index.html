@@ -4,18 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PolTitan Matrix</title>
+    <!-- Ethers.js Library -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #0f172a;
             color: #ffffff;
             text-align: center;
-            margin-top: 30%;
+            margin-top: 15%;
         }
-        h1 {
-            color: #a78bfa;
+        h1 { color: #a78bfa; }
+        .card {
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            margin: 0 auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
-        .wallet-btn {
+        .btn {
             background-color: #8b5cf6;
             color: white;
             border: none;
@@ -24,52 +32,108 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-            margin-top: 20px;
+            margin: 10px;
+            width: 80%;
         }
-        .wallet-btn:hover {
-            background-color: #7c3aed;
-        }
-        #walletAddress {
-            margin-top: 20px;
-            color: #10b981;
-            font-weight: bold;
-            font-size: 16px;
-        }
+        .btn:hover { background-color: #7c3aed; }
+        .btn:disabled { background-color: #475569; cursor: not-allowed; }
+        #registerBtn { background-color: #3b82f6; display: none; }
+        #registerBtn:hover { background-color: #2563eb; }
+        .text-green { color: #10b981; font-weight: bold; margin-top: 10px;}
+        .text-red { color: #ef4444; font-weight: bold; margin-top: 10px;}
     </style>
 </head>
 <body>
 
-    <h1>Welcome to PolTitan Matrix</h1>
-    <p>A Decentralized Polygon DApp</p>
-    
-    <!-- Connect Wallet Button -->
-    <button class="wallet-btn" id="connectWalletBtn">Connect Wallet</button>
-    
-    <p id="walletAddress"></p>
+    <div class="card">
+        <h1>PolTitan Matrix</h1>
+        <p>Decentralized 30 POL Plan</p>
+        
+        <!-- Connect Wallet Button -->
+        <button class="btn" id="connectWalletBtn">Connect Wallet</button>
+        <p class="text-green" id="walletAddress"></p>
 
-    <!-- Web3 Javascript Logic -->
+        <!-- Register Button (Hidden by default) -->
+        <button class="btn" id="registerBtn">Register Matrix (30 POL)</button>
+        <p id="statusMsg"></p>
+    </div>
+
     <script>
-        const connectBtn = document.getElementById('connectWalletBtn');
-        const walletAddressDisplay = document.getElementById('walletAddress');
+        // Aapka Contract Address
+        const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
+        // Contract ka ABI (Functions batane ke liye). Abhi sirf 'register' function add kiya hai.
+        const CONTRACT_ABI = [
+            "function register(address referrer) external payable"
+        ];
 
+        let provider;
+        let signer;
+        let contract;
+        let userAddress;
+
+        const connectBtn = document.getElementById('connectWalletBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const walletAddressDisplay = document.getElementById('walletAddress');
+        const statusMsg = document.getElementById('statusMsg');
+
+        // 1. Connect Wallet Logic
         connectBtn.addEventListener('click', async () => {
-            // Check if MetaMask or Trust Wallet is injected
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // Request account access
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
+                    // Connect using Ethers.js
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
                     
-                    // Change Button UI after successful connection
-                    walletAddressDisplay.innerText = "Connected: " + account.substring(0, 6) + "..." + account.substring(account.length - 4);
-                    connectBtn.innerText = "Wallet Connected";
-                    connectBtn.style.backgroundColor = "#10b981"; // Green color
+                    // Setup Contract instance
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                    // Update UI
+                    walletAddressDisplay.innerText = "Connected: " + userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+                    connectBtn.style.display = "none"; // Hide connect button
+                    registerBtn.style.display = "inline-block"; // Show register button
+                    
                 } catch (error) {
-                    console.error("Connection rejected", error);
+                    console.error("Connection failed", error);
+                    statusMsg.innerText = "Wallet connection failed!";
+                    statusMsg.className = "text-red";
                 }
             } else {
                 alert("Please open this link inside MetaMask or Trust Wallet DApp browser!");
+            }
+        });
+
+        // 2. Register (Buy 30 POL) Logic
+        registerBtn.addEventListener('click', async () => {
+            try {
+                statusMsg.innerText = "Waiting for transaction approval...";
+                statusMsg.className = "text-green";
+                registerBtn.disabled = true;
+
+                // Amount to pay (30 POL)
+                const amountInWei = ethers.utils.parseEther("30.0");
+                
+                // Assuming admin wallet as default referrer for now (You can change this logic later)
+                const defaultReferrer = "0x0000000000000000000000000000000000000000"; // Replace with real referrer if needed
+
+                // Call register function on smart contract
+                const tx = await contract.register(defaultReferrer, { value: amountInWei });
+                
+                statusMsg.innerText = "Transaction pending on blockchain...";
+                
+                // Wait for transaction to be mined
+                await tx.wait();
+                
+                statusMsg.innerText = "Registration Successful! Welcome to PolTitan!";
+                statusMsg.className = "text-green";
+                registerBtn.style.display = "none"; // Hide button after success
+
+            } catch (error) {
+                console.error("Transaction failed", error);
+                statusMsg.innerText = "Transaction Failed or Rejected by user.";
+                statusMsg.className = "text-red";
+                registerBtn.disabled = false;
             }
         });
     </script>
