@@ -120,15 +120,17 @@
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
 
-        // 1. Connect Wallet Logic
+        // 1. Connect Wallet Logic (Fix for Mobile Wallets)
         connectBtn.addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    userAddress = await signer.getAddress();
+                    // Direct method (jo pehle kaam kiya tha)
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAddress = accounts[0];
                     
+                    // Setup Ethers provider after connection
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
                     // Update UI
