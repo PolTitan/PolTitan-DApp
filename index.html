@@ -24,7 +24,7 @@
         
         body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; }
 
-        /* Header Layout (Menu on Left, Wallet on Right) */
+        /* Header Layout */
         header {
             background: var(--card-bg);
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
@@ -37,7 +37,7 @@
         .wallet-badge { background: #1a1a1a; border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); }
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
-        /* Side Menu (Left se Right open hoga) */
+        /* Side Menu */
         .side-menu {
             position: fixed; top: 0; left: -300px;
             width: 280px; height: 100vh;
@@ -54,6 +54,8 @@
         }
         .menu-item i { color: var(--gold); width: 25px; }
         .menu-item:hover { color: var(--gold); padding-left: 15px; }
+        .logout-btn { color: #ff4d4d !important; }
+        .logout-btn i { color: #ff4d4d !important; }
 
         /* Cards & Layout */
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
@@ -99,7 +101,6 @@
         .stat-box .title { font-size: 11px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; }
         .stat-box .value { font-size: 22px; font-weight: 800; color: #fff; margin-top: 5px; }
         
-        /* Clickable Stat Box (For Direct Team) */
         .clickable-box { cursor: pointer; border-color: rgba(245, 197, 24, 0.4); }
         .clickable-box:hover { background: #111; border-color: var(--gold); }
 
@@ -143,6 +144,7 @@
         <div class="menu-item" onclick="loadNetwork(); toggleMenu();"><i class="fa-solid fa-users-viewfinder"></i> My Network</div>
         <div class="menu-item" onclick="alert('Slots Matrix Page Coming Soon!');"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="alert('Wallet & Income Page Coming Soon!');"><i class="fa-solid fa-sack-dollar"></i> POL Wallet</div>
+        <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Logout Securely</div>
     </div>
 
     <main class="container">
@@ -191,7 +193,6 @@
                         <div class="title">Current Slot</div>
                         <div class="value" id="displaySlot" style="color: var(--gold);">--</div>
                     </div>
-                    <!-- Yahan humne Clickable banaya hai aur click karne par loadNetwork() chalega -->
                     <div class="stat-box clickable-box" onclick="loadNetwork()">
                         <i class="fa-solid fa-users"></i>
                         <div class="title">Direct Team <i class="fa-solid fa-up-right-from-square" style="font-size: 9px; margin-left: 2px;"></i></div>
@@ -213,24 +214,20 @@
             </div>
         </div>
 
-        <!-- 4. NETWORK VIEW (Naya Page Jo Directs Dikhayega) -->
+        <!-- 4. NETWORK VIEW -->
         <div id="networkView" class="view-section">
             <div class="vip-card">
                 <button class="btn-outline btn-small" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
                 <h3 style="color: var(--gold); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 10px; text-align: left;">
                     <i class="fa-solid fa-users-viewfinder"></i> MY DIRECT TEAM
                 </h3>
-                
-                <div id="directListContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto;">
-                    <!-- Directs ka data yahan aayega -->
-                </div>
+                <div id="directListContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto;"></div>
             </div>
         </div>
 
     </main>
 
     <script>
-        // Contract setup (ABI me userDirects array lene ka function add kiya hai)
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
@@ -239,13 +236,11 @@
         ];
 
         let provider, signer, contract, userAddress;
-        let globalDirectCount = 0; // User ke kitne directs hain ye save karne ke liye
+        let globalDirectCount = 0;
 
-        // UI Elements
         const headerWallet = document.getElementById('headerWallet');
         const menuBtn = document.getElementById('menuBtn');
         const sideMenu = document.getElementById('sideMenu');
-        
         const connectWalletBtn = document.getElementById('connectWalletBtn');
         const registerBtn = document.getElementById('registerBtn');
         const copyRefBtn = document.getElementById('copyRefBtn');
@@ -254,7 +249,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
 
-        // Functions
         function toggleMenu() { sideMenu.classList.toggle('active'); }
         
         function switchView(viewId) {
@@ -269,7 +263,99 @@
             el.style.display = "block";
         }
 
-        // Network Fetching Logic (Naya Function)
+        // Common Login Logic (Manual aur Auto-login dono isko use karenge)
+        async function processLogin(account) {
+            try {
+                userAddress = account;
+                provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                
+                const network = await provider.getNetwork();
+                if (network.chainId !== 137) {
+                    showAlert('authAlert', 'Wrong Network! Switch MetaMask to Polygon Mainnet.', true);
+                    connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
+                    return;
+                }
+
+                signer = provider.getSigner();
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                headerWallet.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${userAddress.substring(0, 4)}...${userAddress.substring(userAddress.length - 3)}`;
+                
+                const userInfo = await contract.users(userAddress);
+                const userId = userInfo[0].toNumber(); 
+
+                if (userId > 0) {
+                    globalDirectCount = userInfo[3].toNumber(); 
+                    
+                    document.getElementById('displayId').innerText = userId;
+                    document.getElementById('menuVipId').innerText = userId; 
+                    document.getElementById('displaySlot').innerText = userInfo[4].toNumber();
+                    document.getElementById('displayDirects').innerText = globalDirectCount;
+                    document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo[5]);
+                    
+                    const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
+                    document.getElementById('displayRefLink').innerText = myLink;
+
+                    menuBtn.style.display = "block"; 
+                    switchView('dashboardView');
+                } else {
+                    if (refFromUrl && refFromUrl.length === 42) {
+                        document.getElementById('uplineInput').value = refFromUrl;
+                        document.getElementById('uplineInput').readOnly = true; 
+                    }
+                    switchView('registerView');
+                }
+            } catch (error) {
+                console.error("Login Process Error:", error);
+                showAlert('authAlert', 'Connection processing failed!', true);
+                connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
+            }
+        }
+
+        // NAYA FEATURE: Auto-Login on Page Refresh
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Check if already connected without popping up MetaMask
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resuming Session...';
+                        await processLogin(accounts[0]);
+                    }
+                } catch (error) {
+                    console.error("Auto-login failed:", error);
+                }
+            }
+        });
+
+        // Manual Connect Button
+        connectWalletBtn.addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    await processLogin(accounts[0]);
+                } catch (error) {
+                    console.error("Manual Connect Error:", error);
+                    showAlert('authAlert', 'Connection Rejected by User!', true);
+                    connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
+                }
+            } else {
+                alert("Please open this link in MetaMask DApp Browser!");
+            }
+        });
+
+        // NAYA FEATURE: Logout Function
+        function logoutWallet() {
+            userAddress = null;
+            toggleMenu(); // Close side menu
+            menuBtn.style.display = "none"; // Hide menu icon
+            headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; // Reset header
+            switchView('authView'); // Show login screen again
+            connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
+        }
+
+        // Network Fetching Logic
         async function loadNetwork() {
             switchView('networkView');
             directListContainer.innerHTML = '<p style="color: var(--gold); text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching records from blockchain...</p>';
@@ -281,7 +367,6 @@
 
             try {
                 let htmlContent = '';
-                // Har direct ka address aur ID blockchain se fetch kar rahe hain
                 for(let i = 0; i < globalDirectCount; i++) {
                     const directWallet = await contract.userDirects(userAddress, i);
                     const directInfo = await contract.users(directWallet);
@@ -302,63 +387,6 @@
                 directListContainer.innerHTML = '<p style="color: #ff4d4d; text-align: center; padding: 20px;">Error loading network data.</p>';
             }
         }
-
-        // Connect Wallet
-        connectWalletBtn.addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-                    
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAddress = accounts[0];
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    
-                    const network = await provider.getNetwork();
-                    if (network.chainId !== 137) {
-                        showAlert('authAlert', 'Wrong Network! Switch MetaMask to Polygon Mainnet.', true);
-                        connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
-                        return;
-                    }
-
-                    signer = provider.getSigner();
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-                    headerWallet.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${userAddress.substring(0, 4)}...${userAddress.substring(userAddress.length - 3)}`;
-                    
-                    const userInfo = await contract.users(userAddress);
-                    const userId = userInfo[0].toNumber(); 
-
-                    if (userId > 0) {
-                        globalDirectCount = userInfo[3].toNumber(); // Directs ka count save kiya
-                        
-                        document.getElementById('displayId').innerText = userId;
-                        document.getElementById('menuVipId').innerText = userId; 
-                        document.getElementById('displaySlot').innerText = userInfo[4].toNumber();
-                        document.getElementById('displayDirects').innerText = globalDirectCount;
-                        document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo[5]);
-                        
-                        const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
-                        document.getElementById('displayRefLink').innerText = myLink;
-
-                        menuBtn.style.display = "block"; 
-                        switchView('dashboardView');
-                    } else {
-                        if (refFromUrl && refFromUrl.length === 42) {
-                            document.getElementById('uplineInput').value = refFromUrl;
-                            document.getElementById('uplineInput').readOnly = true; 
-                        }
-                        switchView('registerView');
-                    }
-                    
-                } catch (error) {
-                    console.error(error);
-                    showAlert('authAlert', 'Connection Failed!', true);
-                    connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
-                }
-            } else {
-                alert("Please open this link in MetaMask DApp Browser!");
-            }
-        });
 
         // Register
         registerBtn.addEventListener('click', async () => {
