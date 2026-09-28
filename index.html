@@ -12,14 +12,15 @@
             background-color: #0f172a;
             color: #ffffff;
             text-align: center;
-            margin-top: 15%;
+            margin-top: 10%;
         }
         h1 { color: #a78bfa; }
         .card {
             background-color: #1e293b;
             padding: 30px;
             border-radius: 15px;
-            width: 80%;
+            width: 85%;
+            max-width: 400px;
             margin: 0 auto;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
@@ -27,20 +28,26 @@
             background-color: #8b5cf6;
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 15px;
+            font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            margin: 10px;
-            width: 80%;
+            margin-top: 15px;
+            width: 100%;
         }
         .btn:hover { background-color: #7c3aed; }
         .btn:disabled { background-color: #475569; cursor: not-allowed; }
+        
         #registerBtn { background-color: #3b82f6; display: none; }
         #registerBtn:hover { background-color: #2563eb; }
+        
+        #copyRefBtn { background-color: #f59e0b; display: none; margin-top: 10px; font-size: 14px;}
+        #copyRefBtn:hover { background-color: #d97706; }
+
         .text-green { color: #10b981; font-weight: bold; margin-top: 10px;}
         .text-red { color: #ef4444; font-weight: bold; margin-top: 10px;}
+        .upline-box { font-size: 12px; color: #94a3b8; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -53,46 +60,67 @@
         <button class="btn" id="connectWalletBtn">Connect Wallet</button>
         <p class="text-green" id="walletAddress"></p>
 
-        <!-- Register Button (Hidden by default) -->
+        <!-- Upline Display -->
+        <div class="upline-box" id="uplineBox" style="display: none;">
+            Your Upline: <span id="uplineAddressDisplay" style="color: #a78bfa;"></span>
+        </div>
+
+        <!-- Register Button -->
         <button class="btn" id="registerBtn">Register Matrix (30 POL)</button>
         <p id="statusMsg"></p>
+
+        <!-- Copy Referral Link -->
+        <button class="btn" id="copyRefBtn">📋 Copy My Referral Link</button>
     </div>
 
     <script>
-        // Aapka Contract Address
+        // 🔴 YAHAN APNA CONTRACT ADDRESS AUR CREATOR WALLET ADDRESS DAALEIN 🔴
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
-        // Contract ka ABI (Functions batane ke liye). Abhi sirf 'register' function add kiya hai.
+        const DEFAULT_UPLINE = "0x0000000000000000000000000000000000000000"; // Ise badal kar apna Creator Wallet Address daal dijiye
+        
         const CONTRACT_ABI = [
-            "function register(address referrer) external payable"
+            "function register(address _upline) external payable"
         ];
 
-        let provider;
-        let signer;
-        let contract;
-        let userAddress;
+        let provider, signer, contract, userAddress;
+        let finalUplineAddress = DEFAULT_UPLINE;
 
         const connectBtn = document.getElementById('connectWalletBtn');
         const registerBtn = document.getElementById('registerBtn');
+        const copyRefBtn = document.getElementById('copyRefBtn');
         const walletAddressDisplay = document.getElementById('walletAddress');
         const statusMsg = document.getElementById('statusMsg');
+        const uplineBox = document.getElementById('uplineBox');
+        const uplineAddressDisplay = document.getElementById('uplineAddressDisplay');
+
+        // Extract Referral from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const refFromUrl = urlParams.get('ref');
+
+        if (refFromUrl && refFromUrl.length === 42 && refFromUrl.startsWith("0x")) {
+            finalUplineAddress = refFromUrl;
+        }
 
         // 1. Connect Wallet Logic
         connectBtn.addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // Connect using Ethers.js
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
                     userAddress = await signer.getAddress();
                     
-                    // Setup Contract instance
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
                     // Update UI
                     walletAddressDisplay.innerText = "Connected: " + userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
-                    connectBtn.style.display = "none"; // Hide connect button
-                    registerBtn.style.display = "inline-block"; // Show register button
+                    connectBtn.style.display = "none"; 
+                    
+                    uplineAddressDisplay.innerText = finalUplineAddress.substring(0, 6) + "..." + finalUplineAddress.substring(finalUplineAddress.length - 4);
+                    uplineBox.style.display = "block";
+                    
+                    registerBtn.style.display = "block"; 
+                    copyRefBtn.style.display = "block"; 
                     
                 } catch (error) {
                     console.error("Connection failed", error);
@@ -104,36 +132,41 @@
             }
         });
 
-        // 2. Register (Buy 30 POL) Logic
+        // 2. Register Logic
         registerBtn.addEventListener('click', async () => {
             try {
                 statusMsg.innerText = "Waiting for transaction approval...";
                 statusMsg.className = "text-green";
                 registerBtn.disabled = true;
 
-                // Amount to pay (30 POL)
                 const amountInWei = ethers.utils.parseEther("30.0");
                 
-                // Assuming admin wallet as default referrer for now (You can change this logic later)
-                const defaultReferrer = "0x0000000000000000000000000000000000000000"; // Replace with real referrer if needed
-
-                // Call register function on smart contract
-                const tx = await contract.register(defaultReferrer, { value: amountInWei });
-                
+                const tx = await contract.register(finalUplineAddress, { value: amountInWei });
                 statusMsg.innerText = "Transaction pending on blockchain...";
                 
-                // Wait for transaction to be mined
                 await tx.wait();
                 
                 statusMsg.innerText = "Registration Successful! Welcome to PolTitan!";
                 statusMsg.className = "text-green";
-                registerBtn.style.display = "none"; // Hide button after success
+                registerBtn.style.display = "none"; 
 
             } catch (error) {
                 console.error("Transaction failed", error);
-                statusMsg.innerText = "Transaction Failed or Rejected by user.";
+                statusMsg.innerText = "Transaction Failed or Rejected.";
                 statusMsg.className = "text-red";
                 registerBtn.disabled = false;
+            }
+        });
+
+        // 3. Copy Referral Link Logic
+        copyRefBtn.addEventListener('click', () => {
+            if (userAddress) {
+                const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
+                navigator.clipboard.writeText(myLink).then(() => {
+                    alert("Referral Link Copied!\n" + myLink);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
             }
         });
     </script>
