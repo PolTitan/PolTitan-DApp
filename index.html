@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolTitan Matrix</title>
+    <title>PolTitan Matrix Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
     <style>
         body {
@@ -11,18 +11,22 @@
             background-color: #0f172a;
             color: #ffffff;
             text-align: center;
-            margin-top: 10%;
+            margin: 0;
+            padding: 20px;
         }
-        h1 { color: #a78bfa; }
+        h1 { color: #a78bfa; margin-bottom: 5px; }
+        .subtitle { color: #94a3b8; font-size: 14px; margin-top: 0; margin-bottom: 20px; }
+        
         .card {
             background-color: #1e293b;
-            padding: 30px;
+            padding: 25px;
             border-radius: 15px;
-            width: 85%;
-            max-width: 400px;
+            width: 90%;
+            max-width: 450px;
             margin: 0 auto;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
+
         .btn {
             background-color: #8b5cf6;
             color: white;
@@ -38,89 +42,122 @@
         .btn:hover { background-color: #7c3aed; }
         .btn:disabled { background-color: #475569; cursor: not-allowed; }
         
-        #registerBtn { background-color: #3b82f6; display: none; }
+        /* Specific Buttons */
+        #registerBtn { background-color: #3b82f6; }
         #registerBtn:hover { background-color: #2563eb; }
-        
-        #copyRefBtn { background-color: #f59e0b; display: none; margin-top: 10px; font-size: 14px;}
-        #copyRefBtn:hover { background-color: #d97706; }
+        .copy-btn { background-color: #f59e0b; margin-top: 15px; }
+        .copy-btn:hover { background-color: #d97706; }
 
+        /* Status Texts */
         .text-green { color: #10b981; font-weight: bold; margin-top: 10px;}
         .text-red { color: #ef4444; font-weight: bold; margin-top: 10px;}
         
-        .input-group {
-            margin-top: 15px;
-            text-align: left;
-            display: none;
-        }
-        .input-group label {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 5px;
-            display: block;
-        }
+        /* Input Fields */
+        .input-group { text-align: left; margin-top: 15px; }
+        .input-group label { font-size: 14px; color: #94a3b8; margin-bottom: 5px; display: block; }
         .input-group input {
-            width: 90%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #475569;
+            width: 90%; padding: 10px; border-radius: 5px;
+            border: 1px solid #475569; background-color: #0f172a;
+            color: white; font-size: 14px;
+        }
+        .input-group input:read-only { background-color: #334155; color: #a78bfa; }
+
+        /* Dashboard Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-box {
             background-color: #0f172a;
-            color: white;
-            font-size: 14px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #334155;
         }
-        .input-group input:read-only {
-            background-color: #334155;
-            color: #a78bfa;
-            cursor: not-allowed;
-        }
+        .stat-title { font-size: 12px; color: #94a3b8; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #10b981; margin-top: 5px; }
+        .stat-value.purple { color: #a78bfa; }
+
+        /* Sections */
+        #registerSection, #dashboardSection { display: none; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>PolTitan Matrix</h1>
-        <p>Decentralized 30 POL Plan</p>
+        <h1>PolTitan</h1>
+        <p class="subtitle">Decentralized Matrix Plan</p>
         
         <button class="btn" id="connectWalletBtn">Connect Wallet</button>
         <p class="text-green" id="walletAddress"></p>
-
-        <div class="input-group" id="uplineGroup">
-            <label>Referral / Upline Address:</label>
-            <input type="text" id="uplineInput" placeholder="Enter valid Upline Address">
-        </div>
-
-        <button class="btn" id="registerBtn">Register Matrix (30 POL)</button>
         <p id="statusMsg"></p>
 
-        <button class="btn" id="copyRefBtn">📋 Copy My Referral Link</button>
+        <div id="registerSection">
+            <div class="input-group">
+                <label>Referral / Upline Address:</label>
+                <input type="text" id="uplineInput" placeholder="Enter Upline Address">
+            </div>
+            <button class="btn" id="registerBtn">Register Matrix (30 POL)</button>
+        </div>
+
+        <div id="dashboardSection">
+            <h3 style="color: white; border-bottom: 1px solid #334155; padding-bottom: 10px;">My Dashboard</h3>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-title">My ID</div>
+                    <div class="stat-value purple" id="displayId">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Current Slot</div>
+                    <div class="stat-value" id="displaySlot">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Direct Team</div>
+                    <div class="stat-value" id="displayDirects">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Hold Amount</div>
+                    <div class="stat-value" id="displayHold">0.0</div>
+                </div>
+            </div>
+
+            <button class="btn copy-btn" id="copyRefBtn">📋 Copy Referral Link</button>
+        </div>
+
     </div>
 
     <script>
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
         const CONTRACT_ABI = [
-            "function register(address _upline) external payable"
+            "function register(address _upline) external payable",
+            "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)"
         ];
 
         let provider, signer, contract, userAddress;
 
         const connectBtn = document.getElementById('connectWalletBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const copyRefBtn = document.getElementById('copyRefBtn');
         const walletAddressDisplay = document.getElementById('walletAddress');
         const statusMsg = document.getElementById('statusMsg');
-        const uplineGroup = document.getElementById('uplineGroup');
+        
+        const registerSection = document.getElementById('registerSection');
+        const dashboardSection = document.getElementById('dashboardSection');
+        
         const uplineInput = document.getElementById('uplineInput');
+        const registerBtn = document.getElementById('registerBtn');
+        const copyRefBtn = document.getElementById('copyRefBtn');
 
+        // Extract referral from link
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
 
+        // Connect Wallet
         connectBtn.addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // Check if ethers loaded correctly
-                    if (typeof ethers === 'undefined') {
-                        throw new Error("Library load error! Please check internet or refresh the page.");
-                    }
-
+                    statusMsg.innerText = "Connecting...";
+                    
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userAddress = accounts[0];
                     
@@ -130,79 +167,80 @@
 
                     walletAddressDisplay.innerText = "Connected: " + userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
                     connectBtn.style.display = "none"; 
-                    statusMsg.innerText = "";
-                    
-                    uplineGroup.style.display = "block";
-                    
-                    if (refFromUrl && refFromUrl.length === 42 && refFromUrl.startsWith("0x")) {
-                        uplineInput.value = refFromUrl;
-                        uplineInput.readOnly = true; 
+                    statusMsg.innerText = "Checking account status...";
+
+                    // ✅ SMART CONTRACT SE CHECK KAR RAHE HAIN KI USER REGISTERED HAI YA NAHI
+                    const userInfo = await contract.users(userAddress);
+                    const userId = userInfo.id.toNumber();
+
+                    if (userId > 0) {
+                        // User is registered -> Show Dashboard
+                        statusMsg.innerText = "";
+                        document.getElementById('displayId').innerText = userId;
+                        document.getElementById('displaySlot').innerText = userInfo.currentSlot.toNumber();
+                        document.getElementById('displayDirects').innerText = userInfo.directCount.toNumber();
+                        document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo.holdAmount);
+                        
+                        dashboardSection.style.display = "block";
+                    } else {
+                        // New User -> Show Register Form
+                        statusMsg.innerText = "";
+                        registerSection.style.display = "block";
+                        
+                        if (refFromUrl && refFromUrl.length === 42) {
+                            uplineInput.value = refFromUrl;
+                            uplineInput.readOnly = true; 
+                        }
                     }
                     
-                    registerBtn.style.display = "block"; 
-                    copyRefBtn.style.display = "block"; 
-                    
                 } catch (error) {
-                    console.error("Connection failed", error);
-                    alert("Error: " + (error.message || "Failed to connect wallet."));
-                    statusMsg.innerText = "Wallet connection failed!";
+                    console.error(error);
+                    statusMsg.innerText = "Connection failed!";
                     statusMsg.className = "text-red";
                 }
             } else {
-                alert("Please open this link inside MetaMask or Trust Wallet DApp browser!");
+                alert("Please open this in MetaMask!");
             }
         });
 
+        // Register Button Logic
         registerBtn.addEventListener('click', async () => {
-            const finalUplineAddress = uplineInput.value.trim();
-
-            if (!finalUplineAddress || finalUplineAddress.length !== 42 || !finalUplineAddress.startsWith("0x")) {
-                statusMsg.innerText = "Error: Please enter a valid Referral Upline Address!";
-                statusMsg.className = "text-red";
-                return;
+            const finalUpline = uplineInput.value.trim();
+            if (!finalUpline || finalUpline.length !== 42) {
+                statusMsg.innerText = "Error: Invalid Upline Address!";
+                statusMsg.className = "text-red"; return;
             }
-
-            if (finalUplineAddress.toLowerCase() === userAddress.toLowerCase()) {
-                statusMsg.innerText = "Error: You cannot be your own Upline!";
-                statusMsg.className = "text-red";
-                return;
+            if (finalUpline.toLowerCase() === userAddress.toLowerCase()) {
+                statusMsg.innerText = "Error: Cannot be your own Upline!";
+                statusMsg.className = "text-red"; return;
             }
 
             try {
-                statusMsg.innerText = "Waiting for transaction approval...";
+                statusMsg.innerText = "Waiting for approval...";
                 statusMsg.className = "text-green";
                 registerBtn.disabled = true;
 
-                const amountInWei = ethers.utils.parseEther("30.0");
-                
-                const tx = await contract.register(finalUplineAddress, { value: amountInWei });
-                statusMsg.innerText = "Transaction pending on blockchain...";
-                
+                const tx = await contract.register(finalUpline, { value: ethers.utils.parseEther("30.0") });
+                statusMsg.innerText = "Transaction pending...";
                 await tx.wait();
                 
-                statusMsg.innerText = "Registration Successful! Welcome to PolTitan!";
-                statusMsg.className = "text-green";
-                registerBtn.style.display = "none"; 
-                uplineGroup.style.display = "none";
+                // Refresh page after success
+                window.location.reload();
 
             } catch (error) {
-                console.error("Transaction failed", error);
-                alert("Transaction Error: " + (error.message || JSON.stringify(error)));
-                statusMsg.innerText = "Transaction Failed or Rejected.";
+                console.error(error);
+                statusMsg.innerText = "Transaction Failed!";
                 statusMsg.className = "text-red";
                 registerBtn.disabled = false;
             }
         });
 
+        // Copy Link
         copyRefBtn.addEventListener('click', () => {
-            if (userAddress) {
-                const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
-                navigator.clipboard.writeText(myLink).then(() => {
-                    alert("Referral Link Copied!\n" + myLink);
-                }).catch(err => {
-                    console.error('Failed to copy text: ', err);
-                });
-            }
+            const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
+            navigator.clipboard.writeText(myLink).then(() => {
+                alert("Link Copied! \n" + myLink);
+            });
         });
     </script>
 </body>
