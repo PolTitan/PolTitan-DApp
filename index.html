@@ -120,27 +120,29 @@
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
 
-        // 1. Connect Wallet Logic (Fix for Mobile Wallets)
+        // 1. Connect Wallet Logic 
         connectBtn.addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // Direct method (jo pehle kaam kiya tha)
+                    // Check if ethers loaded correctly
+                    if (typeof ethers === 'undefined') {
+                        throw new Error("Ethers library load nahi hui. Page refresh kijiye ya internet check kijiye.");
+                    }
+
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userAddress = accounts[0];
                     
-                    // Setup Ethers provider after connection
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    // "any" parameter add kiya hai taaki mobile network sync error na aaye
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     signer = provider.getSigner();
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
-                    // Update UI
                     walletAddressDisplay.innerText = "Connected: " + userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
                     connectBtn.style.display = "none"; 
+                    statusMsg.innerText = "";
                     
-                    // Show Upline Input Box
                     uplineGroup.style.display = "block";
                     
-                    // Agar link me Referral valid hai, to usko box me daal kar Lock kar do
                     if (refFromUrl && refFromUrl.length === 42 && refFromUrl.startsWith("0x")) {
                         uplineInput.value = refFromUrl;
                         uplineInput.readOnly = true; 
@@ -151,6 +153,9 @@
                     
                 } catch (error) {
                     console.error("Connection failed", error);
+                    // YAHAN ALERT ADD KIYA HAI - Asli error screen par dikhega
+                    alert("System Error: " + (error.message || JSON.stringify(error)));
+                    
                     statusMsg.innerText = "Wallet connection failed!";
                     statusMsg.className = "text-red";
                 }
@@ -159,18 +164,16 @@
             }
         });
 
-        // 2. Register Logic (Strict Check ke sath)
+        // 2. Register Logic
         registerBtn.addEventListener('click', async () => {
             const finalUplineAddress = uplineInput.value.trim();
 
-            // Check: Bina Upline ke register nahi hone dega
             if (!finalUplineAddress || finalUplineAddress.length !== 42 || !finalUplineAddress.startsWith("0x")) {
                 statusMsg.innerText = "Error: Please enter a valid Referral Upline Address!";
                 statusMsg.className = "text-red";
                 return;
             }
 
-            // Check: Koi khud ki hi link se join na kar le
             if (finalUplineAddress.toLowerCase() === userAddress.toLowerCase()) {
                 statusMsg.innerText = "Error: You cannot be your own Upline!";
                 statusMsg.className = "text-red";
@@ -196,6 +199,7 @@
 
             } catch (error) {
                 console.error("Transaction failed", error);
+                alert("Transaction Error: " + (error.message || JSON.stringify(error)));
                 statusMsg.innerText = "Transaction Failed or Rejected.";
                 statusMsg.className = "text-red";
                 registerBtn.disabled = false;
