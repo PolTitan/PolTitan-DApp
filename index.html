@@ -24,26 +24,28 @@
         
         body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; }
 
-        /* Header */
+        /* Header Layout (Menu on Left, Wallet on Right) */
         header {
             background: var(--card-bg);
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;
         }
+        .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { font-size: 20px; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
         .logo span { color: #fff; }
         
-        .header-right { display: flex; align-items: center; gap: 15px; }
         .wallet-badge { background: #1a1a1a; border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); }
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
-        /* Side Menu (Like DK Atovitt) */
+        /* Side Menu (Left se Right open hoga) */
         .side-menu {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100vh;
-            background: #111; border-left: 1px solid var(--border-color);
-            transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.9);
+            position: fixed; top: 0; left: -300px; /* Hidden on Left */
+            width: 280px; height: 100vh;
+            background: #111; border-right: 1px solid var(--border-color); /* Border on Right side */
+            transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9);
         }
-        .side-menu.active { right: 0; }
+        .side-menu.active { left: 0; } /* Slide to 0 position */
+        
         .close-menu { text-align: right; font-size: 24px; color: var(--gold); cursor: pointer; margin-bottom: 20px; }
         .menu-user-info { background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center;}
         .menu-item {
@@ -111,16 +113,16 @@
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- Header (Menu button left me) -->
     <header>
-        <div class="logo"><i class="fa-solid fa-crown"></i> Pol<span>Titan</span></div>
-        <div class="header-right">
-            <div class="wallet-badge" id="headerWallet"><i class="fa-solid fa-wallet"></i> Connect</div>
+        <div class="header-left">
             <i class="fa-solid fa-bars menu-btn" id="menuBtn" onclick="toggleMenu()"></i>
+            <div class="logo"><i class="fa-solid fa-crown"></i> Pol<span>Titan</span></div>
         </div>
+        <div class="wallet-badge" id="headerWallet"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
 
-    <!-- Side Menu Overlay -->
+    <!-- Side Menu Overlay (Ab Left Side me) -->
     <div class="side-menu" id="sideMenu">
         <div class="close-menu" onclick="toggleMenu()"><i class="fa-solid fa-times"></i></div>
         <div class="menu-user-info">
@@ -268,7 +270,7 @@
                     if (userId > 0) {
                         // VIP User Dashboard
                         document.getElementById('displayId').innerText = userId;
-                        document.getElementById('menuVipId').innerText = userId; // Menu ID Update
+                        document.getElementById('menuVipId').innerText = userId; 
                         document.getElementById('displaySlot').innerText = userInfo[4].toNumber();
                         document.getElementById('displayDirects').innerText = userInfo[3].toNumber();
                         document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo[5]);
@@ -276,7 +278,7 @@
                         const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                         document.getElementById('displayRefLink').innerText = myLink;
 
-                        menuBtn.style.display = "block"; // Show menu icon
+                        menuBtn.style.display = "block"; 
                         switchView('dashboardView');
                     } else {
                         // New User Registration
