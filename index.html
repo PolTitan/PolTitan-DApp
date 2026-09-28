@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PolTitan Matrix</title>
-    <!-- Ethers.js Library -->
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -81,26 +80,21 @@
         <h1>PolTitan Matrix</h1>
         <p>Decentralized 30 POL Plan</p>
         
-        <!-- Connect Wallet Button -->
         <button class="btn" id="connectWalletBtn">Connect Wallet</button>
         <p class="text-green" id="walletAddress"></p>
 
-        <!-- Upline Input Box -->
         <div class="input-group" id="uplineGroup">
             <label>Referral / Upline Address:</label>
             <input type="text" id="uplineInput" placeholder="Enter valid Upline Address">
         </div>
 
-        <!-- Register Button -->
         <button class="btn" id="registerBtn">Register Matrix (30 POL)</button>
         <p id="statusMsg"></p>
 
-        <!-- Copy Referral Link -->
         <button class="btn" id="copyRefBtn">📋 Copy My Referral Link</button>
     </div>
 
     <script>
-        // Aapka Contract Address
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
         const CONTRACT_ABI = [
             "function register(address _upline) external payable"
@@ -116,23 +110,20 @@
         const uplineGroup = document.getElementById('uplineGroup');
         const uplineInput = document.getElementById('uplineInput');
 
-        // URL me se referral nikalne ka code
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
 
-        // 1. Connect Wallet Logic 
         connectBtn.addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     // Check if ethers loaded correctly
                     if (typeof ethers === 'undefined') {
-                        throw new Error("Ethers library load nahi hui. Page refresh kijiye ya internet check kijiye.");
+                        throw new Error("Library load error! Please check internet or refresh the page.");
                     }
 
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userAddress = accounts[0];
                     
-                    // "any" parameter add kiya hai taaki mobile network sync error na aaye
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     signer = provider.getSigner();
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
@@ -153,9 +144,7 @@
                     
                 } catch (error) {
                     console.error("Connection failed", error);
-                    // YAHAN ALERT ADD KIYA HAI - Asli error screen par dikhega
-                    alert("System Error: " + (error.message || JSON.stringify(error)));
-                    
+                    alert("Error: " + (error.message || "Failed to connect wallet."));
                     statusMsg.innerText = "Wallet connection failed!";
                     statusMsg.className = "text-red";
                 }
@@ -164,7 +153,6 @@
             }
         });
 
-        // 2. Register Logic
         registerBtn.addEventListener('click', async () => {
             const finalUplineAddress = uplineInput.value.trim();
 
@@ -206,7 +194,6 @@
             }
         });
 
-        // 3. Copy Referral Link Logic
         copyRefBtn.addEventListener('click', () => {
             if (userAddress) {
                 const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
