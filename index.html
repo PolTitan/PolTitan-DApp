@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PolTitan Matrix Dashboard</title>
+    <!-- Cloudflare Ethers.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
     <style>
         body {
@@ -42,17 +43,14 @@
         .btn:hover { background-color: #7c3aed; }
         .btn:disabled { background-color: #475569; cursor: not-allowed; }
         
-        /* Specific Buttons */
         #registerBtn { background-color: #3b82f6; }
         #registerBtn:hover { background-color: #2563eb; }
         .copy-btn { background-color: #f59e0b; margin-top: 15px; }
         .copy-btn:hover { background-color: #d97706; }
 
-        /* Status Texts */
         .text-green { color: #10b981; font-weight: bold; margin-top: 10px;}
         .text-red { color: #ef4444; font-weight: bold; margin-top: 10px;}
         
-        /* Input Fields */
         .input-group { text-align: left; margin-top: 15px; }
         .input-group label { font-size: 14px; color: #94a3b8; margin-bottom: 5px; display: block; }
         .input-group input {
@@ -62,7 +60,6 @@
         }
         .input-group input:read-only { background-color: #334155; color: #a78bfa; }
 
-        /* Dashboard Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -79,7 +76,6 @@
         .stat-value { font-size: 24px; font-weight: bold; color: #10b981; margin-top: 5px; }
         .stat-value.purple { color: #a78bfa; }
 
-        /* Sections */
         #registerSection, #dashboardSection { display: none; }
     </style>
 </head>
@@ -89,10 +85,12 @@
         <h1>PolTitan</h1>
         <p class="subtitle">Decentralized Matrix Plan</p>
         
+        <!-- Login/Connect Section -->
         <button class="btn" id="connectWalletBtn">Connect Wallet</button>
         <p class="text-green" id="walletAddress"></p>
         <p id="statusMsg"></p>
 
+        <!-- 1. REGISTRATION SECTION -->
         <div id="registerSection">
             <div class="input-group">
                 <label>Referral / Upline Address:</label>
@@ -101,6 +99,7 @@
             <button class="btn" id="registerBtn">Register Matrix (30 POL)</button>
         </div>
 
+        <!-- 2. DASHBOARD SECTION -->
         <div id="dashboardSection">
             <h3 style="color: white; border-bottom: 1px solid #334155; padding-bottom: 10px;">My Dashboard</h3>
             
@@ -148,42 +147,54 @@
         const registerBtn = document.getElementById('registerBtn');
         const copyRefBtn = document.getElementById('copyRefBtn');
 
-        // Extract referral from link
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
 
-        // Connect Wallet
         connectBtn.addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     statusMsg.innerText = "Connecting...";
+                    statusMsg.className = "";
                     
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userAddress = accounts[0];
                     
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    
+                    // Network Check (Ensure Polygon Mainnet - ChainID 137)
+                    const network = await provider.getNetwork();
+                    if (network.chainId !== 137) {
+                        alert("Bhai, MetaMask wrong network par hai! Please switch to 'Polygon Mainnet' in MetaMask.");
+                        statusMsg.innerText = "Error: Wrong Network! Switch to Polygon.";
+                        statusMsg.className = "text-red";
+                        return;
+                    }
+
                     signer = provider.getSigner();
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
                     walletAddressDisplay.innerText = "Connected: " + userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
                     connectBtn.style.display = "none"; 
-                    statusMsg.innerText = "Checking account status...";
+                    statusMsg.innerText = "Loading Dashboard...";
+                    statusMsg.className = "text-green";
 
-                    // ✅ SMART CONTRACT SE CHECK KAR RAHE HAIN KI USER REGISTERED HAI YA NAHI
+                    // Fetch user data securely
                     const userInfo = await contract.users(userAddress);
-                    const userId = userInfo.id.toNumber();
+                    
+                    // Ethers returns struct data as an array/object. Index 0 is 'id'.
+                    const userId = userInfo[0].toNumber(); 
 
                     if (userId > 0) {
-                        // User is registered -> Show Dashboard
+                        // User exists
                         statusMsg.innerText = "";
                         document.getElementById('displayId').innerText = userId;
-                        document.getElementById('displaySlot').innerText = userInfo.currentSlot.toNumber();
-                        document.getElementById('displayDirects').innerText = userInfo.directCount.toNumber();
-                        document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo.holdAmount);
+                        document.getElementById('displaySlot').innerText = userInfo[4].toNumber(); // currentSlot
+                        document.getElementById('displayDirects').innerText = userInfo[3].toNumber(); // directCount
+                        document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo[5]); // holdAmount
                         
                         dashboardSection.style.display = "block";
                     } else {
-                        // New User -> Show Register Form
+                        // New User
                         statusMsg.innerText = "";
                         registerSection.style.display = "block";
                         
@@ -195,6 +206,7 @@
                     
                 } catch (error) {
                     console.error(error);
+                    alert("Dashboard Load Error: " + (error.message || JSON.stringify(error)));
                     statusMsg.innerText = "Connection failed!";
                     statusMsg.className = "text-red";
                 }
@@ -203,7 +215,6 @@
             }
         });
 
-        // Register Button Logic
         registerBtn.addEventListener('click', async () => {
             const finalUpline = uplineInput.value.trim();
             if (!finalUpline || finalUpline.length !== 42) {
@@ -224,18 +235,17 @@
                 statusMsg.innerText = "Transaction pending...";
                 await tx.wait();
                 
-                // Refresh page after success
                 window.location.reload();
 
             } catch (error) {
                 console.error(error);
+                alert("Transaction Error: " + (error.message || JSON.stringify(error)));
                 statusMsg.innerText = "Transaction Failed!";
                 statusMsg.className = "text-red";
                 registerBtn.disabled = false;
             }
         });
 
-        // Copy Link
         copyRefBtn.addEventListener('click', () => {
             const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
             navigator.clipboard.writeText(myLink).then(() => {
