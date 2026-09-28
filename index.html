@@ -39,12 +39,12 @@
 
         /* Side Menu (Left se Right open hoga) */
         .side-menu {
-            position: fixed; top: 0; left: -300px; /* Hidden on Left */
+            position: fixed; top: 0; left: -300px;
             width: 280px; height: 100vh;
-            background: #111; border-right: 1px solid var(--border-color); /* Border on Right side */
+            background: #111; border-right: 1px solid var(--border-color);
             transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9);
         }
-        .side-menu.active { left: 0; } /* Slide to 0 position */
+        .side-menu.active { left: 0; }
         
         .close-menu { text-align: right; font-size: 24px; color: var(--gold); cursor: pointer; margin-bottom: 20px; }
         .menu-user-info { background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center;}
@@ -80,6 +80,7 @@
             background: transparent; border: 1px solid var(--gold); color: var(--gold);
             padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px;
         }
+        .btn-small { padding: 8px 15px; font-size: 12px; width: auto; margin-bottom: 15px; }
 
         /* Inputs */
         .input-box { text-align: left; margin-bottom: 20px; }
@@ -93,14 +94,24 @@
 
         /* Dashboard Stats Grid */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .stat-box { background: #000; padding: 20px 10px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .stat-box { background: #000; padding: 20px 10px; border-radius: 10px; border: 1px solid var(--border-color); transition: 0.3s; }
         .stat-box i { font-size: 24px; color: var(--gold); margin-bottom: 10px; }
         .stat-box .title { font-size: 11px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; }
         .stat-box .value { font-size: 22px; font-weight: 800; color: #fff; margin-top: 5px; }
+        
+        /* Clickable Stat Box (For Direct Team) */
+        .clickable-box { cursor: pointer; border-color: rgba(245, 197, 24, 0.4); }
+        .clickable-box:hover { background: #111; border-color: var(--gold); }
 
         /* Referral Box */
         .ref-box { background: rgba(245, 197, 24, 0.1); border: 1px dashed var(--gold); padding: 15px; border-radius: 10px; margin-top: 20px; }
         .ref-link { color: var(--gold); font-size: 12px; word-break: break-all; margin: 10px 0; }
+
+        /* Direct Team List */
+        .direct-item { background: #000; border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 12px; text-align: left; }
+        .direct-item .d-id { font-size: 16px; font-weight: bold; color: var(--gold); margin-bottom: 5px;}
+        .direct-item .d-wallet { font-size: 11px; color: var(--text-gray); word-break: break-all; margin-bottom: 8px;}
+        .direct-item .d-stats { font-size: 12px; color: #fff; display: flex; justify-content: space-between;}
 
         /* Sections */
         .view-section { display: none; }
@@ -113,7 +124,6 @@
 </head>
 <body>
 
-    <!-- Header (Menu button left me) -->
     <header>
         <div class="header-left">
             <i class="fa-solid fa-bars menu-btn" id="menuBtn" onclick="toggleMenu()"></i>
@@ -122,7 +132,6 @@
         <div class="wallet-badge" id="headerWallet"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
 
-    <!-- Side Menu Overlay (Ab Left Side me) -->
     <div class="side-menu" id="sideMenu">
         <div class="close-menu" onclick="toggleMenu()"><i class="fa-solid fa-times"></i></div>
         <div class="menu-user-info">
@@ -131,9 +140,9 @@
             <div style="font-size: 18px; font-weight: 800; color: #fff;" id="menuVipId">--</div>
         </div>
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-chart-line"></i> VIP Dashboard</div>
+        <div class="menu-item" onclick="loadNetwork(); toggleMenu();"><i class="fa-solid fa-users-viewfinder"></i> My Network</div>
         <div class="menu-item" onclick="alert('Slots Matrix Page Coming Soon!');"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="alert('Wallet & Income Page Coming Soon!');"><i class="fa-solid fa-sack-dollar"></i> POL Wallet</div>
-        <div class="menu-item" onclick="alert('Network Page Coming Soon!');"><i class="fa-solid fa-users-viewfinder"></i> My Network</div>
     </div>
 
     <main class="container">
@@ -147,7 +156,7 @@
             <div id="authAlert" class="alert"></div>
         </div>
 
-        <!-- 2. REGISTER VIEW (New User) -->
+        <!-- 2. REGISTER VIEW -->
         <div id="registerView" class="view-section vip-card">
             <h2>JOIN <span>MATRIX</span></h2>
             <p class="subtitle">Enter VIP Link ID to unlock your dashboard.</p>
@@ -182,9 +191,10 @@
                         <div class="title">Current Slot</div>
                         <div class="value" id="displaySlot" style="color: var(--gold);">--</div>
                     </div>
-                    <div class="stat-box">
+                    <!-- Yahan humne Clickable banaya hai aur click karne par loadNetwork() chalega -->
+                    <div class="stat-box clickable-box" onclick="loadNetwork()">
                         <i class="fa-solid fa-users"></i>
-                        <div class="title">Direct Team</div>
+                        <div class="title">Direct Team <i class="fa-solid fa-up-right-from-square" style="font-size: 9px; margin-left: 2px;"></i></div>
                         <div class="value" id="displayDirects">--</div>
                     </div>
                     <div class="stat-box">
@@ -203,17 +213,33 @@
             </div>
         </div>
 
+        <!-- 4. NETWORK VIEW (Naya Page Jo Directs Dikhayega) -->
+        <div id="networkView" class="view-section">
+            <div class="vip-card">
+                <button class="btn-outline btn-small" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
+                <h3 style="color: var(--gold); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 10px; text-align: left;">
+                    <i class="fa-solid fa-users-viewfinder"></i> MY DIRECT TEAM
+                </h3>
+                
+                <div id="directListContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto;">
+                    <!-- Directs ka data yahan aayega -->
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        // Contract setup
+        // Contract setup (ABI me userDirects array lene ka function add kiya hai)
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
-            "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)"
+            "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)",
+            "function userDirects(address user, uint256 index) external view returns (address)"
         ];
 
         let provider, signer, contract, userAddress;
+        let globalDirectCount = 0; // User ke kitne directs hain ye save karne ke liye
 
         // UI Elements
         const headerWallet = document.getElementById('headerWallet');
@@ -223,6 +249,7 @@
         const connectWalletBtn = document.getElementById('connectWalletBtn');
         const registerBtn = document.getElementById('registerBtn');
         const copyRefBtn = document.getElementById('copyRefBtn');
+        const directListContainer = document.getElementById('directListContainer');
 
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
@@ -240,6 +267,40 @@
             el.innerText = msg;
             el.className = isError ? "alert alert-error" : "alert alert-success";
             el.style.display = "block";
+        }
+
+        // Network Fetching Logic (Naya Function)
+        async function loadNetwork() {
+            switchView('networkView');
+            directListContainer.innerHTML = '<p style="color: var(--gold); text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching records from blockchain...</p>';
+
+            if (globalDirectCount === 0) {
+                directListContainer.innerHTML = '<p style="color: var(--text-gray); text-align: center; padding: 20px;">No direct members joined yet.</p>';
+                return;
+            }
+
+            try {
+                let htmlContent = '';
+                // Har direct ka address aur ID blockchain se fetch kar rahe hain
+                for(let i = 0; i < globalDirectCount; i++) {
+                    const directWallet = await contract.userDirects(userAddress, i);
+                    const directInfo = await contract.users(directWallet);
+                    
+                    htmlContent += `
+                    <div class="direct-item">
+                        <div class="d-id"><i class="fa-solid fa-user-check"></i> ID: ${directInfo[0].toNumber()}</div>
+                        <div class="d-wallet">${directWallet}</div>
+                        <div class="d-stats">
+                            <span><i class="fa-solid fa-layer-group" style="color: var(--gold);"></i> Slot: ${directInfo[4].toNumber()}</span>
+                            <span><i class="fa-solid fa-users" style="color: #3b82f6;"></i> Team: ${directInfo[3].toNumber()}</span>
+                        </div>
+                    </div>`;
+                }
+                directListContainer.innerHTML = htmlContent;
+            } catch (error) {
+                console.error(error);
+                directListContainer.innerHTML = '<p style="color: #ff4d4d; text-align: center; padding: 20px;">Error loading network data.</p>';
+            }
         }
 
         // Connect Wallet
@@ -268,11 +329,12 @@
                     const userId = userInfo[0].toNumber(); 
 
                     if (userId > 0) {
-                        // VIP User Dashboard
+                        globalDirectCount = userInfo[3].toNumber(); // Directs ka count save kiya
+                        
                         document.getElementById('displayId').innerText = userId;
                         document.getElementById('menuVipId').innerText = userId; 
                         document.getElementById('displaySlot').innerText = userInfo[4].toNumber();
-                        document.getElementById('displayDirects').innerText = userInfo[3].toNumber();
+                        document.getElementById('displayDirects').innerText = globalDirectCount;
                         document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo[5]);
                         
                         const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
@@ -281,7 +343,6 @@
                         menuBtn.style.display = "block"; 
                         switchView('dashboardView');
                     } else {
-                        // New User Registration
                         if (refFromUrl && refFromUrl.length === 42) {
                             document.getElementById('uplineInput').value = refFromUrl;
                             document.getElementById('uplineInput').readOnly = true; 
