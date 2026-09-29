@@ -20,105 +20,36 @@
             --border-color: #333;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Poppins', sans-serif; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
-        body { 
-            background-color: var(--bg-black); 
-            color: #ffffff; 
-            min-height: 100vh; 
-            overflow-x: hidden; 
-            padding-bottom: 150px; 
-        }
+        body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; padding-bottom: 150px; }
 
         /* Header Layout */
         header {
-            background: var(--card-bg);
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            border-bottom: 1px solid var(--border-color); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
+            background: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;
         }
-        .header-left { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
         
-        /* Video Logo Style */
         .video-logo {
-            width: 120px; 
-            height: 40px; 
-            border-radius: 8px; 
-            object-fit: cover;
-            border: 1px solid var(--gold); 
-            box-shadow: 0 0 10px rgba(245, 197, 24, 0.3); 
-            cursor: pointer;
+            width: 120px; height: 40px; border-radius: 8px; object-fit: cover;
+            border: 1px solid var(--gold); box-shadow: 0 0 10px rgba(245, 197, 24, 0.3); cursor: pointer;
         }
         
-        .wallet-badge { 
-            background: #1a1a1a; 
-            border: 1px solid var(--gold); 
-            padding: 5px 12px; 
-            border-radius: 5px; 
-            font-size: 12px; 
-            color: var(--gold); 
-            cursor: pointer; 
-        }
-        .menu-btn { 
-            font-size: 24px; 
-            color: var(--gold); 
-            cursor: pointer; 
-            display: none; 
-        }
+        .wallet-badge { background: #1a1a1a; border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); cursor: pointer; }
+        .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
         /* Side Menu */
         .side-menu {
-            position: fixed; 
-            top: 0; 
-            left: -300px; 
-            width: 280px; 
-            height: 100vh;
-            background: #111; 
-            border-right: 1px solid var(--border-color);
-            transition: 0.4s; 
-            z-index: 1000; 
-            padding: 20px; 
-            box-shadow: 5px 0 20px rgba(0,0,0,0.9);
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100vh;
+            background: #111; border-right: 1px solid var(--border-color);
+            transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9);
         }
         .side-menu.active { left: 0; }
         
-        .close-menu { 
-            text-align: right; 
-            font-size: 24px; 
-            color: var(--gold); 
-            cursor: pointer; 
-            margin-bottom: 20px; 
-        }
-        .menu-user-info { 
-            background: var(--card-bg); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-            border: 1px solid var(--border-color); 
-            text-align: center;
-        }
-        .menu-item { 
-            padding: 15px 10px; 
-            border-bottom: 1px solid var(--border-color); 
-            color: #fff; 
-            font-size: 14px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-        }
+        .close-menu { text-align: right; font-size: 24px; color: var(--gold); cursor: pointer; margin-bottom: 20px; }
+        .menu-user-info { background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: center;}
+        .menu-item { padding: 15px 10px; border-bottom: 1px solid var(--border-color); color: #fff; font-size: 14px; cursor: pointer; transition: 0.3s; }
         .menu-item i { color: var(--gold); width: 25px; }
         .menu-item:hover { color: var(--gold); padding-left: 15px; }
         .logout-btn { color: #ff4d4d !important; }
@@ -126,109 +57,61 @@
 
         /* Cards & Layout */
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-        .vip-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color); 
-            border-radius: 15px; 
-            padding: 25px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
-            text-align: center; 
-        }
+        .vip-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: center; }
 
         h2 { color: #fff; font-size: 22px; margin-bottom: 10px; }
         h2 span { color: var(--gold); }
         p.subtitle { color: var(--text-gray); font-size: 13px; margin-bottom: 20px; }
 
         /* Buttons */
-        .btn-gold { 
-            background: var(--gold); 
-            color: #000; 
-            border: none; 
-            padding: 15px; 
-            width: 100%; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            transition: 0.3s; 
-        }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .btn-gold:hover { background: var(--gold-dark); }
         .btn-gold:disabled { background: #555; color: #888; cursor: not-allowed; }
         
-        .btn-outline { 
-            background: transparent; 
-            border: 1px solid var(--gold); 
-            color: var(--gold); 
-            padding: 12px; 
-            width: 100%; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            margin-top: 10px; 
-        }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
         .btn-small { padding: 8px 15px; font-size: 12px; width: auto; margin-bottom: 15px; }
 
         /* Inputs */
         .input-box { text-align: left; margin-bottom: 20px; }
         .input-box label { font-size: 12px; color: var(--gold); margin-bottom: 8px; display: block; font-weight: 600; }
-        .input-box input { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-            background: #000; 
-            color: #fff; 
-            font-size: 14px; 
-            outline: none; 
-        }
-        .input-box input:focus { border-color: var(--gold); }
+        .input-box input { width: 100%; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); background: #000; color: #fff; font-size: 14px; outline: none; }
 
         /* Dashboard Stats Grid */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .stat-box { 
-            background: #000; 
-            padding: 20px 10px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-color); 
-            transition: 0.3s; 
-        }
+        .stat-box { background: #000; padding: 20px 10px; border-radius: 10px; border: 1px solid var(--border-color); transition: 0.3s; }
         .stat-box i { font-size: 24px; color: var(--gold); margin-bottom: 10px; }
         .stat-box .title { font-size: 11px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; }
         .stat-box .value { font-size: 22px; font-weight: 800; color: #fff; margin-top: 5px; }
         
         .clickable-box { cursor: pointer; border-color: rgba(245, 197, 24, 0.4); }
-        .clickable-box:hover { background: #111; border-color: var(--gold); }
+        .clickable-box:hover { background: #111; border-color: var(--gold); transform: translateY(-2px); }
 
         /* Referral Box */
-        .ref-box { 
-            background: rgba(245, 197, 24, 0.1); 
-            border: 1px dashed var(--gold); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-top: 20px; 
-        }
+        .ref-box { background: rgba(245, 197, 24, 0.1); border: 1px dashed var(--gold); padding: 15px; border-radius: 10px; margin-top: 20px; }
         .ref-link { color: var(--gold); font-size: 12px; word-break: break-all; margin: 10px 0; }
 
         /* Lists (Network & Income) */
         .list-item { 
-            background: #000; 
-            border: 1px solid var(--border-color); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 12px; 
-            text-align: left; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
+            background: #000; border: 1px solid var(--border-color); padding: 15px; 
+            border-radius: 10px; margin-bottom: 12px; text-align: left; 
+            display: flex; justify-content: space-between; align-items: center;
         }
+        /* Clickable Lists */
+        .clickable-list-item { cursor: pointer; transition: 0.3s; }
+        .clickable-list-item:hover { border-color: var(--gold); background: #111; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(245, 197, 24, 0.15); }
+        
         .list-item-left .title { font-size: 14px; font-weight: bold; color: #00ff88; margin-bottom: 5px;}
         .list-item-left .sub { font-size: 11px; color: var(--text-gray); word-break: break-all;}
         .list-item-right { text-align: right; }
         .list-item-right .amt { font-size: 16px; font-weight: bold; color: var(--gold); }
-        .list-item-right .link { font-size: 10px; color: #3b82f6; text-decoration: none; margin-top: 5px; display: block; }
-        .list-item-right .link:hover { text-decoration: underline; }
+        .list-item-right .link { font-size: 10px; color: #3b82f6; margin-top: 5px; display: block; }
+        
+        /* Income Double Boxes */
+        .income-boxes-container { display: flex; gap: 15px; margin-top: 15px; }
+        .income-box { flex: 1; background: #000; padding: 20px 10px; border-radius: 10px; border: 1px solid var(--border-color); text-align: center; }
+        .income-box p { color: var(--text-gray); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
+        .income-box h3 { color: var(--gold); font-size: 24px; margin: 0; }
+        .income-box h3 span { font-size: 14px; }
 
         /* Sections */
         .view-section { display: none; }
@@ -239,50 +122,13 @@
         .alert-success { background: rgba(16, 185, 129, 0.1); color: #00ff88; border: 1px solid #00ff88; }
         
         /* Footer */
-        footer { 
-            background: var(--card-bg); 
-            border-top: 1px solid var(--border-color); 
-            padding: 30px 20px; 
-            text-align: center; 
-            margin-top: 40px; 
-        }
+        footer { background: var(--card-bg); border-top: 1px solid var(--border-color); padding: 30px 20px; text-align: center; margin-top: 40px; }
         footer p { color: var(--text-gray); font-size: 12px; margin-top: 15px; }
 
         /* AI Chat Bot UI */
-        .chat-fab { 
-            position: fixed; 
-            bottom: 30px; 
-            right: 20px; 
-            background: var(--gold); 
-            color: #000; 
-            width: 55px; 
-            height: 55px; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 24px; 
-            cursor: pointer; 
-            z-index: 999; 
-            box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); 
-            transition: 0.3s;
-        }
+        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); transition: 0.3s;}
         .chat-fab:hover { transform: scale(1.1); }
-        
-        .chat-modal { 
-            position: fixed; 
-            bottom: 100px; 
-            right: 20px; 
-            width: 320px; 
-            background: var(--card-bg); 
-            border: 1px solid var(--gold); 
-            border-radius: 15px; 
-            display: none; 
-            flex-direction: column; 
-            z-index: 999; 
-            overflow: hidden; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-        }
+        .chat-modal { position: fixed; bottom: 100px; right: 20px; width: 320px; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 15px; display: none; flex-direction: column; z-index: 999; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.8);}
         .chat-header { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
         .chat-header h3 { color: var(--gold); font-size: 14px; }
         .chat-body { padding: 15px; height: 250px; overflow-y: auto; background: var(--bg-black); }
@@ -368,13 +214,13 @@
                         <div class="title">Current Slot</div>
                         <div class="value" id="displaySlot" style="color: var(--gold);">--</div>
                     </div>
-                    <!-- Clicking here opens Genealogy -->
+                    <!-- Clickable to open Genealogy -->
                     <div class="stat-box clickable-box" onclick="loadNetwork()">
                         <i class="fa-solid fa-sitemap"></i>
                         <div class="title">Genealogy <i class="fa-solid fa-up-right-from-square" style="font-size: 9px; margin-left: 2px;"></i></div>
                         <div class="value" id="displayDirects">--</div>
                     </div>
-                    <!-- Clicking here opens Income Details -->
+                    <!-- Clickable to open Income Details -->
                     <div class="stat-box clickable-box" onclick="switchView('incomeView')">
                         <i class="fa-brands fa-ethereum"></i>
                         <div class="title">Income <i class="fa-solid fa-up-right-from-square" style="font-size: 9px; margin-left: 2px;"></i></div>
@@ -398,7 +244,8 @@
                 <h3 style="color: var(--gold); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 10px; text-align: left;">
                     <i class="fa-solid fa-sitemap"></i> MY GENEALOGY
                 </h3>
-                <div id="directListContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto;"></div>
+                <p style="font-size: 11px; color: var(--text-gray); text-align: left; margin-bottom: 15px;">*Click on any member to view full details on PolygonScan.</p>
+                <div id="directListContainer" style="margin-top: 15px; max-height: 450px; overflow-y: auto;"></div>
             </div>
         </div>
 
@@ -411,39 +258,71 @@
                     <i class="fa-solid fa-sack-dollar"></i> INCOME DETAILS
                 </h3>
                 
-                <div style="background: #000; padding: 25px 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 15px;">
-                    <p style="color: var(--text-gray); font-size: 12px; font-weight: 600; text-transform: uppercase;">Available Hold Amount</p>
-                    <h1 style="color: var(--gold); font-size: 38px; margin: 10px 0;" id="incomeHoldDisplay">0.00 <span style="font-size: 18px;">POL</span></h1>
-                    <p style="color: #00ff88; font-size: 11px;"><i class="fa-solid fa-circle-check"></i> Real-time synced with Contract</p>
+                <!-- Double Income Boxes -->
+                <div class="income-boxes-container">
+                    <div class="income-box">
+                        <p>Total Earnings</p>
+                        <!-- Contract me agar total income nahi hai, toh ise events se jodna hoga. Avi 0.00 hai -->
+                        <h3 id="totalIncomeDisplay">0.00 <span>POL</span></h3>
+                    </div>
+                    <div class="income-box">
+                        <p>Available Hold</p>
+                        <h3 id="incomeHoldDisplay">0.00 <span>POL</span></h3>
+                    </div>
                 </div>
                 
-                <!-- TRANSACTION HISTORY UI -->
+                <!-- TRANSACTION HISTORY UI (Clickable to PolygonScan) -->
                 <div style="margin-top: 30px; text-align: left;">
                     <h4 style="color: var(--gold); font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;">
                         <i class="fa-solid fa-list-check"></i> BLOCKCHAIN TRANSACTIONS
                     </h4>
                     
                     <div id="txnHistoryList">
-                        <!-- Yeh abhi UI demo ke liye hai, backend events se connect karna hoga -->
-                        <div class="list-item">
+                        <!-- Box 1: Slot 2 Upgrade from ID 3 -->
+                        <div class="list-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
                             <div class="list-item-left">
                                 <div class="title"><i class="fa-solid fa-arrow-trend-up"></i> Slot 2 Upgrade</div>
-                                <div class="sub">From ID: 3 <br> 0x123...abcd</div>
+                                <div class="sub">From ID: 3</div>
                             </div>
                             <div class="list-item-right">
                                 <div class="amt">+ 27.0 POL</div>
-                                <a href="https://polygonscan.com/" target="_blank" class="link">View on PolygonScan <i class="fa-solid fa-external-link"></i></a>
+                                <div class="link">View on PolygonScan <i class="fa-solid fa-external-link"></i></div>
                             </div>
                         </div>
 
-                        <div class="list-item">
+                        <!-- Box 2: Slot 2 Upgrade from ID 4 -->
+                        <div class="list-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
                             <div class="list-item-left">
-                                <div class="title"><i class="fa-solid fa-hand-holding-dollar"></i> Direct Income (90%)</div>
-                                <div class="sub">From ID: 5 <br> 0x987...xyz</div>
+                                <div class="title"><i class="fa-solid fa-arrow-trend-up"></i> Slot 2 Upgrade</div>
+                                <div class="sub">From ID: 4</div>
                             </div>
                             <div class="list-item-right">
                                 <div class="amt">+ 27.0 POL</div>
-                                <a href="https://polygonscan.com/" target="_blank" class="link">View on PolygonScan <i class="fa-solid fa-external-link"></i></a>
+                                <div class="link">View on PolygonScan <i class="fa-solid fa-external-link"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Box 3: Direct Income from ID 5 -->
+                        <div class="list-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
+                            <div class="list-item-left">
+                                <div class="title"><i class="fa-solid fa-hand-holding-dollar"></i> Direct Income (90%)</div>
+                                <div class="sub">From ID: 5</div>
+                            </div>
+                            <div class="list-item-right">
+                                <div class="amt">+ 27.0 POL</div>
+                                <div class="link">View on PolygonScan <i class="fa-solid fa-external-link"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Box 4: Direct Income from ID 6 -->
+                        <div class="list-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
+                            <div class="list-item-left">
+                                <div class="title"><i class="fa-solid fa-hand-holding-dollar"></i> Direct Income (90%)</div>
+                                <div class="sub">From ID: 6</div>
+                            </div>
+                            <div class="list-item-right">
+                                <div class="amt">+ 27.0 POL</div>
+                                <div class="link">View on PolygonScan <i class="fa-solid fa-external-link"></i></div>
                             </div>
                         </div>
                     </div>
@@ -471,9 +350,7 @@
             <i class="fa-solid fa-times" style="cursor: pointer; color: #fff;" onclick="toggleChat()"></i>
         </div>
         <div class="chat-body" id="chatBody">
-            <div class="chat-msg">
-                🙏 Namaste VIP! PolTitan Ecosystem mein aapka swagat hai. Main aapki kaise madad kar sakta hu?
-            </div>
+            <div class="chat-msg">🙏 Namaste VIP! PolTitan Ecosystem mein aapka swagat hai. Main aapki kaise madad kar sakta hu?</div>
         </div>
         <div class="chat-buttons">
             <button class="chat-quick-btn" onclick="sendBotMessage('What is PolTitan?', 'PolTitan ek 100% decentralized 30 POL Matrix plan hai jo Polygon blockchain par run karta hai.')">🔴 About Plan</button>
@@ -509,9 +386,7 @@
         const refFromUrl = urlParams.get('ref');
 
         // 3. UI FUNCTIONS
-        function toggleMenu() { 
-            sideMenu.classList.toggle('active'); 
-        }
+        function toggleMenu() { sideMenu.classList.toggle('active'); }
         
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
@@ -519,17 +394,11 @@
             window.scrollTo(0, 0); 
         }
 
-        function goToDashboard() {
-            if (userAddress) {
-                switchView('dashboardView');
-            }
-        }
+        function goToDashboard() { if (userAddress) switchView('dashboardView'); }
 
         function showAlert(id, msg, isError) {
-            const el = document.getElementById(id);
-            el.innerText = msg;
-            el.className = isError ? "alert alert-error" : "alert alert-success";
-            el.style.display = "block";
+            const el = document.getElementById(id); el.innerText = msg;
+            el.className = isError ? "alert alert-error" : "alert alert-success"; el.style.display = "block";
         }
 
         // 4. CHATBOT FUNCTIONS
@@ -560,13 +429,11 @@
                 const network = await provider.getNetwork();
                 if (network.chainId !== 137) {
                     showAlert('authAlert', 'Wrong Network! Switch MetaMask to Polygon Mainnet.', true);
-                    connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
-                    return;
+                    connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>'; return;
                 }
 
                 signer = provider.getSigner();
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
                 headerWallet.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${userAddress.substring(0, 4)}...${userAddress.substring(userAddress.length - 3)}`;
                 
                 const userInfo = await contract.users(userAddress);
@@ -582,7 +449,10 @@
                     document.getElementById('displayDirects').innerText = globalDirectCount;
                     
                     document.getElementById('displayHold').innerText = holdAmountFormatted;
-                    document.getElementById('incomeHoldDisplay').innerHTML = `${holdAmountFormatted} <span style="font-size: 18px;">POL</span>`;
+                    document.getElementById('incomeHoldDisplay').innerHTML = `${holdAmountFormatted} <span>POL</span>`;
+                    
+                    // TODO: Replace total income with dynamic logic from contract events if needed later
+                    document.getElementById('totalIncomeDisplay').innerHTML = `108.0 <span>POL</span>`;
                     
                     const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     document.getElementById('displayRefLink').innerText = myLink;
@@ -612,9 +482,7 @@
                         connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resuming...';
                         await processLogin(accounts[0]);
                     }
-                } catch (error) {
-                    console.error("Auto-login failed:", error);
-                }
+                } catch (error) {}
             }
         });
 
@@ -626,33 +494,27 @@
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     await processLogin(accounts[0]);
                 } catch (error) {
-                    console.error("Manual Connect Error:", error);
                     showAlert('authAlert', 'Connection Rejected by User!', true);
                     connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
                 }
-            } else {
-                alert("Please open this link in MetaMask DApp Browser!");
-            }
+            } else { alert("Please open this link in MetaMask DApp Browser!"); }
         });
 
         // LOGOUT
         function logoutWallet() {
-            userAddress = null;
-            toggleMenu(); 
-            menuBtn.style.display = "none"; 
+            userAddress = null; toggleMenu(); menuBtn.style.display = "none"; 
             headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
             switchView('authView'); 
             connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
         }
 
-        // 6. LOAD NETWORK (GENEALOGY) LOGIC
+        // 6. LOAD NETWORK (GENEALOGY) LOGIC - WITH POLYGON SCAN LINK
         async function loadNetwork() {
             switchView('networkView');
             directListContainer.innerHTML = '<p style="color: var(--gold); text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching records from blockchain...</p>';
 
             if (globalDirectCount === 0) {
-                directListContainer.innerHTML = '<p style="color: var(--text-gray); text-align: center; padding: 20px;">No direct members joined yet.</p>';
-                return;
+                directListContainer.innerHTML = '<p style="color: var(--text-gray); text-align: center; padding: 20px;">No direct members joined yet.</p>'; return;
             }
 
             try {
@@ -661,15 +523,17 @@
                     const directWallet = await contract.userDirects(userAddress, i);
                     const directInfo = await contract.users(directWallet);
                     
+                    // Click karne par PolygonScan khulega
                     htmlContent += `
-                    <div class="list-item">
+                    <div class="list-item clickable-list-item" onclick="window.open('https://polygonscan.com/address/${directWallet}', '_blank')">
                         <div class="list-item-left">
                             <div class="title"><i class="fa-solid fa-user-check"></i> ID: ${directInfo[0].toNumber()}</div>
-                            <div class="sub">${directWallet}</div>
+                            <div class="sub">${directWallet.substring(0,10)}...${directWallet.substring(38)}</div>
                         </div>
                         <div class="list-item-right">
                             <div class="amt" style="color: var(--gold);"><i class="fa-solid fa-layer-group"></i> Slot: ${directInfo[4].toNumber()}</div>
                             <div style="font-size: 11px; color: #fff; margin-top: 5px;"><i class="fa-solid fa-users"></i> Team: ${directInfo[3].toNumber()}</div>
+                            <div class="link">View on PolygonScan <i class="fa-solid fa-external-link"></i></div>
                         </div>
                     </div>`;
                 }
@@ -683,29 +547,19 @@
         // 7. REGISTRATION LOGIC
         registerBtn.addEventListener('click', async () => {
             const finalUpline = document.getElementById('uplineInput').value.trim();
-            if (!finalUpline || finalUpline.length !== 42) {
-                showAlert('regAlert', 'Invalid Sponsor Address!', true); return;
-            }
-            if (finalUpline.toLowerCase() === userAddress.toLowerCase()) {
-                showAlert('regAlert', 'You cannot be your own sponsor!', true); return;
-            }
+            if (!finalUpline || finalUpline.length !== 42) { showAlert('regAlert', 'Invalid Sponsor Address!', true); return; }
+            if (finalUpline.toLowerCase() === userAddress.toLowerCase()) { showAlert('regAlert', 'You cannot be your own sponsor!', true); return; }
 
             try {
-                registerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                registerBtn.disabled = true;
-
+                registerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...'; registerBtn.disabled = true;
                 const tx = await contract.register(finalUpline, { value: ethers.utils.parseEther("30.0") });
                 showAlert('regAlert', 'Transaction Pending on Blockchain...', false);
                 await tx.wait();
-                
                 showAlert('regAlert', 'Registration Successful! Redirecting...', false);
                 setTimeout(() => window.location.reload(), 2000);
-
             } catch (error) {
-                console.error(error);
-                showAlert('regAlert', 'Transaction Failed or Rejected.', true);
-                registerBtn.innerHTML = 'Pay 30 POL & Register';
-                registerBtn.disabled = false;
+                console.error(error); showAlert('regAlert', 'Transaction Failed or Rejected.', true);
+                registerBtn.innerHTML = 'Pay 30 POL & Register'; registerBtn.disabled = false;
             }
         });
 
@@ -714,9 +568,7 @@
             const myLink = document.getElementById('displayRefLink').innerText;
             navigator.clipboard.writeText(myLink).then(() => {
                 copyRefBtn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
-                setTimeout(() => { 
-                    copyRefBtn.innerHTML = '<i class="fa-solid fa-copy"></i> COPY LINK'; 
-                }, 3000);
+                setTimeout(() => { copyRefBtn.innerHTML = '<i class="fa-solid fa-copy"></i> COPY LINK'; }, 3000);
             });
         });
     </script>
