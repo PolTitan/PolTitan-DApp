@@ -71,6 +71,11 @@
         
         .join-date-box { background: #000; border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
 
+        /* Real Wallet Balance Box (New) */
+        .wallet-bal-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed #3b82f6; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center; }
+        .wallet-bal-box .title { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+        .wallet-bal-box .val { font-size: 20px; font-weight: bold; color: #3b82f6; margin-top: 5px; }
+
         /* Referral Box */
         .ref-box { background: rgba(245, 197, 24, 0.1); border: 1px dashed var(--gold); padding: 15px; border-radius: 10px; margin-top: 20px; }
         .ref-link { color: var(--gold); font-size: 12px; word-break: break-all; margin: 10px 0; }
@@ -132,7 +137,8 @@
         .chat-msg { background: rgba(245, 197, 24, 0.1); padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 10px; color: #fff;}
         .chat-user-msg { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); text-align: right; color: #fff; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 10px;}
         .chat-buttons { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: #111; border-top: 1px solid var(--border-color); }
-        .chat-quick-btn { background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 8px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; }
+        .chat-quick-btn { background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 8px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: 0.3s; }
+        .chat-quick-btn:hover { background: var(--gold); color: #000; }
     </style>
 </head>
 <body>
@@ -219,6 +225,12 @@
             <div class="join-date-box">
                 <div style="font-size: 12px; color: var(--text-gray);"><i class="fa-regular fa-calendar-check"></i> Joining Date</div>
                 <div style="font-size: 13px; font-weight: bold; color: #00ff88;">Syncing with Block...</div>
+            </div>
+
+            <!-- NAYA: Asli (Real-time) Wallet Balance Box -->
+            <div class="wallet-bal-box">
+                <div class="title"><i class="fa-solid fa-wallet"></i> My Current Wallet Balance</div>
+                <div class="val" id="displayRealWalletBalance">0.00 POL</div>
             </div>
 
             <div class="vip-card" style="margin-top: 20px;">
@@ -496,6 +508,20 @@
             }, 1000);
         }
 
+        // NAYA: REAL WALLET BALANCE FETCH FUNCTION
+        async function fetchRealWalletBalance(walletAddress) {
+            try {
+                // ethers.js ka direct function jo MetaMask se current balance check karta hai
+                const balanceWei = await provider.getBalance(walletAddress);
+                const balanceEth = ethers.utils.formatEther(balanceWei);
+                // Sirf 2 decimal tak (jaise 30.55 POL) dikhayega
+                document.getElementById('displayRealWalletBalance').innerText = parseFloat(balanceEth).toFixed(4) + " POL";
+            } catch (error) {
+                console.error("Error fetching real balance:", error);
+                document.getElementById('displayRealWalletBalance').innerText = "Error";
+            }
+        }
+
         // LOGIN
         async function processLogin(account) {
             try {
@@ -512,10 +538,14 @@
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 headerWallet.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${userAddress.substring(0, 4)}...${userAddress.substring(userAddress.length - 3)}`;
                 
+                // Fetch user data from contract
                 const userInfo = await contract.users(userAddress);
                 const userId = userInfo[0].toNumber(); 
 
                 if (userId > 0) {
+                    // YAHAN HUM REAL BALANCE FETCH CALL KAR RAHE HAIN
+                    fetchRealWalletBalance(userAddress);
+
                     userCurrentSlot = userInfo[4].toNumber();
                     globalDirectCount = userInfo[3].toNumber(); 
                     myUplineAddress = userInfo[2];
