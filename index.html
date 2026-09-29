@@ -40,9 +40,10 @@
             object-fit: cover;
             border: 1px solid var(--gold);
             box-shadow: 0 0 10px rgba(245, 197, 24, 0.3);
+            cursor: pointer;
         }
         
-        .wallet-badge { background: #1a1a1a; border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); }
+        .wallet-badge { background: #1a1a1a; border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); cursor: pointer; }
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
         /* Side Menu */
@@ -123,11 +124,8 @@
 
         /* Footer */
         footer {
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            padding: 30px 20px;
-            text-align: center;
-            margin-top: 40px;
+            background: var(--card-bg); border-top: 1px solid var(--border-color);
+            padding: 30px 20px; text-align: center; margin-top: 40px;
         }
         footer p { color: var(--text-gray); font-size: 12px; margin-top: 15px; }
 
@@ -176,18 +174,18 @@
 </head>
 <body>
 
-    <header>
+    <!-- HEADER: Ab video logo click karne par bina refresh hue Dashboard khulega -->
+    <header onclick="goToDashboard()">
         <div class="header-left">
-            <i class="fa-solid fa-bars menu-btn" id="menuBtn" onclick="toggleMenu()"></i>
-            <!-- Video Logo Upload karein Github me aur yaha file ka naam change kare agar alag ho -->
+            <i class="fa-solid fa-bars menu-btn" id="menuBtn" onclick="toggleMenu(); event.stopPropagation();"></i>
             <video class="video-logo" autoplay loop muted playsinline>
                 <source src="poltitan-logo.mp4" type="video/mp4">
-                PolTitan
             </video>
         </div>
-        <div class="wallet-badge" id="headerWallet"><i class="fa-solid fa-wallet"></i> Connect</div>
+        <div class="wallet-badge" id="headerWallet" onclick="event.stopPropagation();"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
 
+    <!-- SIDE MENU -->
     <div class="side-menu" id="sideMenu">
         <div class="close-menu" onclick="toggleMenu()"><i class="fa-solid fa-times"></i></div>
         <div class="menu-user-info">
@@ -195,10 +193,16 @@
             <div style="font-size: 12px; color: var(--text-gray);">VIP MEMBER ID</div>
             <div style="font-size: 18px; font-weight: 800; color: #fff;" id="menuVipId">--</div>
         </div>
+        
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-chart-line"></i> VIP Dashboard</div>
-        <div class="menu-item" onclick="loadNetwork(); toggleMenu();"><i class="fa-solid fa-users-viewfinder"></i> My Network</div>
+        
+        <!-- Live Genealogy (Network) Menu -->
+        <div class="menu-item" onclick="loadNetwork(); toggleMenu();"><i class="fa-solid fa-sitemap"></i> Genealogy (Network)</div>
+        
+        <!-- Live Income Details Menu -->
+        <div class="menu-item" onclick="switchView('incomeView'); toggleMenu();"><i class="fa-solid fa-sack-dollar"></i> Income Details</div>
+        
         <div class="menu-item" onclick="alert('Slots Matrix Page Coming Soon!');"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        <div class="menu-item" onclick="alert('Wallet & Income Page Coming Soon!');"><i class="fa-solid fa-sack-dollar"></i> POL Wallet</div>
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Logout Securely</div>
     </div>
 
@@ -248,14 +252,16 @@
                         <div class="title">Current Slot</div>
                         <div class="value" id="displaySlot" style="color: var(--gold);">--</div>
                     </div>
+                    <!-- Clicking here also opens Genealogy -->
                     <div class="stat-box clickable-box" onclick="loadNetwork()">
-                        <i class="fa-solid fa-users"></i>
-                        <div class="title">Direct Team <i class="fa-solid fa-up-right-from-square" style="font-size: 9px; margin-left: 2px;"></i></div>
+                        <i class="fa-solid fa-sitemap"></i>
+                        <div class="title">Genealogy <i class="fa-solid fa-up-right-from-square" style="font-size: 9px; margin-left: 2px;"></i></div>
                         <div class="value" id="displayDirects">--</div>
                     </div>
-                    <div class="stat-box">
+                    <!-- Clicking here opens Income Details -->
+                    <div class="stat-box clickable-box" onclick="switchView('incomeView')">
                         <i class="fa-brands fa-ethereum"></i>
-                        <div class="title">Hold (POL)</div>
+                        <div class="title">Income <i class="fa-solid fa-up-right-from-square" style="font-size: 9px; margin-left: 2px;"></i></div>
                         <div class="value" id="displayHold" style="color: var(--gold);">0.0</div>
                     </div>
                 </div>
@@ -269,21 +275,42 @@
             </div>
         </div>
 
-        <!-- 4. NETWORK VIEW -->
+        <!-- 4. GENEALOGY (NETWORK) VIEW -->
         <div id="networkView" class="view-section">
             <div class="vip-card">
                 <button class="btn-outline btn-small" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
                 <h3 style="color: var(--gold); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 10px; text-align: left;">
-                    <i class="fa-solid fa-users-viewfinder"></i> MY DIRECT TEAM
+                    <i class="fa-solid fa-sitemap"></i> MY GENEALOGY
                 </h3>
                 <div id="directListContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- 5. NEW: INCOME DETAILS VIEW -->
+        <div id="incomeView" class="view-section">
+            <div class="vip-card">
+                <button class="btn-outline btn-small" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
+                
+                <h3 style="color: var(--gold); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 10px; text-align: left;">
+                    <i class="fa-solid fa-sack-dollar"></i> INCOME DETAILS
+                </h3>
+                
+                <div style="background: #000; padding: 25px 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 15px;">
+                    <p style="color: var(--text-gray); font-size: 12px; font-weight: 600; text-transform: uppercase;">Available Hold Amount</p>
+                    <h1 style="color: var(--gold); font-size: 38px; margin: 10px 0;" id="incomeHoldDisplay">0.00 <span style="font-size: 18px;">POL</span></h1>
+                    <p style="color: #00ff88; font-size: 11px;"><i class="fa-solid fa-circle-check"></i> Real-time synced with Contract</p>
+                </div>
+                
+                <p style="color: var(--text-gray); font-size: 12px; margin-top: 20px;">
+                    *Hold amount is automatically managed by the smart contract for slot upgrades and matrix placement.
+                </p>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
     <footer>
-        <video class="video-logo" style="width: 150px; height: 50px;" autoplay loop muted playsinline>
+        <video class="video-logo" style="width: 150px; height: 50px; cursor: pointer;" autoplay loop muted playsinline onclick="goToDashboard()">
             <source src="poltitan-logo.mp4" type="video/mp4">
         </video>
         <p>© 2026 PolTitan Global Matrix. All Rights Reserved.</p>
@@ -334,11 +361,20 @@
         const urlParams = new URLSearchParams(window.location.search);
         const refFromUrl = urlParams.get('ref');
 
+        // Functions
         function toggleMenu() { sideMenu.classList.toggle('active'); }
         
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
+            window.scrollTo(0, 0); // View change hone par screen upar aa jayegi
+        }
+
+        // Header logo pe click karne par bina refresh ke Dashboard kholna
+        function goToDashboard() {
+            if (userAddress) {
+                switchView('dashboardView');
+            }
         }
 
         function showAlert(id, msg, isError) {
@@ -356,17 +392,10 @@
 
         function sendBotMessage(userQuestion, botAnswer) {
             const chatBody = document.getElementById('chatBody');
-            
-            // User Message
             chatBody.innerHTML += `<div class="chat-user-msg">${userQuestion}</div>`;
-            
-            // Bot Loading
             const loadingId = 'loading-' + Date.now();
             chatBody.innerHTML += `<div class="chat-msg" id="${loadingId}"><i class="fa-solid fa-ellipsis fa-bounce"></i> Typing...</div>`;
-            
             chatBody.scrollTop = chatBody.scrollHeight;
-
-            // Bot Answer after 1 second
             setTimeout(() => {
                 document.getElementById(loadingId).remove();
                 chatBody.innerHTML += `<div class="chat-msg"><i class="fa-solid fa-robot" style="color: var(--gold);"></i> ${botAnswer}</div>`;
@@ -397,12 +426,16 @@
 
                 if (userId > 0) {
                     globalDirectCount = userInfo[3].toNumber(); 
+                    const holdAmountFormatted = ethers.utils.formatEther(userInfo[5]);
                     
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('menuVipId').innerText = userId; 
                     document.getElementById('displaySlot').innerText = userInfo[4].toNumber();
                     document.getElementById('displayDirects').innerText = globalDirectCount;
-                    document.getElementById('displayHold').innerText = ethers.utils.formatEther(userInfo[5]);
+                    
+                    // Dono jagah Income/Hold update karna
+                    document.getElementById('displayHold').innerText = holdAmountFormatted;
+                    document.getElementById('incomeHoldDisplay').innerHTML = `${holdAmountFormatted} <span style="font-size: 18px;">POL</span>`;
                     
                     const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     document.getElementById('displayRefLink').innerText = myLink;
