@@ -22,17 +22,25 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
-        body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; }
+        body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; padding-bottom: 150px; }
 
         /* Header Layout */
         header {
             background: var(--card-bg);
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
-        .logo { font-size: 20px; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
-        .logo span { color: #fff; }
+        
+        /* Video Logo Style */
+        .video-logo {
+            width: 120px; 
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 10px rgba(245, 197, 24, 0.3);
+        }
         
         .wallet-badge { background: #1a1a1a; border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); }
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
@@ -100,7 +108,6 @@
         .stat-box i { font-size: 24px; color: var(--gold); margin-bottom: 10px; }
         .stat-box .title { font-size: 11px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; }
         .stat-box .value { font-size: 22px; font-weight: 800; color: #fff; margin-top: 5px; }
-        
         .clickable-box { cursor: pointer; border-color: rgba(245, 197, 24, 0.4); }
         .clickable-box:hover { background: #111; border-color: var(--gold); }
 
@@ -114,9 +121,53 @@
         .direct-item .d-wallet { font-size: 11px; color: var(--text-gray); word-break: break-all; margin-bottom: 8px;}
         .direct-item .d-stats { font-size: 12px; color: #fff; display: flex; justify-content: space-between;}
 
+        /* Footer */
+        footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        footer p { color: var(--text-gray); font-size: 12px; margin-top: 15px; }
+
+        /* AI CHATBOT UI */
+        .chat-fab {
+            position: fixed; bottom: 30px; right: 20px;
+            background: var(--gold); color: #000;
+            width: 55px; height: 55px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; cursor: pointer; z-index: 999;
+            box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); transition: 0.3s;
+        }
+        .chat-fab:hover { transform: scale(1.1); }
+
+        .chat-modal {
+            position: fixed; bottom: 100px; right: 20px;
+            width: 320px; background: var(--card-bg);
+            border: 1px solid var(--gold); border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            display: none; flex-direction: column; z-index: 999;
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #111; padding: 15px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--border-color);
+        }
+        .chat-header h3 { color: var(--gold); font-size: 14px; }
+        .chat-body { padding: 15px; height: 250px; overflow-y: auto; background: var(--bg-black); }
+        .chat-msg { background: rgba(245, 197, 24, 0.1); border: 1px solid rgba(245, 197, 24, 0.3); padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 10px; color: #fff;}
+        .chat-user-msg { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); text-align: right; color: #fff; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 10px;}
+        .chat-buttons { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: #111; border-top: 1px solid var(--border-color); }
+        .chat-quick-btn {
+            background: #222; border: 1px solid var(--gold); color: var(--gold);
+            padding: 8px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: 0.3s;
+        }
+        .chat-quick-btn:hover { background: var(--gold); color: #000; }
+
         /* Sections */
         .view-section { display: none; }
-        #authView { display: block; margin-top: 15vh; }
+        #authView { display: block; margin-top: 10vh; }
         
         .alert { padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-top: 15px; display: none; }
         .alert-error { background: rgba(239, 68, 68, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; }
@@ -128,7 +179,11 @@
     <header>
         <div class="header-left">
             <i class="fa-solid fa-bars menu-btn" id="menuBtn" onclick="toggleMenu()"></i>
-            <div class="logo"><i class="fa-solid fa-crown"></i> Pol<span>Titan</span></div>
+            <!-- Video Logo Upload karein Github me aur yaha file ka naam change kare agar alag ho -->
+            <video class="video-logo" autoplay loop muted playsinline>
+                <source src="poltitan-logo.mp4" type="video/mp4">
+                PolTitan
+            </video>
         </div>
         <div class="wallet-badge" id="headerWallet"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
@@ -224,8 +279,38 @@
                 <div id="directListContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto;"></div>
             </div>
         </div>
-
     </main>
+
+    <!-- Footer -->
+    <footer>
+        <video class="video-logo" style="width: 150px; height: 50px;" autoplay loop muted playsinline>
+            <source src="poltitan-logo.mp4" type="video/mp4">
+        </video>
+        <p>© 2026 PolTitan Global Matrix. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Floating AI Chat Bot -->
+    <div class="chat-fab" onclick="toggleChat()">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-header">
+            <h3><i class="fa-solid fa-robot"></i> PolTitan AI CHAT</h3>
+            <i class="fa-solid fa-times" style="cursor: pointer; color: #fff;" onclick="toggleChat()"></i>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg">
+                🙏 Namaste VIP! PolTitan Ecosystem mein aapka swagat hai. Main aapki kaise madad kar sakta hu?
+            </div>
+        </div>
+        <div class="chat-buttons">
+            <button class="chat-quick-btn" onclick="sendBotMessage('What is PolTitan?', 'PolTitan ek 100% decentralized 30 POL Matrix plan hai jo Polygon blockchain par run karta hai.')">🔴 About Plan</button>
+            <button class="chat-quick-btn" onclick="sendBotMessage('How to register?', 'Aapko bas kisi existing VIP member ka Sponsor Link chahiye aur aapke MetaMask mein 30 POL hone chahiye.')">🟢 How to Join</button>
+            <button class="chat-quick-btn" onclick="sendBotMessage('Where is the Smart Contract?', 'Aapka contract Polygon network par deployed hai aur 100% verified hai.')">🟡 Contract Info</button>
+            <button class="chat-quick-btn" onclick="sendBotMessage('Need Support', 'Support ke liye kripya apne upline/sponsor se contact karein ya humari community join karein.')">🔵 Support</button>
+        </div>
+    </div>
 
     <script>
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
@@ -263,7 +348,33 @@
             el.style.display = "block";
         }
 
-        // Common Login Logic (Manual aur Auto-login dono isko use karenge)
+        // Chatbot Functions
+        function toggleChat() {
+            const modal = document.getElementById('chatModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendBotMessage(userQuestion, botAnswer) {
+            const chatBody = document.getElementById('chatBody');
+            
+            // User Message
+            chatBody.innerHTML += `<div class="chat-user-msg">${userQuestion}</div>`;
+            
+            // Bot Loading
+            const loadingId = 'loading-' + Date.now();
+            chatBody.innerHTML += `<div class="chat-msg" id="${loadingId}"><i class="fa-solid fa-ellipsis fa-bounce"></i> Typing...</div>`;
+            
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Bot Answer after 1 second
+            setTimeout(() => {
+                document.getElementById(loadingId).remove();
+                chatBody.innerHTML += `<div class="chat-msg"><i class="fa-solid fa-robot" style="color: var(--gold);"></i> ${botAnswer}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 1000);
+        }
+
+        // Login Logic
         async function processLogin(account) {
             try {
                 userAddress = account;
@@ -312,14 +423,12 @@
             }
         }
 
-        // NAYA FEATURE: Auto-Login on Page Refresh
         window.addEventListener('load', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // Check if already connected without popping up MetaMask
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     if (accounts.length > 0) {
-                        connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resuming Session...';
+                        connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resuming...';
                         await processLogin(accounts[0]);
                     }
                 } catch (error) {
@@ -328,7 +437,6 @@
             }
         });
 
-        // Manual Connect Button
         connectWalletBtn.addEventListener('click', async () => {
             if (typeof window.ethereum !== 'undefined') {
                 try {
@@ -345,17 +453,15 @@
             }
         });
 
-        // NAYA FEATURE: Logout Function
         function logoutWallet() {
             userAddress = null;
-            toggleMenu(); // Close side menu
-            menuBtn.style.display = "none"; // Hide menu icon
-            headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; // Reset header
-            switchView('authView'); // Show login screen again
+            toggleMenu(); 
+            menuBtn.style.display = "none"; 
+            headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
+            switchView('authView'); 
             connectWalletBtn.innerHTML = 'Secure Connect <i class="fa-solid fa-arrow-right"></i>';
         }
 
-        // Network Fetching Logic
         async function loadNetwork() {
             switchView('networkView');
             directListContainer.innerHTML = '<p style="color: var(--gold); text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching records from blockchain...</p>';
@@ -388,7 +494,6 @@
             }
         }
 
-        // Register
         registerBtn.addEventListener('click', async () => {
             const finalUpline = document.getElementById('uplineInput').value.trim();
             if (!finalUpline || finalUpline.length !== 42) {
@@ -417,7 +522,6 @@
             }
         });
 
-        // Copy Link
         copyRefBtn.addEventListener('click', () => {
             const myLink = document.getElementById('displayRefLink').innerText;
             navigator.clipboard.writeText(myLink).then(() => {
