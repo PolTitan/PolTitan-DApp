@@ -31,7 +31,7 @@
         .wallet-badge { background: var(--box-bg); border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); cursor: pointer; }
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
-        /* SIDE MENU (B-Titan Style) */
+        /* SIDE MENU */
         .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #0f0f0f; border-right: 1px solid var(--border-color); transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9); }
         .side-menu.active { left: 0; }
         .close-menu { text-align: right; font-size: 24px; color: var(--gold); cursor: pointer; margin-bottom: 10px; }
@@ -46,7 +46,7 @@
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
         .vip-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: center; }
         
-        /* B-TITAN STYLE PROFILE CARD */
+        /* PROFILE CARD */
         .profile-card { background: linear-gradient(145deg, #111, #1a1a1a); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; }
         .profile-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: rgba(245, 197, 24, 0.1); filter: blur(30px); border-radius: 50%; }
         
@@ -105,7 +105,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; }
 
-        /* CSS TREE VIEW (GENEALOGY MATRIX) */
+        /* CSS TREE VIEW */
         .tree-container { overflow-x: auto; padding: 20px 0; text-align: center; }
         .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; padding-left: 0; }
         .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; }
@@ -137,8 +137,16 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
-        /* Floating Bot */
-        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); }
+        /* Floating Bot & Chat Modal Fixes */
+        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); }
+        
+        .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
+        .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
+        .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
+
+        /* Alert Styling */
+        .alert { display: none; margin-top: 15px; font-size: 13px; text-align: center; padding: 12px; border-radius: 8px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -226,15 +234,13 @@
             <div id="regAlert" class="alert"></div>
         </div>
 
-        <!-- 3. B-TITAN STYLE DASHBOARD -->
+        <!-- 3. DASHBOARD -->
         <div id="dashboardView" class="view-section">
             
-            <!-- Read Only Banner -->
             <div id="readOnlyBanner" style="display: none; background: #ff4d4d; color: #fff; text-align: center; padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
                 <i class="fa-solid fa-eye"></i> You are in View-Only Mode
             </div>
 
-            <!-- Profile Card -->
             <div class="profile-card">
                 <div class="profile-header">
                     <div class="avatar"><i class="fa-solid fa-user-astronaut"></i></div>
@@ -274,7 +280,6 @@
                 </div>
             </div>
 
-            <!-- Personal Link Box -->
             <div class="action-box" id="personalLinkBox">
                 <h4>Personal Link <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="link-container">
@@ -284,7 +289,6 @@
                 <p style="font-size: 12px; color: #fff;">Not a Member Yet? <span style="color: #c026d3; cursor: pointer;">Register With this upline</span></p>
             </div>
 
-            <!-- Total Earning Box -->
             <div class="action-box earning-box">
                 <h4>Total Earning <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="amount">
@@ -295,14 +299,12 @@
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
             </div>
 
-            <!-- Latest Activity (Transactions) -->
             <div class="section-title">Latest Activity</div>
             <div class="activity-list">
                 <div class="activity-header">
                     <span>Name</span>
                     <span>Amount</span>
                 </div>
-                <!-- Box 1 -->
                 <div class="activity-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
                     <div class="act-left">
                         <div class="act-icon"><i class="fa-solid fa-user-plus"></i></div>
@@ -313,7 +315,6 @@
                     </div>
                     <div class="act-right">+ 30.0 POL</div>
                 </div>
-                <!-- Box 2 -->
                 <div class="activity-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
                     <div class="act-left">
                         <div class="act-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fa-solid fa-wallet"></i></div>
@@ -330,7 +331,6 @@
         <!-- 4. MATRIX SLOTS SELECTION VIEW -->
         <div id="slotsView" class="view-section">
             <h3 style="color: var(--gold); font-size: 20px; margin-bottom: 20px;"><i class="fa-solid fa-cubes"></i> Select Slot</h3>
-            
             <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px;" onclick="loadTreeMatrix()">
                 <div style="text-align: left;">
                     <h2 style="margin: 0; color: #fff;">Slot 1</h2>
@@ -338,7 +338,6 @@
                 </div>
                 <div style="font-size: 24px; color: var(--gold);"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
             </div>
-
             <div class="vip-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; opacity: 0.5;">
                 <div style="text-align: left;">
                     <h2 style="margin: 0; color: #fff;"><i class="fa-solid fa-lock"></i> Slot 2</h2>
@@ -347,21 +346,18 @@
             </div>
         </div>
 
-        <!-- 5. REAL MATRIX TREE VIEW (THE ULTIMATE FEATURE) -->
+        <!-- 5. REAL MATRIX TREE VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">Slot 1 Matrix</h3>
             </div>
-            
             <div class="vip-card" style="padding: 10px;">
                 <div class="tree-container">
                     <div class="tree" id="matrixTreeDisplay">
-                        <!-- Tree will be rendered here via JS -->
                         <div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Tree...</div>
                     </div>
                 </div>
-                
                 <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; font-size: 10px; color: var(--text-gray); flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 12px; height: 12px; background: #3b82f6; border-radius: 3px;"></span> You</div>
                     <div style="display: flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 12px; height: 12px; background: var(--gold); border-radius: 3px;"></span> Direct Partners</div>
@@ -375,8 +371,10 @@
     <!-- Floating AI Chat Bot -->
     <div class="chat-fab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
-        <div class="chat-header"><h3><i class="fa-solid fa-robot"></i> AI CHAT</h3><i class="fa-solid fa-times" style="color: #fff; cursor:pointer;" onclick="toggleChat()"></i></div>
-        <div class="chat-body" id="chatBody"><div class="chat-msg">🙏 Namaste VIP! Main aapki kaise madad kar sakta hu?</div></div>
+        <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg">🙏 Namaste VIP! Main aapki kaise madad kar sakta hu?</div>
+        </div>
     </div>
 
     <!-- MAIN JAVASCRIPT LOGIC -->
@@ -396,6 +394,18 @@
         const sideMenu = document.getElementById('sideMenu');
         const connectWalletBtn = document.getElementById('connectWalletBtn');
         const inspectModalOverlay = document.getElementById('inspectModalOverlay');
+
+        // Helper func to show UI alerts
+        function showAlert(id, msg, isError) {
+            const alertDiv = document.getElementById(id);
+            if(!alertDiv) return;
+            alertDiv.innerText = msg;
+            alertDiv.style.color = isError ? "#ff4d4d" : "#10b981";
+            alertDiv.style.backgroundColor = isError ? "rgba(255, 77, 77, 0.1)" : "rgba(16, 185, 129, 0.1)";
+            alertDiv.style.border = `1px solid ${isError ? "#ff4d4d" : "#10b981"}`;
+            alertDiv.style.display = "block";
+            setTimeout(() => { alertDiv.style.display = "none"; }, 4000);
+        }
 
         function toggleMenu() { sideMenu.classList.toggle('active'); }
         function switchView(viewId) {
@@ -436,7 +446,7 @@
         }
         function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
 
-        // TREE VIEW LOGIC (Generates CSS Hierarchy)
+        // TREE VIEW LOGIC
         async function getNodeData(address) {
             if (!address || address === "0x0000000000000000000000000000000000000000") return null;
             const info = await contract.users(address);
@@ -454,20 +464,16 @@
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Visual Tree...</div>';
 
             try {
-                // Root
                 const root = await getNodeData(globalRootAddress);
                 if(!root) return;
 
-                // Level 1
                 const left = await getNodeData(root.left);
                 const right = await getNodeData(root.right);
 
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;"><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul>`;
 
-                // Left Leg
                 if(left) {
                     html += `<li><a onclick="viewUserDetails('${left.address}')"><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a>`;
-                    // Fetch Level 2 Left
                     const leftL = await getNodeData(left.left);
                     const leftR = await getNodeData(left.right);
                     if(leftL || leftR) {
@@ -477,14 +483,10 @@
                         html += `</ul>`;
                     }
                     html += `</li>`;
-                } else {
-                    html += createEmptyNode();
-                }
+                } else { html += createEmptyNode(); }
 
-                // Right Leg
                 if(right) {
                     html += `<li><a onclick="viewUserDetails('${right.address}')"><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a>`;
-                    // Fetch Level 2 Right
                     const rightL = await getNodeData(right.left);
                     const rightR = await getNodeData(right.right);
                     if(rightL || rightR) {
@@ -494,9 +496,7 @@
                         html += `</ul>`;
                     }
                     html += `</li>`;
-                } else {
-                    html += createEmptyNode();
-                }
+                } else { html += createEmptyNode(); }
 
                 html += `</ul></li></ul>`;
                 treeContainer.innerHTML = html;
@@ -511,7 +511,7 @@
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address;
-                globalRootAddress = address; // Root for tree
+                globalRootAddress = address;
                 isViewOnly = viewMode;
 
                 if(!provider) {
@@ -560,7 +560,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                showAlert('authAlert', 'Connection failed!', true);
+                showAlert('authAlert', 'Connection failed! Check network.', true);
             }
         }
 
@@ -568,7 +568,6 @@
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
             if(inputAddr.length === 42) {
-                // Basic setup without requesting metamask popup
                 provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 await loadDashboardData(inputAddr, true);
@@ -577,21 +576,34 @@
             }
         }
 
+        // THE FIXED CONNECTION BLOCK
         connectWalletBtn.addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
+            if (window.ethereum || window.web3) {
                 try {
                     connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+                    
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    // PROMPT METAMASK TO CONNECT
                     await provider.send("eth_requestAccounts", []);
+                    
                     signer = provider.getSigner();
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     const accounts = await provider.listAccounts();
-                    await loadDashboardData(accounts[0], false);
+                    
+                    if(accounts && accounts.length > 0) {
+                         await loadDashboardData(accounts[0], false);
+                    } else {
+                         throw new Error("No accounts found");
+                    }
                 } catch (error) {
-                    showAlert('authAlert', 'Connection Rejected!', true);
+                    console.error("Connection Error:", error);
+                    showAlert('authAlert', 'Connection Rejected! Please try again.', true);
                     connectWalletBtn.innerHTML = 'Login With Wallet';
                 }
-            } else { alert("Please use MetaMask DApp Browser!"); }
+            } else { 
+                alert("Please open this link inside MetaMask or Trust Wallet DApp Browser!"); 
+                connectWalletBtn.innerHTML = 'Login With Wallet';
+            }
         });
 
         function logoutWallet() {
@@ -615,7 +627,7 @@
 
         function toggleChat() {
             const modal = document.getElementById('chatModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         }
     </script>
 </body>
