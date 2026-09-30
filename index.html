@@ -526,7 +526,7 @@
             }
         }
 
-        // LOAD DASHBOARD DATA WITH CRASH PROTECTION
+        // --- FIXED DATA LOADER FOR NEW USERS ---
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address;
@@ -539,11 +539,22 @@
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 }
 
-                // FETCHING DATA FROM CONTRACT
-                const userInfo = await contract.users(userAddress);
-                const userId = userInfo[0].toNumber(); 
+                let userId = 0;
+                let userInfo = null;
 
-                if (userId > 0) {
+                // 1. DATA READ KARNE KI KOSHISH
+                try {
+                    userInfo = await contract.users(userAddress);
+                    userId = userInfo[0].toNumber(); 
+                } catch (dataError) {
+                    // Agar naya user hai ya data khaali hai, toh crash mat ho, ID 0 maan lo.
+                    console.warn("New user detected or empty data");
+                    userId = 0; 
+                }
+
+                // 2. CHECK KARO KI USER HAI YA NAYA HAI
+                if (userId > 0 && userInfo) {
+                    // --- PURANA USER (DASHBOARD KHOLEGA) ---
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     
@@ -565,38 +576,35 @@
                         headerWallet.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${userAddress.substring(0,4)}...`;
                         document.getElementById('readOnlyBanner').style.display = "none";
                         document.getElementById('personalLinkBox').style.display = "block";
-                        const myLink = window.location.origin + window.location.pathname + "?ref=" + userAddress;
-                        document.getElementById('displayRefLink').innerText = myLink;
+                        document.getElementById('displayRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     }
 
                     menuBtn.style.display = "block"; 
                     switchView('dashboardView');
+                    
                 } else {
+                    // --- NAYA USER (REGISTER PAGE PAR BHEJEGA) ---
                     if(isViewOnly) {
                         showAlert('authAlert', 'Address not found in Matrix!', true);
                         const btn = document.getElementById('connectWalletBtn');
                         if (btn) btn.innerHTML = 'Login With Wallet';
                     } else {
+                        // Button ko wapas normal karo aur Register page dikhao
+                        const btn = document.getElementById('connectWalletBtn');
+                        if (btn) btn.innerHTML = 'Login With Wallet';
                         switchView('registerView');
                     }
                 }
             } catch (error) {
-                console.error("Data Load Error (ABI Mismatch or Network):", error);
-                
-                // RESET THE BUTTON SO IT DOESN'T HANG
+                // Yeh error ab sirf tab aayega jab mobile mein network (Polygon) select na ho
+                console.error("Critical Network Error:", error);
                 const btn = document.getElementById('connectWalletBtn');
                 if (btn) btn.innerHTML = 'Login With Wallet';
-                
-                // SHOW ERROR ON SCREEN
-                let errorMsg = "Data Load Failed! Please check F12 Console.";
-                if(error.message && error.message.includes("call exception")) {
-                    errorMsg = "ABI Error: Smart Contract data mismatch!";
-                }
-                showAlert('authAlert', errorMsg, true);
+                showAlert('authAlert', 'Network Error! Please select Polygon Network.', true);
             }
         }
 
-        // LOGIN TRIGGERS
+        // LOGIN TRIGGERS (VIEW MODE)
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
             if(inputAddr.length === 42) {
@@ -615,8 +623,6 @@
                     connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
                     
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    
-                    // THIS LINE FIXES THE METAMASK POPUP HANG ISSUE
                     await provider.send("eth_requestAccounts", []);
                     
                     signer = provider.getSigner();
