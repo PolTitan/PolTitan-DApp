@@ -31,7 +31,7 @@
         .wallet-badge { background: var(--box-bg); border: 1px solid var(--gold); padding: 5px 12px; border-radius: 5px; font-size: 12px; color: var(--gold); cursor: pointer; }
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
-        /* SIDE MENU (B-Titan Style) */
+        /* SIDE MENU */
         .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #0f0f0f; border-right: 1px solid var(--border-color); transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9); }
         .side-menu.active { left: 0; }
         .close-menu { text-align: right; font-size: 24px; color: var(--gold); cursor: pointer; margin-bottom: 10px; }
@@ -46,7 +46,7 @@
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
         .vip-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: center; }
         
-        /* B-TITAN STYLE PROFILE CARD */
+        /* PROFILE CARD */
         .profile-card { background: linear-gradient(145deg, #111, #1a1a1a); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; }
         .profile-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: rgba(245, 197, 24, 0.1); filter: blur(30px); border-radius: 50%; }
         
@@ -547,7 +547,6 @@
                     userInfo = await contract.users(userAddress);
                     userId = userInfo[0].toNumber(); 
                 } catch (dataError) {
-                    // Agar naya user hai ya data khaali hai, toh crash mat ho, ID 0 maan lo.
                     console.warn("New user detected or empty data");
                     userId = 0; 
                 }
@@ -589,14 +588,12 @@
                         const btn = document.getElementById('connectWalletBtn');
                         if (btn) btn.innerHTML = 'Login With Wallet';
                     } else {
-                        // Button ko wapas normal karo aur Register page dikhao
                         const btn = document.getElementById('connectWalletBtn');
                         if (btn) btn.innerHTML = 'Login With Wallet';
                         switchView('registerView');
                     }
                 }
             } catch (error) {
-                // Yeh error ab sirf tab aayega jab mobile mein network (Polygon) select na ho
                 console.error("Critical Network Error:", error);
                 const btn = document.getElementById('connectWalletBtn');
                 if (btn) btn.innerHTML = 'Login With Wallet';
@@ -616,7 +613,7 @@
             }
         }
 
-        // WALLET CONNECT BUTTON LOGIC (FIXED)
+        // WALLET CONNECT BUTTON LOGIC
         connectWalletBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
@@ -645,6 +642,53 @@
             } else { 
                 alert("Please open this link inside MetaMask or Trust Wallet DApp Browser!"); 
                 connectWalletBtn.innerHTML = 'Login With Wallet';
+            }
+        });
+
+        // --- THE MISSING REGISTRATION BUTTON LOGIC ---
+        const registerBtn = document.getElementById('registerBtn');
+        
+        // Auto-fill Sponsor ID from URL parameter (e.g. ?ref=0x...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+        if (refParam && refParam.length === 42) {
+            document.getElementById('uplineInput').value = refParam;
+        }
+
+        registerBtn.addEventListener('click', async () => {
+            const uplineAddr = document.getElementById('uplineInput').value.trim();
+            
+            if (!uplineAddr || uplineAddr.length !== 42) {
+                showAlert('regAlert', 'Please enter a valid Sponsor Address (0x...)', true);
+                return;
+            }
+
+            try {
+                // Button ko processing mode mein badalna
+                registerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                
+                // Smart contract par 30 POL ke sath register function call karna
+                const tx = await contract.register(uplineAddr, { 
+                    value: ethers.utils.parseEther("30") 
+                });
+                
+                showAlert('regAlert', 'Transaction sent! Waiting for confirmation...', false);
+                
+                // Blockchain par transaction pass hone ka wait karna
+                await tx.wait(); 
+                
+                showAlert('regAlert', 'Registration Successful! Welcome VIP.', false);
+                registerBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
+                
+                // Registration ke 3 second baad apne aap Dashboard reload ho jayega
+                setTimeout(() => {
+                    loadDashboardData(userAddress, false);
+                }, 3000);
+
+            } catch (error) {
+                console.error("Registration error:", error);
+                showAlert('regAlert', 'Transaction Failed or Rejected by Wallet!', true);
+                registerBtn.innerHTML = 'Register (30 POL)';
             }
         });
 
