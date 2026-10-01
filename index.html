@@ -91,7 +91,7 @@
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: #fff; padding: 15px; width: 100%; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
         .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
-        .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; }
+        .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
         
         /* ACTIVITY LIST */
         .activity-list { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); }
@@ -122,25 +122,20 @@
         .tree li a i { font-size: 20px; color: var(--text-gray); margin-bottom: 5px; }
         .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-3px); }
         .tree li a.empty-node { border: 1px dashed #555; background: transparent; color: #555; cursor: default;}
+        .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
+        .tree li a.empty-node i { color: #333; }
 
         /* View Sections */
         .view-section { display: none; }
         #authView { display: block; margin-top: 5vh; }
         
-        /* Modal for Upline Details */
+        /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .inspect-card { background: var(--card-bg); width: 90%; max-width: 350px; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; text-align: left; box-shadow: 0 10px 30px rgba(245, 197, 24, 0.3); }
         .inspect-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
         .inspect-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #333; font-size: 13px; }
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
-
-        /* Floating Bot & Chat Modal (Fixed CSS for Mobile) */
-        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); }
-        .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
-        .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
-        .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
 
         /* Alert Styling */
         .alert { display: none; margin-top: 15px; font-size: 13px; text-align: center; padding: 12px; border-radius: 8px; font-weight: 600; }
@@ -159,7 +154,7 @@
         <div class="wallet-badge" id="headerWallet" onclick="event.stopPropagation();"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
 
-    <!-- B-TITAN STYLE SIDE MENU -->
+    <!-- SIDE MENU -->
     <div class="side-menu" id="sideMenu">
         <div class="close-menu" onclick="toggleMenu()"><i class="fa-solid fa-times"></i></div>
         <div class="menu-header">
@@ -167,13 +162,13 @@
         </div>
         
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
-        <div class="menu-item" onclick="loadSlots(); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
+        <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="loadTreeMatrix(); toggleMenu();"><i class="fa-solid fa-sitemap"></i> My Partners</div>
         <div class="menu-item" onclick="alert('Transaction Page Coming Soon!');"><i class="fa-solid fa-list-check"></i> Transactions</div>
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
 
-    <!-- MODAL - AB YEH UPLINE DETAILS DIKHAYEGA -->
+    <!-- MODAL - UPLINE DETAILS -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -192,9 +187,19 @@
         </div>
     </div>
 
+    <!-- NAYA MODAL - WELCOME MESSAGE (FIRST TIME JOINING) -->
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
+            <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
+            <h2 style="color: #fff; margin-bottom: 10px;">Registration Successful!</h2>
+            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 25px;">Welcome to PolTitan VIP Matrix. Your 30 POL transaction is complete and your ID has been activated.</p>
+            <button class="btn-gold" onclick="closeWelcomeModal()" style="padding: 10px; font-size: 14px;">Cut & Go To Dashboard</button>
+        </div>
+    </div>
+
     <main class="container">
         
-        <!-- 1. AUTH VIEW -->
+        <!-- 1. SMART AUTH VIEW (Registration + Login) -->
         <div id="authView" class="view-section">
             <div style="text-align: center; margin-bottom: 30px;">
                 <i class="fa-brands fa-ethereum" style="font-size: 70px; color: var(--gold); margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(245,197,24,0.5));"></i>
@@ -203,36 +208,33 @@
             </div>
 
             <div class="vip-card">
-                <button class="btn-gold" id="connectWalletBtn" style="margin-bottom: 15px;">Login With Wallet</button>
+                <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">Join Matrix / Login Dashboard</p>
                 
-                <div style="display: flex; align-items: center; margin: 20px 0; color: #555;">
-                    <hr style="flex: 1; border-color: #333;"> <span style="margin: 0 10px; font-size: 12px;">OR</span> <hr style="flex: 1; border-color: #333;">
+                <!-- Sponsor ID Box -->
+                <div class="input-box" style="margin-bottom: 20px;">
+                    <i class="fa-solid fa-user-tie" style="color: var(--gold); margin-right: 10px;"></i>
+                    <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
 
+                <!-- 1 Master Button -->
+                <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Connect Wallet</button>
+                <div id="authAlert" class="alert"></div>
+
+                <div style="display: flex; align-items: center; margin: 25px 0; color: #555;">
+                    <hr style="flex: 1; border-color: #333;"> <span style="margin: 0 10px; font-size: 12px;">VIEW MODE</span> <hr style="flex: 1; border-color: #333;">
+                </div>
+                
                 <div class="input-box">
                     <input type="text" id="inspectAddressInput" placeholder="Enter Wallet Address to View">
                 </div>
-                <button class="btn-outline" onclick="inspectFromLogin()">View By Address</button>
-                <div id="authAlert" class="alert"></div>
+                <button class="btn-outline" onclick="inspectFromLogin()" style="padding: 10px; font-size: 13px;">View Dashboard</button>
             </div>
         </div>
 
-        <!-- 2. REGISTER VIEW -->
-        <div id="registerView" class="view-section vip-card">
-            <h2>JOIN <span>MATRIX</span></h2>
-            <p class="subtitle" style="margin-bottom: 20px;">Enter Sponsor ID/Address to register.</p>
-            <div class="input-box">
-                <input type="text" id="uplineInput" placeholder="Sponsor Address (0x...)">
-            </div>
-            <button class="btn-gold" id="registerBtn">Register (30 POL)</button>
-            <button class="btn-outline" onclick="logoutWallet()">Back Home</button>
-            <div id="regAlert" class="alert"></div>
-        </div>
-
-        <!-- 3. B-TITAN STYLE DASHBOARD -->
+        <!-- 2. DASHBOARD VIEW -->
         <div id="dashboardView" class="view-section">
             
-            <!-- Read Only Banner: Yahan exit button de diya hai dusre ka menu band karne ke liye -->
+            <!-- View Mode Exit Banner -->
             <div id="readOnlyBanner" style="display: none; background: #ff4d4d; color: #fff; text-align: center; padding: 10px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
                 <i class="fa-solid fa-eye"></i> You are viewing someone else's Dashboard <br>
                 <button onclick="logoutWallet()" style="margin-top: 8px; padding: 5px 10px; border-radius: 5px; border: none; background: #fff; color: #ff4d4d; font-weight: bold; cursor: pointer;">Exit View Mode</button>
@@ -283,7 +285,7 @@
                 <h4>Total Earning <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="amount">
                     <i class="fa-brands fa-ethereum" style="color: #fff; background: var(--gold); border-radius: 50%; padding: 5px; font-size: 18px;"></i> 
-                    <span id="totalIncomeDisplay">114.00</span> POL
+                    <span id="totalIncomeDisplay">0.00</span> POL
                 </div>
                 <div class="sub-amt">Current Hold: <span id="incomeHoldDisplay">0.00</span> POL</div>
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
@@ -319,16 +321,16 @@
             </div>
         </div>
 
-        <!-- 4. DYNAMIC MATRIX SLOTS VIEW (Ab 7 Slots yahan dikhenge) -->
+        <!-- 3. NAYA MATRIX SLOTS VIEW (7 Slots, Auto Upgrade Logic) -->
         <div id="slotsView" class="view-section">
             <h3 style="color: var(--gold); font-size: 20px; margin-bottom: 20px;"><i class="fa-solid fa-cubes"></i> Matrix Slots</h3>
+            <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 15px;">* Slots are upgraded automatically by the contract.</p>
             <div id="slotsContainer">
                 <div style="color: var(--gold); text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Slots...</div>
             </div>
-            <div id="slotAlert" class="alert"></div>
         </div>
 
-        <!-- 5. REAL MATRIX TREE VIEW -->
+        <!-- 4. REAL MATRIX TREE VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -343,8 +345,7 @@
                 </div>
                 
                 <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; font-size: 10px; color: var(--text-gray); flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 12px; height: 12px; background: #3b82f6; border-radius: 3px;"></span> You</div>
-                    <div style="display: flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 12px; height: 12px; background: var(--gold); border-radius: 3px;"></span> Direct Partners</div>
+                    <div style="display: flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 12px; height: 12px; background: #3b82f6; border-radius: 3px;"></span> Active ID</div>
                     <div style="display: flex; align-items: center; gap: 5px;"><span style="display: inline-block; width: 12px; height: 12px; border: 1px dashed #555; border-radius: 3px;"></span> Empty Slot</div>
                 </div>
             </div>
@@ -352,19 +353,11 @@
 
     </main>
 
-    <!-- Floating AI Chat Bot -->
-    <div class="chat-fab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
-    <div class="chat-modal" id="chatModal">
-        <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
-        <div class="chat-body" id="chatBody"><div class="chat-msg">🙏 Namaste VIP! Main aapki kaise madad kar sakta hu?</div></div>
-    </div>
-
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
-            "function buySlot(uint256 _slot) external payable",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)"
         ];
 
@@ -372,14 +365,12 @@
         let isViewOnly = false;
         let globalRootAddress = "";
 
-        // SLOT PRICES FOR 7 SLOTS (Index 1 to 7)
-        const slotPrices = [0, 30, 60, 120, 240, 480, 960, 1920];
-
         const headerWallet = document.getElementById('headerWallet');
         const menuBtn = document.getElementById('menuBtn');
         const sideMenu = document.getElementById('sideMenu');
-        const connectWalletBtn = document.getElementById('connectWalletBtn');
         const inspectModalOverlay = document.getElementById('inspectModalOverlay');
+        const welcomeModal = document.getElementById('welcomeModal');
+        const masterConnectBtn = document.getElementById('masterConnectBtn');
 
         function showAlert(id, msg, isError) {
             const alertDiv = document.getElementById(id);
@@ -401,42 +392,35 @@
         function goToDashboard() { if (userAddress) switchView('dashboardView'); }
 
         function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
+        
+        // Welcome Modal cut karne par Dashboard khulega
+        window.closeWelcomeModal = function() {
+            welcomeModal.style.display = 'none';
+            loadDashboardData(userAddress, false);
+        }
 
-        // --- NAYA FEATURE: 7 SLOTS GENERATOR ---
+        // --- NEW FEATURE 3: 7 SLOTS AUTO UI (NO BUY BUTTONS) ---
         function renderSlots(currentSlot) {
             const container = document.getElementById('slotsContainer');
             if(!container) return;
             let html = '';
             
-            // Loop for 7 Slots
             for(let i=1; i<=7; i++) {
                 if(i <= currentSlot) {
-                    // Jo slot kharid liya gaya hai
                     html += `
                     <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: var(--gold);" onclick="switchView('treeView')">
                         <div style="text-align: left;">
                             <h2 style="margin: 0; color: #fff;">Slot ${i}</h2>
-                            <p style="font-size: 12px; color: var(--gold);"><i class="fa-solid fa-check-circle"></i> Khula Hai (Active)</p>
+                            <p style="font-size: 12px; color: var(--gold);"><i class="fa-solid fa-unlock"></i> Open</p>
                         </div>
                         <div style="font-size: 24px; color: var(--gold);"><i class="fa-solid fa-sitemap"></i></div>
                     </div>`;
-                } else if (i === currentSlot + 1) {
-                    // Theek aage wala slot (Tala laga hai, par Buy button hai)
-                    html += `
-                    <div class="vip-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: #3b82f6;">
-                        <div style="text-align: left;">
-                            <h2 style="margin: 0; color: #fff;"><i class="fa-solid fa-lock" style="color: #ff4d4d;"></i> Slot ${i}</h2>
-                            <p style="font-size: 12px; color: #3b82f6;">Cost: ${slotPrices[i]} POL</p>
-                        </div>
-                        <button class="btn-gold" style="width: auto; padding: 10px 20px; font-size: 14px;" onclick="upgradeSlot(${i}, ${slotPrices[i]})"><i class="fa-solid fa-unlock"></i> Buy</button>
-                    </div>`;
                 } else {
-                    // Baki ke aage ke sabhi slots (Poori tarah Locked)
                     html += `
                     <div class="vip-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; opacity: 0.5;">
                         <div style="text-align: left;">
-                            <h2 style="margin: 0; color: #fff;"><i class="fa-solid fa-lock"></i> Slot ${i}</h2>
-                            <p style="font-size: 12px; color: var(--text-gray);">Cost: ${slotPrices[i]} POL</p>
+                            <h2 style="margin: 0; color: #fff;"><i class="fa-solid fa-lock" style="color: #ff4d4d;"></i> Slot ${i}</h2>
+                            <p style="font-size: 12px; color: var(--text-gray);">Locked</p>
                         </div>
                     </div>`;
                 }
@@ -444,40 +428,20 @@
             container.innerHTML = html;
         }
 
-        async function upgradeSlot(slotNum, price) {
-            if(isViewOnly) return showAlert('slotAlert', 'Aap view mode mein hain!', true);
-            try {
-                showAlert('slotAlert', `Please confirm ${price} POL payment...`, false);
-                const tx = await contract.buySlot(slotNum, { value: ethers.utils.parseEther(price.toString()) });
-                showAlert('slotAlert', 'Waiting for confirmation...', false);
-                await tx.wait(); 
-                showAlert('slotAlert', `Slot ${slotNum} Khul Gaya!`, false);
-                setTimeout(() => { loadDashboardData(userAddress, false); switchView('dashboardView'); }, 3000);
-            } catch (error) {
-                showAlert('slotAlert', 'Upgrade Failed!', true);
-            }
-        }
-
-
-        // --- NAYA FEATURE: HOLD & QUICK CLICK (SMART TREE) ---
+        // --- TREE VIEW LOGIC (HOLD FOR DETAILS, CLICK FOR DASHBOARD) ---
         let pressStartTime = 0;
         let pressTimer;
 
-        // Jab user ID ko dabayega
         window.startNodePress = function(e, addr) {
             pressStartTime = new Date().getTime();
-            
             pressTimer = setTimeout(async () => {
-                // Agar 500ms tak daba kar rakha (LONG PRESS)
-                pressStartTime = 0; // Reset
-                
-                // Upline Data nikalo aur popup mein dikhao
+                pressStartTime = 0; 
                 inspectModalOverlay.style.display = "flex";
                 document.getElementById('inspectLoading').style.display = "block";
                 document.getElementById('inspectData').style.display = "none";
                 try {
                     const info = await contract.users(addr);
-                    document.getElementById('insId').innerText = info[0].toNumber(); // Target ID
+                    document.getElementById('insId').innerText = info[0].toNumber();
                     const uplineAddr = info[2];
                     if(uplineAddr !== "0x0000000000000000000000000000000000000000") {
                         const spInfo = await contract.users(uplineAddr);
@@ -495,16 +459,13 @@
             }, 500);
         };
 
-        // Jab user ungli hatayega
         window.endNodePress = function(e, addr) {
-            if (e.type === 'touchend') { e.preventDefault(); } // Mobile click fix
+            if (e.type === 'touchend') { e.preventDefault(); }
             clearTimeout(pressTimer);
-            
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
-                // Agar daba kar turant hata liya (QUICK CLICK)
                 pressStartTime = 0;
-                // Us dusre user ka Dashboard / Menu View-Only Mode mein khol do!
+                // Quick Click -> View that user's Dashboard/Menu
                 loadDashboardData(addr, true); 
             }
         };
@@ -514,7 +475,6 @@
             pressStartTime = 0;
         };
 
-        // Tree Button par events lagane ka helper
         function getSmartEvents(addr) {
             return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}')" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}')" ontouchcancel="cancelNodePress()"`;
         }
@@ -525,9 +485,7 @@
                 const info = await contract.users(address);
                 if (info[0].toNumber() === 0) return null;
                 return { id: info[0].toNumber(), address: address, left: info[7], right: info[8] };
-            } catch (e) {
-                return null;
-            }
+            } catch (e) { return null; }
         }
 
         function createEmptyNode() {
@@ -545,10 +503,8 @@
                 const left = await getNodeData(root.left);
                 const right = await getNodeData(root.right);
 
-                // Root Node (Khudi ka id)
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(root.address)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul>`;
 
-                // Left Leg
                 if(left) {
                     html += `<li><a ${getSmartEvents(left.address)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a>`;
                     const leftL = await getNodeData(left.left);
@@ -562,7 +518,6 @@
                     html += `</li>`;
                 } else { html += createEmptyNode(); }
 
-                // Right Leg
                 if(right) {
                     html += `<li><a ${getSmartEvents(right.address)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a>`;
                     const rightL = await getNodeData(right.left);
@@ -616,7 +571,6 @@
                     document.getElementById('displayDirects').innerText = userInfo[3].toNumber();
                     document.getElementById('incomeHoldDisplay').innerText = ethers.utils.formatEther(userInfo[5]);
                     
-                    // Call slot renderer to show 7 slots
                     userCurrentSlotNum = userInfo[4].toNumber();
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
                     renderSlots(userCurrentSlotNum);
@@ -634,20 +588,71 @@
 
                     menuBtn.style.display = "block"; 
                     switchView('dashboardView');
-                    
                 } else {
-                    if(!isViewOnly) {
-                        switchView('registerView');
-                    } else {
-                        showAlert('authAlert', 'Address not found!', true);
-                    }
+                    showAlert('authAlert', 'Address not found in Matrix!', true);
                 }
             } catch (error) {
                 showAlert('authAlert', 'Network Error!', true);
             }
         }
 
-        // LOGIN TRIGGERS (VIEW MODE)
+        // --- NEW FEATURE 1: ONE CLICK SMART AUTH ---
+        // Auto-fill Link
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+        if (refParam && refParam.length === 42) {
+            document.getElementById('uplineInput').value = refParam;
+        }
+
+        masterConnectBtn.addEventListener('click', async () => {
+            if (window.ethereum || window.web3) {
+                try {
+                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+                    
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    await provider.send("eth_requestAccounts", []);
+                    
+                    signer = provider.getSigner();
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    const accounts = await provider.listAccounts();
+                    const addr = accounts[0];
+                    
+                    let userInfo;
+                    try { userInfo = await contract.users(addr); } catch(e){}
+                    
+                    if(userInfo && userInfo[0].toNumber() > 0) {
+                        // Purana User: Seedha Login
+                        await loadDashboardData(addr, false);
+                    } else {
+                        // Naya User: Registration Process Shuru
+                        const uplineAddr = document.getElementById('uplineInput').value.trim();
+                        if(!uplineAddr || uplineAddr.length !== 42) {
+                            showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true);
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
+                            return;
+                        }
+
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
+                        const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
+                        
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                        await tx.wait(); // Transaction Pass
+                        
+                        userAddress = addr;
+                        // NEW FEATURE 2: Dikhaye Welcome Message
+                        welcomeModal.style.display = 'flex';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
+                    showAlert('authAlert', 'Transaction Failed! Fund low or User Rejected.', true);
+                }
+            } else { 
+                alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
+            }
+        });
+
+        // VIEW MODE LOGIN
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
             if(inputAddr.length === 42) {
@@ -659,69 +664,20 @@
             }
         }
 
-        // WALLET CONNECT
-        connectWalletBtn.addEventListener('click', async () => {
-            if (window.ethereum || window.web3) {
-                try {
-                    connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                    const accounts = await provider.listAccounts();
-                    
-                    if(accounts && accounts.length > 0) {
-                         await loadDashboardData(accounts[0], false);
-                    }
-                } catch (error) {
-                    connectWalletBtn.innerHTML = 'Login With Wallet';
-                    showAlert('authAlert', 'Connection Rejected!', true);
-                }
-            } else { 
-                alert("Please open this inside MetaMask browser!"); 
-                connectWalletBtn.innerHTML = 'Login With Wallet';
-            }
-        });
-
-        // REGISTRATION
-        const registerBtn = document.getElementById('registerBtn');
-        const urlParams = new URLSearchParams(window.location.search);
-        const refParam = urlParams.get('ref');
-        if (refParam && refParam.length === 42) {
-            document.getElementById('uplineInput').value = refParam;
-        }
-
-        registerBtn.addEventListener('click', async () => {
-            const uplineAddr = document.getElementById('uplineInput').value.trim();
-            if (!uplineAddr || uplineAddr.length !== 42) return showAlert('regAlert', 'Invalid Sponsor Address', true);
-            try {
-                registerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
-                await tx.wait(); 
-                registerBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
-                setTimeout(() => loadDashboardData(userAddress, false), 3000);
-            } catch (error) {
-                showAlert('regAlert', 'Transaction Failed!', true);
-                registerBtn.innerHTML = 'Register (30 POL)';
-            }
-        });
-
-        // EXTRAS
         document.getElementById('copyRefBtn').addEventListener('click', () => {
             if(isViewOnly) return;
-            navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Copied!"));
+            navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Link Copied!"));
         });
+
         function logoutWallet() {
             userAddress = null; isViewOnly = false; toggleMenu(); menuBtn.style.display = "none"; 
             headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
-            switchView('authView'); connectWalletBtn.innerHTML = 'Login With Wallet';
+            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
+            switchView('authView'); 
         }
+
         function loadSlots() { switchView('slotsView'); }
         function loadNetwork() { loadTreeMatrix(); }
-        function toggleChat() {
-            const modal = document.getElementById('chatModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        }
     </script>
 </body>
 </html>
