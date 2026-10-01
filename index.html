@@ -64,7 +64,7 @@
         .p-val-blue { color: #3b82f6; cursor: pointer; }
         
         .team-summary { display: flex; gap: 10px; margin-top: 20px; }
-        .team-box { flex: 1; background: #0a0a0a; border: 1px solid var(--border-color); padding: 15px 10px; border-radius: 12px; display: flex; align-items: center; gap: 15px; }
+        .team-box { flex: 1; background: #0a0a0a; border: 1px solid var(--border-color); padding: 15px 10px; border-radius: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; }
         .team-box .icon { background: rgba(245, 197, 24, 0.1); width: 40px; height: 40px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: var(--gold); }
         .team-box .data h4 { color: #fff; font-size: 20px; }
         .team-box .data p { color: var(--text-gray); font-size: 11px; }
@@ -170,7 +170,7 @@
         
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        <div class="menu-item" onclick="loadTreeMatrix(); toggleMenu();"><i class="fa-solid fa-sitemap"></i> My Partners</div>
+        <div class="menu-item" onclick="loadMyPartners(); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
@@ -267,7 +267,7 @@
                     </div>
                 </div>
                 <div class="team-summary">
-                    <div class="team-box">
+                    <div class="team-box" onclick="loadMyPartners()">
                         <div class="icon"><i class="fa-solid fa-users"></i></div>
                         <div class="data">
                             <h4 id="displayDirects">--</h4>
@@ -291,7 +291,7 @@
                     <i class="fa-brands fa-ethereum" style="color: #fff; background: var(--gold); border-radius: 50%; padding: 5px; font-size: 18px;"></i> 
                     <span id="totalIncomeDisplay">0.00</span> POL
                 </div>
-                <div class="sub-amt">Current Hold: <span id="incomeHoldDisplay">0.00</span> POL</div>
+                <div class="sub-amt">Calculated on 27 POL per active direct (after initial 2)</div>
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
             </div>
 
@@ -320,11 +320,11 @@
             </div>
         </div>
 
-        <!-- 4. TREE VIEW -->
+        <!-- 4. TREE VIEW & PARTNERS VIEW-->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <h3 style="color: var(--gold); font-size: 18px;">Matrix Tree</h3>
+                <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
             
             <div class="vip-card" style="padding: 10px;">
@@ -349,7 +349,7 @@
             </div>
             
             <div class="activity-list" id="transactionListContainer">
-                <!-- Ye JavaScript se auto-fill hoga -->
+                <!-- Data injected via JS -->
             </div>
         </div>
 
@@ -413,13 +413,16 @@
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
             let scanAddress = userAddress ? userAddress : CONTRACT_ADDRESS;
+            let targetUrl = `https://polygonscan.com/address/${scanAddress}#tokentxns`;
             
+            // New Tab me open karne ke liye a tag ka use target="_blank" ke sath taaki pichla tab band na ho
             container.innerHTML = `
                 <div class="activity-header">
                     <span>Details</span>
                     <span>Status</span>
                 </div>
-                <div class="activity-item clickable-list-item" onclick="window.open('https://polygonscan.com/address/${scanAddress}#tokentxns', '_blank')">
+                <a href="${targetUrl}" target="_blank" style="text-decoration:none;">
+                <div class="activity-item clickable-list-item">
                     <div class="act-left">
                         <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div>
                         <div class="act-details">
@@ -429,11 +432,17 @@
                     </div>
                     <div class="act-right" style="color: var(--gold); font-size: 12px;">Check <i class="fa-solid fa-external-link"></i></div>
                 </div>
+                </a>
                 <div style="padding: 20px; font-size: 12px; color: var(--text-gray); text-align: center;">
                     * All P2P matrix transactions are instantly routed via Smart Contract. 
-                    <br><br>Click above to see your 100% transparent live earning history directly on the blockchain.
+                    <br><br>Click above to see your 100% transparent live earning history directly on the blockchain in a new tab.
                 </div>
             `;
+        }
+
+        function loadMyPartners() {
+            document.getElementById('treeViewTitle').innerText = "My Partners Genealogy";
+            loadTreeMatrix(userAddress); 
         }
 
         function renderSlots(currentSlot) {
@@ -444,7 +453,7 @@
             for(let i=1; i<=7; i++) {
                 if(i <= currentSlot) {
                     html += `
-                    <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: var(--gold);" onclick="switchView('treeView')">
+                    <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: var(--gold);" onclick="document.getElementById('treeViewTitle').innerText = 'Slot ${i} Matrix'; loadTreeMatrix(userAddress);">
                         <div style="text-align: left;">
                             <h2 style="margin: 0; color: #fff;">Slot ${i}</h2>
                             <p style="font-size: 12px; color: var(--gold);"><i class="fa-solid fa-unlock"></i> Open</p>
@@ -501,7 +510,8 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                loadDashboardData(addr, true); 
+                // Tree me hi naya node load karne ke liye
+                loadTreeMatrix(addr); 
             }
         };
 
@@ -527,13 +537,14 @@
             return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`;
         }
 
-        async function loadTreeMatrix() {
+        async function loadTreeMatrix(targetAddress) {
+            if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Tree...</div>';
 
             try {
-                const root = await getNodeData(globalRootAddress);
+                const root = await getNodeData(targetAddress);
                 if(!root) return;
                 const left = await getNodeData(root.left);
                 const right = await getNodeData(root.right);
@@ -574,7 +585,7 @@
             }
         }
 
-        // --- DASHBOARD LOADER ---
+        // --- DASHBOARD LOADER & INCOME CALCULATION ---
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; 
@@ -603,8 +614,15 @@
                         document.getElementById('displayUplineId').innerText = uInfo[0].toNumber();
                     }
                     
-                    document.getElementById('displayDirects').innerText = userInfo[3].toNumber();
-                    document.getElementById('incomeHoldDisplay').innerText = ethers.utils.formatEther(userInfo[5]);
+                    let directCount = userInfo[3].toNumber();
+                    document.getElementById('displayDirects').innerText = directCount;
+                    
+                    // Fixed Income Logic: First 2 goes to upgrade, rest 27 POL per direct
+                    let calculatedIncome = 0;
+                    if(directCount > 2) {
+                        calculatedIncome = (directCount - 2) * 27;
+                    }
+                    document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
                     
                     userCurrentSlotNum = userInfo[4].toNumber();
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
@@ -715,8 +733,7 @@
             switchView('authView'); 
         }
 
-        function loadSlots() { switchView('slotsView'); }
-        function loadNetwork() { loadTreeMatrix(); }
+        function loadNetwork() { loadTreeMatrix(userAddress); }
         function toggleChat() {
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
