@@ -122,14 +122,12 @@
         .tree li a i { font-size: 20px; color: var(--text-gray); margin-bottom: 5px; }
         .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-3px); }
         .tree li a.empty-node { border: 1px dashed #555; background: transparent; color: #555; cursor: default;}
-        .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
-        .tree li a.empty-node i { color: #333; }
 
         /* View Sections */
         .view-section { display: none; }
         #authView { display: block; margin-top: 5vh; }
         
-        /* Modal */
+        /* Modal for Upline Details */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .inspect-card { background: var(--card-bg); width: 90%; max-width: 350px; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; text-align: left; box-shadow: 0 10px 30px rgba(245, 197, 24, 0.3); }
         .inspect-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
@@ -170,35 +168,33 @@
         
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
         <div class="menu-item" onclick="loadSlots(); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        <div class="menu-item" onclick="loadNetwork(); toggleMenu();"><i class="fa-solid fa-sitemap"></i> My Partners (Tree)</div>
+        <div class="menu-item" onclick="loadTreeMatrix(); toggleMenu();"><i class="fa-solid fa-sitemap"></i> My Partners</div>
         <div class="menu-item" onclick="alert('Transaction Page Coming Soon!');"><i class="fa-solid fa-list-check"></i> Transactions</div>
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
 
-    <!-- READ-ONLY ID INSPECTION MODAL -->
+    <!-- MODAL - AB YEH UPLINE DETAILS DIKHAYEGA -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
-                <h3 style="color: var(--gold);"><i class="fa-solid fa-id-badge"></i> View User Details</h3>
+                <h3 style="color: var(--gold);"><i class="fa-solid fa-sitemap"></i> Upline Details</h3>
                 <i class="fa-solid fa-times" style="color: #fff; cursor: pointer;" onclick="closeInspectModal()"></i>
             </div>
             <div id="inspectLoading" style="text-align: center; color: var(--gold); padding: 20px;">
-                <i class="fa-solid fa-spinner fa-spin"></i> Fetching Live Data...
+                <i class="fa-solid fa-spinner fa-spin"></i> Fetching Upline...
             </div>
             <div id="inspectData" style="display: none;">
-                <div class="inspect-row"><span class="label">Registration ID:</span> <span class="val" id="insId" style="color: var(--gold);">--</span></div>
-                <div class="inspect-row"><span class="label">Wallet:</span> <span class="val" id="insWallet" style="font-size: 10px;">--</span></div>
-                <div class="inspect-row"><span class="label">Invited By:</span> <span class="val" id="insUpline" style="color: #3b82f6;">--</span></div>
-                <div class="inspect-row"><span class="label">Current Slot:</span> <span class="val" id="insSlot">--</span></div>
-                <div class="inspect-row"><span class="label">Total Partners:</span> <span class="val" id="insDirects">--</span></div>
-                <p style="font-size: 10px; color: #ff4d4d; text-align: center; margin-top: 15px;"><i class="fa-solid fa-eye"></i> Read-Only Mode. Modifications disabled.</p>
+                <div class="inspect-row"><span class="label">Target User ID:</span> <span class="val" id="insId" style="color: #fff;">--</span></div>
+                <div class="inspect-row" style="border-bottom: none;"><span class="label" style="color: var(--gold);">Upline ID:</span> <span class="val" id="insUpline" style="color: var(--gold); font-size: 18px;">--</span></div>
+                <div class="inspect-row"><span class="label">Upline Wallet:</span> <span class="val" id="insWallet" style="font-size: 10px;">--</span></div>
+                <p style="font-size: 10px; color: var(--text-gray); text-align: center; margin-top: 15px;">(Long Press to see Upline, Quick Click to view Dashboard)</p>
             </div>
         </div>
     </div>
 
     <main class="container">
         
-        <!-- 1. AUTH VIEW (Login & Inspect) -->
+        <!-- 1. AUTH VIEW -->
         <div id="authView" class="view-section">
             <div style="text-align: center; margin-bottom: 30px;">
                 <i class="fa-brands fa-ethereum" style="font-size: 70px; color: var(--gold); margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(245,197,24,0.5));"></i>
@@ -236,12 +232,12 @@
         <!-- 3. B-TITAN STYLE DASHBOARD -->
         <div id="dashboardView" class="view-section">
             
-            <!-- Read Only Banner -->
-            <div id="readOnlyBanner" style="display: none; background: #ff4d4d; color: #fff; text-align: center; padding: 8px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
-                <i class="fa-solid fa-eye"></i> You are in View-Only Mode
+            <!-- Read Only Banner: Yahan exit button de diya hai dusre ka menu band karne ke liye -->
+            <div id="readOnlyBanner" style="display: none; background: #ff4d4d; color: #fff; text-align: center; padding: 10px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
+                <i class="fa-solid fa-eye"></i> You are viewing someone else's Dashboard <br>
+                <button onclick="logoutWallet()" style="margin-top: 8px; padding: 5px 10px; border-radius: 5px; border: none; background: #fff; color: #ff4d4d; font-weight: bold; cursor: pointer;">Exit View Mode</button>
             </div>
 
-            <!-- Profile Card -->
             <div class="profile-card">
                 <div class="profile-header">
                     <div class="avatar"><i class="fa-solid fa-user-astronaut"></i></div>
@@ -250,7 +246,6 @@
                         <h1>ID <span id="displayId">--</span></h1>
                     </div>
                 </div>
-
                 <div class="profile-details">
                     <div class="p-row">
                         <span class="p-label">Wallet Address</span>
@@ -261,15 +256,10 @@
                         <span class="p-val p-val-blue" id="displayUplineBox" onclick="">ID <span id="displayUplineId">--</span></span>
                     </div>
                     <div class="p-row">
-                        <span class="p-label">Member Since</span>
-                        <span class="p-val">Syncing...</span>
-                    </div>
-                    <div class="p-row">
-                        <span class="p-label">Current Rank</span>
-                        <span class="p-val"><span class="rank-badge">Titan Plate</span></span>
+                        <span class="p-label">Current Slot</span>
+                        <span class="p-val"><span class="rank-badge">Slot <span id="displayCurrentSlot">1</span></span></span>
                     </div>
                 </div>
-
                 <div class="team-summary">
                     <div class="team-box">
                         <div class="icon"><i class="fa-solid fa-users"></i></div>
@@ -281,17 +271,14 @@
                 </div>
             </div>
 
-            <!-- Personal Link Box -->
             <div class="action-box" id="personalLinkBox">
                 <h4>Personal Link <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="link-container">
                     <span id="displayRefLink">https://...</span>
                     <i class="fa-regular fa-copy" id="copyRefBtn"></i>
                 </div>
-                <p style="font-size: 12px; color: #fff;">Not a Member Yet? <span style="color: #c026d3; cursor: pointer;">Register With this upline</span></p>
             </div>
 
-            <!-- Total Earning Box -->
             <div class="action-box earning-box">
                 <h4>Total Earning <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="amount">
@@ -332,37 +319,25 @@
             </div>
         </div>
 
-        <!-- 4. MATRIX SLOTS SELECTION VIEW -->
+        <!-- 4. DYNAMIC MATRIX SLOTS VIEW (Ab 7 Slots yahan dikhenge) -->
         <div id="slotsView" class="view-section">
-            <h3 style="color: var(--gold); font-size: 20px; margin-bottom: 20px;"><i class="fa-solid fa-cubes"></i> Select Slot</h3>
-            
-            <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px;" onclick="loadTreeMatrix()">
-                <div style="text-align: left;">
-                    <h2 style="margin: 0; color: #fff;">Slot 1</h2>
-                    <p style="font-size: 12px; color: var(--gold);">Cost: 30 POL</p>
-                </div>
-                <div style="font-size: 24px; color: var(--gold);"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+            <h3 style="color: var(--gold); font-size: 20px; margin-bottom: 20px;"><i class="fa-solid fa-cubes"></i> Matrix Slots</h3>
+            <div id="slotsContainer">
+                <div style="color: var(--gold); text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Slots...</div>
             </div>
-
-            <div class="vip-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; opacity: 0.5;">
-                <div style="text-align: left;">
-                    <h2 style="margin: 0; color: #fff;"><i class="fa-solid fa-lock"></i> Slot 2</h2>
-                    <p style="font-size: 12px; color: var(--text-gray);">Cost: 60 POL</p>
-                </div>
-            </div>
+            <div id="slotAlert" class="alert"></div>
         </div>
 
-        <!-- 5. REAL MATRIX TREE VIEW (THE ULTIMATE FEATURE) -->
+        <!-- 5. REAL MATRIX TREE VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <h3 style="color: var(--gold); font-size: 18px;">Slot 1 Matrix</h3>
+                <h3 style="color: var(--gold); font-size: 18px;">Matrix Tree</h3>
             </div>
             
             <div class="vip-card" style="padding: 10px;">
                 <div class="tree-container">
                     <div class="tree" id="matrixTreeDisplay">
-                        <!-- Tree will be rendered here via JS -->
                         <div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Tree...</div>
                     </div>
                 </div>
@@ -389,12 +364,16 @@
         const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
+            "function buySlot(uint256 _slot) external payable",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)"
         ];
 
-        let provider, signer, contract, userAddress;
+        let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
         let globalRootAddress = "";
+
+        // SLOT PRICES FOR 7 SLOTS (Index 1 to 7)
+        const slotPrices = [0, 30, 60, 120, 240, 480, 960, 1920];
 
         const headerWallet = document.getElementById('headerWallet');
         const menuBtn = document.getElementById('menuBtn');
@@ -402,7 +381,6 @@
         const connectWalletBtn = document.getElementById('connectWalletBtn');
         const inspectModalOverlay = document.getElementById('inspectModalOverlay');
 
-        // HELPER FUNCTION: Alerts dikhane ke liye
         function showAlert(id, msg, isError) {
             const alertDiv = document.getElementById(id);
             if(!alertDiv) return;
@@ -422,38 +400,125 @@
         }
         function goToDashboard() { if (userAddress) switchView('dashboardView'); }
 
-        // MODAL LOGIC
-        async function viewUserDetails(targetAddress) {
-            if(!targetAddress || targetAddress === "0x0000000000000000000000000000000000000000") return;
-            inspectModalOverlay.style.display = "flex";
-            document.getElementById('inspectLoading').style.display = "block";
-            document.getElementById('inspectData').style.display = "none";
-
-            try {
-                const info = await contract.users(targetAddress);
-                document.getElementById('insId').innerText = info[0].toNumber();
-                document.getElementById('insWallet').innerText = targetAddress.substring(0,8) + "...";
-                
-                let spAddress = info[2];
-                if(spAddress !== "0x0000000000000000000000000000000000000000") {
-                    const spInfo = await contract.users(spAddress);
-                    document.getElementById('insUpline').innerText = `ID ${spInfo[0].toNumber()}`;
-                } else {
-                    document.getElementById('insUpline').innerText = "None";
-                }
-                
-                document.getElementById('insSlot').innerText = info[4].toNumber();
-                document.getElementById('insDirects').innerText = info[3].toNumber();
-
-                document.getElementById('inspectLoading').style.display = "none";
-                document.getElementById('inspectData').style.display = "block";
-            } catch (error) {
-                document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Failed to load data</span>";
-            }
-        }
         function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
 
-        // TREE VIEW LOGIC (Generates CSS Hierarchy)
+        // --- NAYA FEATURE: 7 SLOTS GENERATOR ---
+        function renderSlots(currentSlot) {
+            const container = document.getElementById('slotsContainer');
+            if(!container) return;
+            let html = '';
+            
+            // Loop for 7 Slots
+            for(let i=1; i<=7; i++) {
+                if(i <= currentSlot) {
+                    // Jo slot kharid liya gaya hai
+                    html += `
+                    <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: var(--gold);" onclick="switchView('treeView')">
+                        <div style="text-align: left;">
+                            <h2 style="margin: 0; color: #fff;">Slot ${i}</h2>
+                            <p style="font-size: 12px; color: var(--gold);"><i class="fa-solid fa-check-circle"></i> Khula Hai (Active)</p>
+                        </div>
+                        <div style="font-size: 24px; color: var(--gold);"><i class="fa-solid fa-sitemap"></i></div>
+                    </div>`;
+                } else if (i === currentSlot + 1) {
+                    // Theek aage wala slot (Tala laga hai, par Buy button hai)
+                    html += `
+                    <div class="vip-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: #3b82f6;">
+                        <div style="text-align: left;">
+                            <h2 style="margin: 0; color: #fff;"><i class="fa-solid fa-lock" style="color: #ff4d4d;"></i> Slot ${i}</h2>
+                            <p style="font-size: 12px; color: #3b82f6;">Cost: ${slotPrices[i]} POL</p>
+                        </div>
+                        <button class="btn-gold" style="width: auto; padding: 10px 20px; font-size: 14px;" onclick="upgradeSlot(${i}, ${slotPrices[i]})"><i class="fa-solid fa-unlock"></i> Buy</button>
+                    </div>`;
+                } else {
+                    // Baki ke aage ke sabhi slots (Poori tarah Locked)
+                    html += `
+                    <div class="vip-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; opacity: 0.5;">
+                        <div style="text-align: left;">
+                            <h2 style="margin: 0; color: #fff;"><i class="fa-solid fa-lock"></i> Slot ${i}</h2>
+                            <p style="font-size: 12px; color: var(--text-gray);">Cost: ${slotPrices[i]} POL</p>
+                        </div>
+                    </div>`;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        async function upgradeSlot(slotNum, price) {
+            if(isViewOnly) return showAlert('slotAlert', 'Aap view mode mein hain!', true);
+            try {
+                showAlert('slotAlert', `Please confirm ${price} POL payment...`, false);
+                const tx = await contract.buySlot(slotNum, { value: ethers.utils.parseEther(price.toString()) });
+                showAlert('slotAlert', 'Waiting for confirmation...', false);
+                await tx.wait(); 
+                showAlert('slotAlert', `Slot ${slotNum} Khul Gaya!`, false);
+                setTimeout(() => { loadDashboardData(userAddress, false); switchView('dashboardView'); }, 3000);
+            } catch (error) {
+                showAlert('slotAlert', 'Upgrade Failed!', true);
+            }
+        }
+
+
+        // --- NAYA FEATURE: HOLD & QUICK CLICK (SMART TREE) ---
+        let pressStartTime = 0;
+        let pressTimer;
+
+        // Jab user ID ko dabayega
+        window.startNodePress = function(e, addr) {
+            pressStartTime = new Date().getTime();
+            
+            pressTimer = setTimeout(async () => {
+                // Agar 500ms tak daba kar rakha (LONG PRESS)
+                pressStartTime = 0; // Reset
+                
+                // Upline Data nikalo aur popup mein dikhao
+                inspectModalOverlay.style.display = "flex";
+                document.getElementById('inspectLoading').style.display = "block";
+                document.getElementById('inspectData').style.display = "none";
+                try {
+                    const info = await contract.users(addr);
+                    document.getElementById('insId').innerText = info[0].toNumber(); // Target ID
+                    const uplineAddr = info[2];
+                    if(uplineAddr !== "0x0000000000000000000000000000000000000000") {
+                        const spInfo = await contract.users(uplineAddr);
+                        document.getElementById('insUpline').innerText = `ID ${spInfo[0].toNumber()}`;
+                        document.getElementById('insWallet').innerText = uplineAddr.substring(0,8) + "...";
+                    } else {
+                        document.getElementById('insUpline').innerText = "No Upline";
+                        document.getElementById('insWallet').innerText = "--";
+                    }
+                    document.getElementById('inspectLoading').style.display = "none";
+                    document.getElementById('inspectData').style.display = "block";
+                } catch(err) {
+                    document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Error fetching Upline</span>";
+                }
+            }, 500);
+        };
+
+        // Jab user ungli hatayega
+        window.endNodePress = function(e, addr) {
+            if (e.type === 'touchend') { e.preventDefault(); } // Mobile click fix
+            clearTimeout(pressTimer);
+            
+            const pressDuration = new Date().getTime() - pressStartTime;
+            if (pressStartTime !== 0 && pressDuration < 500) {
+                // Agar daba kar turant hata liya (QUICK CLICK)
+                pressStartTime = 0;
+                // Us dusre user ka Dashboard / Menu View-Only Mode mein khol do!
+                loadDashboardData(addr, true); 
+            }
+        };
+
+        window.cancelNodePress = function() {
+            clearTimeout(pressTimer);
+            pressStartTime = 0;
+        };
+
+        // Tree Button par events lagane ka helper
+        function getSmartEvents(addr) {
+            return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}')" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}')" ontouchcancel="cancelNodePress()"`;
+        }
+
         async function getNodeData(address) {
             if (!address || address === "0x0000000000000000000000000000000000000000") return null;
             try {
@@ -472,65 +537,58 @@
         async function loadTreeMatrix() {
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Visual Tree...</div>';
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Tree...</div>';
 
             try {
-                // Root
                 const root = await getNodeData(globalRootAddress);
                 if(!root) return;
-
-                // Level 1
                 const left = await getNodeData(root.left);
                 const right = await getNodeData(root.right);
 
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;"><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul>`;
+                // Root Node (Khudi ka id)
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(root.address)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul>`;
 
                 // Left Leg
                 if(left) {
-                    html += `<li><a onclick="viewUserDetails('${left.address}')"><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a>`;
+                    html += `<li><a ${getSmartEvents(left.address)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a>`;
                     const leftL = await getNodeData(left.left);
                     const leftR = await getNodeData(left.right);
                     if(leftL || leftR) {
                         html += `<ul>`;
-                        html += leftL ? `<li><a onclick="viewUserDetails('${leftL.address}')"><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftL.id}</span></a></li>` : createEmptyNode();
-                        html += leftR ? `<li><a onclick="viewUserDetails('${leftR.address}')"><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftR.id}</span></a></li>` : createEmptyNode();
+                        html += leftL ? `<li><a ${getSmartEvents(leftL.address)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftL.id}</span></a></li>` : createEmptyNode();
+                        html += leftR ? `<li><a ${getSmartEvents(leftR.address)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftR.id}</span></a></li>` : createEmptyNode();
                         html += `</ul>`;
                     }
                     html += `</li>`;
-                } else {
-                    html += createEmptyNode();
-                }
+                } else { html += createEmptyNode(); }
 
                 // Right Leg
                 if(right) {
-                    html += `<li><a onclick="viewUserDetails('${right.address}')"><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a>`;
+                    html += `<li><a ${getSmartEvents(right.address)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a>`;
                     const rightL = await getNodeData(right.left);
                     const rightR = await getNodeData(right.right);
                     if(rightL || rightR) {
                         html += `<ul>`;
-                        html += rightL ? `<li><a onclick="viewUserDetails('${rightL.address}')"><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightL.id}</span></a></li>` : createEmptyNode();
-                        html += rightR ? `<li><a onclick="viewUserDetails('${rightR.address}')"><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightR.id}</span></a></li>` : createEmptyNode();
+                        html += rightL ? `<li><a ${getSmartEvents(rightL.address)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightL.id}</span></a></li>` : createEmptyNode();
+                        html += rightR ? `<li><a ${getSmartEvents(rightR.address)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightR.id}</span></a></li>` : createEmptyNode();
                         html += `</ul>`;
                     }
                     html += `</li>`;
-                } else {
-                    html += createEmptyNode();
-                }
+                } else { html += createEmptyNode(); }
 
                 html += `</ul></li></ul>`;
                 treeContainer.innerHTML = html;
 
             } catch (error) {
-                console.error(error);
                 treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>';
             }
         }
 
-        // --- FIXED DATA LOADER FOR NEW USERS ---
+        // --- DASHBOARD LOADER ---
         async function loadDashboardData(address, viewMode) {
             try {
-                userAddress = address;
-                globalRootAddress = address; // Root for tree
+                userAddress = address; 
+                globalRootAddress = address; 
                 isViewOnly = viewMode;
 
                 if(!provider) {
@@ -539,21 +597,13 @@
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 }
 
-                let userId = 0;
-                let userInfo = null;
-
-                // 1. DATA READ KARNE KI KOSHISH
+                let userId = 0; let userInfo = null;
                 try {
                     userInfo = await contract.users(userAddress);
                     userId = userInfo[0].toNumber(); 
-                } catch (dataError) {
-                    console.warn("New user detected or empty data");
-                    userId = 0; 
-                }
+                } catch (dataError) { userId = 0; }
 
-                // 2. CHECK KARO KI USER HAI YA NAYA HAI
                 if (userId > 0 && userInfo) {
-                    // --- PURANA USER (DASHBOARD KHOLEGA) ---
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     
@@ -561,14 +611,18 @@
                     if(upline !== "0x0000000000000000000000000000000000000000") {
                         const uInfo = await contract.users(upline);
                         document.getElementById('displayUplineId').innerText = uInfo[0].toNumber();
-                        document.getElementById('displayUplineBox').onclick = () => viewUserDetails(upline);
                     }
                     
                     document.getElementById('displayDirects').innerText = userInfo[3].toNumber();
                     document.getElementById('incomeHoldDisplay').innerText = ethers.utils.formatEther(userInfo[5]);
                     
+                    // Call slot renderer to show 7 slots
+                    userCurrentSlotNum = userInfo[4].toNumber();
+                    document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
+                    renderSlots(userCurrentSlotNum);
+                    
                     if(isViewOnly) {
-                        headerWallet.innerHTML = `<i class="fa-solid fa-eye"></i> Viewing ID ${userId}`;
+                        headerWallet.innerHTML = `<i class="fa-solid fa-eye"></i> ID ${userId}`;
                         document.getElementById('readOnlyBanner').style.display = "block";
                         document.getElementById('personalLinkBox').style.display = "none";
                     } else {
@@ -582,22 +636,14 @@
                     switchView('dashboardView');
                     
                 } else {
-                    // --- NAYA USER (REGISTER PAGE PAR BHEJEGA) ---
-                    if(isViewOnly) {
-                        showAlert('authAlert', 'Address not found in Matrix!', true);
-                        const btn = document.getElementById('connectWalletBtn');
-                        if (btn) btn.innerHTML = 'Login With Wallet';
-                    } else {
-                        const btn = document.getElementById('connectWalletBtn');
-                        if (btn) btn.innerHTML = 'Login With Wallet';
+                    if(!isViewOnly) {
                         switchView('registerView');
+                    } else {
+                        showAlert('authAlert', 'Address not found!', true);
                     }
                 }
             } catch (error) {
-                console.error("Critical Network Error:", error);
-                const btn = document.getElementById('connectWalletBtn');
-                if (btn) btn.innerHTML = 'Login With Wallet';
-                showAlert('authAlert', 'Network Error! Please select Polygon Network.', true);
+                showAlert('authAlert', 'Network Error!', true);
             }
         }
 
@@ -613,42 +659,32 @@
             }
         }
 
-        // WALLET CONNECT BUTTON LOGIC
+        // WALLET CONNECT
         connectWalletBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
                     connectWalletBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-                    
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     await provider.send("eth_requestAccounts", []);
-                    
                     signer = provider.getSigner();
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     const accounts = await provider.listAccounts();
                     
                     if(accounts && accounts.length > 0) {
                          await loadDashboardData(accounts[0], false);
-                    } else {
-                         throw new Error("No accounts found");
                     }
                 } catch (error) {
-                    console.error("Connection Error:", error);
                     connectWalletBtn.innerHTML = 'Login With Wallet';
-                    
-                    let msg = 'Connection Rejected! Please try again.';
-                    if(error.message) { msg = 'Error: ' + error.message.substring(0, 35); }
-                    showAlert('authAlert', msg, true);
+                    showAlert('authAlert', 'Connection Rejected!', true);
                 }
             } else { 
-                alert("Please open this link inside MetaMask or Trust Wallet DApp Browser!"); 
+                alert("Please open this inside MetaMask browser!"); 
                 connectWalletBtn.innerHTML = 'Login With Wallet';
             }
         });
 
-        // --- THE MISSING REGISTRATION BUTTON LOGIC ---
+        // REGISTRATION
         const registerBtn = document.getElementById('registerBtn');
-        
-        // Auto-fill Sponsor ID from URL parameter (e.g. ?ref=0x...)
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) {
@@ -657,60 +693,31 @@
 
         registerBtn.addEventListener('click', async () => {
             const uplineAddr = document.getElementById('uplineInput').value.trim();
-            
-            if (!uplineAddr || uplineAddr.length !== 42) {
-                showAlert('regAlert', 'Please enter a valid Sponsor Address (0x...)', true);
-                return;
-            }
-
+            if (!uplineAddr || uplineAddr.length !== 42) return showAlert('regAlert', 'Invalid Sponsor Address', true);
             try {
-                // Button ko processing mode mein badalna
                 registerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                
-                // Smart contract par 30 POL ke sath register function call karna
-                const tx = await contract.register(uplineAddr, { 
-                    value: ethers.utils.parseEther("30") 
-                });
-                
-                showAlert('regAlert', 'Transaction sent! Waiting for confirmation...', false);
-                
-                // Blockchain par transaction pass hone ka wait karna
+                const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
                 await tx.wait(); 
-                
-                showAlert('regAlert', 'Registration Successful! Welcome VIP.', false);
                 registerBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
-                
-                // Registration ke 3 second baad apne aap Dashboard reload ho jayega
-                setTimeout(() => {
-                    loadDashboardData(userAddress, false);
-                }, 3000);
-
+                setTimeout(() => loadDashboardData(userAddress, false), 3000);
             } catch (error) {
-                console.error("Registration error:", error);
-                showAlert('regAlert', 'Transaction Failed or Rejected by Wallet!', true);
+                showAlert('regAlert', 'Transaction Failed!', true);
                 registerBtn.innerHTML = 'Register (30 POL)';
             }
         });
 
+        // EXTRAS
+        document.getElementById('copyRefBtn').addEventListener('click', () => {
+            if(isViewOnly) return;
+            navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Copied!"));
+        });
         function logoutWallet() {
             userAddress = null; isViewOnly = false; toggleMenu(); menuBtn.style.display = "none"; 
             headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
-            switchView('authView'); 
-            connectWalletBtn.innerHTML = 'Login With Wallet';
+            switchView('authView'); connectWalletBtn.innerHTML = 'Login With Wallet';
         }
-
         function loadSlots() { switchView('slotsView'); }
         function loadNetwork() { loadTreeMatrix(); }
-
-        // COPY LINK 
-        document.getElementById('copyRefBtn').addEventListener('click', () => {
-            if(isViewOnly) return;
-            const myLink = document.getElementById('displayRefLink').innerText;
-            navigator.clipboard.writeText(myLink).then(() => {
-                alert("Link Copied!");
-            });
-        });
-
         function toggleChat() {
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
