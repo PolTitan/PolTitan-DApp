@@ -137,7 +137,7 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
-        /* Floating Bot & Chat Modal (Fixed CSS for Mobile) */
+        /* Floating Bot & Chat Modal */
         .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); }
         .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
         .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
@@ -171,10 +171,7 @@
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="loadTreeMatrix(); toggleMenu();"><i class="fa-solid fa-sitemap"></i> My Partners</div>
-        
-        <!-- YAHAN MERA NAYA TRANSACTION BUTTON HAI -->
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
-        
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
 
@@ -197,7 +194,7 @@
         </div>
     </div>
 
-    <!-- MODAL - WELCOME MESSAGE (FIRST TIME JOINING) -->
+    <!-- MODAL - WELCOME MESSAGE -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
@@ -209,7 +206,7 @@
 
     <main class="container">
         
-        <!-- 1. SMART AUTH VIEW (Registration + Login) -->
+        <!-- 1. SMART AUTH VIEW -->
         <div id="authView" class="view-section">
             <div style="text-align: center; margin-bottom: 30px;">
                 <i class="fa-brands fa-ethereum" style="font-size: 70px; color: var(--gold); margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(245,197,24,0.5));"></i>
@@ -220,13 +217,11 @@
             <div class="vip-card">
                 <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">Join Matrix / Login Dashboard</p>
                 
-                <!-- Sponsor ID Box -->
                 <div class="input-box" style="margin-bottom: 20px;">
                     <i class="fa-solid fa-user-tie" style="color: var(--gold); margin-right: 10px;"></i>
                     <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
 
-                <!-- 1 Master Button -->
                 <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Connect Wallet</button>
                 <div id="authAlert" class="alert"></div>
 
@@ -244,7 +239,6 @@
         <!-- 2. DASHBOARD VIEW -->
         <div id="dashboardView" class="view-section">
             
-            <!-- View Mode Exit Banner -->
             <div id="readOnlyBanner" style="display: none; background: #ff4d4d; color: #fff; text-align: center; padding: 10px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
                 <i class="fa-solid fa-eye"></i> You are viewing someone else's Dashboard <br>
                 <button onclick="logoutWallet()" style="margin-top: 8px; padding: 5px 10px; border-radius: 5px; border: none; background: #fff; color: #ff4d4d; font-weight: bold; cursor: pointer;">Exit View Mode</button>
@@ -301,7 +295,7 @@
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
             </div>
 
-            <!-- Dashboard Preview (Dummy Activity) -->
+            <!-- Dashboard Preview -->
             <div class="section-title">Latest Activity</div>
             <div class="activity-list">
                 <div class="activity-item clickable-list-item" onclick="loadTransactions()">
@@ -317,7 +311,7 @@
             </div>
         </div>
 
-        <!-- 3. NAYA MATRIX SLOTS VIEW (7 Slots, Auto Upgrade Logic) -->
+        <!-- 3. SLOTS VIEW -->
         <div id="slotsView" class="view-section">
             <h3 style="color: var(--gold); font-size: 20px; margin-bottom: 20px;"><i class="fa-solid fa-cubes"></i> Matrix Slots</h3>
             <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 15px;">* Slots are upgraded automatically by the contract.</p>
@@ -326,7 +320,7 @@
             </div>
         </div>
 
-        <!-- 4. REAL MATRIX TREE VIEW -->
+        <!-- 4. TREE VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -347,7 +341,7 @@
             </div>
         </div>
 
-        <!-- 5. YAHAN HAI NAYA TRANSACTION VIEW PAGE -->
+        <!-- 5. TRANSACTION VIEW -->
         <div id="transactionView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -361,7 +355,7 @@
 
     </main>
 
-    <!-- Floating AI Chat Bot -->
+    <!-- Chat Bot -->
     <div class="chat-fab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
         <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
@@ -415,11 +409,9 @@
             loadDashboardData(userAddress, false);
         }
 
-        // --- NAYA FUNCTION: TRANSACTION PAGE LOAD KARNA ---
         function loadTransactions() {
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
-            // Polygonscan ke live address link se details connect karna
             let scanAddress = userAddress ? userAddress : CONTRACT_ADDRESS;
             
             container.innerHTML = `
@@ -444,7 +436,6 @@
             `;
         }
 
-        // --- 7 SLOTS AUTO UI ---
         function renderSlots(currentSlot) {
             const container = document.getElementById('slotsContainer');
             if(!container) return;
@@ -473,7 +464,7 @@
             container.innerHTML = html;
         }
 
-        // --- TREE VIEW LOGIC (HOLD & CLICK) ---
+        // --- TREE VIEW LOGIC ---
         let pressStartTime = 0;
         let pressTimer;
 
@@ -640,7 +631,7 @@
             }
         }
 
-        // --- ONE CLICK SMART AUTH ---
+        // --- BULLETPROOF ONE CLICK SMART AUTH ---
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) {
@@ -659,7 +650,18 @@
                     const addr = accounts[0];
                     
                     let userInfo;
-                    try { userInfo = await contract.users(addr); } catch(e){}
+                    let isNetworkError = false;
+                    try { 
+                        userInfo = await contract.users(addr); 
+                    } catch(e) {
+                        isNetworkError = true;
+                    }
+                    
+                    if (isNetworkError) {
+                        showAlert('authAlert', 'Network busy! Please try again.', true);
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
+                        return;
+                    }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) {
                         await loadDashboardData(addr, false);
@@ -680,7 +682,9 @@
                     }
                 } catch (error) {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
-                    showAlert('authAlert', 'Transaction Failed! Fund low or User Rejected.', true);
+                    let msg = 'Transaction Failed! Fund low or User Rejected.';
+                    if(error.message && error.message.includes('network')) msg = 'Wrong Network! Switch to Polygon.';
+                    showAlert('authAlert', msg, true);
                 }
             } else { 
                 alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
