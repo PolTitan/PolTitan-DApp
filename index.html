@@ -96,7 +96,7 @@
         /* ACTIVITY LIST */
         .activity-list { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); }
         .activity-header { display: flex; justify-content: space-between; padding: 15px; background: #0a0a0a; border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-gray); font-weight: bold; }
-        .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border-color); transition: 0.3s; }
+        .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border-color); transition: 0.3s; cursor: pointer;}
         .activity-item:hover { background: #111; }
         .activity-item:last-child { border-bottom: none; }
         .act-left { display: flex; align-items: center; gap: 12px; }
@@ -137,6 +137,13 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
+        /* Floating Bot & Chat Modal (Fixed CSS for Mobile) */
+        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); }
+        .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
+        .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
+        .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
+
         /* Alert Styling */
         .alert { display: none; margin-top: 15px; font-size: 13px; text-align: center; padding: 12px; border-radius: 8px; font-weight: 600; }
     </style>
@@ -154,7 +161,7 @@
         <div class="wallet-badge" id="headerWallet" onclick="event.stopPropagation();"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
 
-    <!-- SIDE MENU -->
+    <!-- B-TITAN STYLE SIDE MENU -->
     <div class="side-menu" id="sideMenu">
         <div class="close-menu" onclick="toggleMenu()"><i class="fa-solid fa-times"></i></div>
         <div class="menu-header">
@@ -164,7 +171,10 @@
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="loadTreeMatrix(); toggleMenu();"><i class="fa-solid fa-sitemap"></i> My Partners</div>
-        <div class="menu-item" onclick="alert('Transaction Page Coming Soon!');"><i class="fa-solid fa-list-check"></i> Transactions</div>
+        
+        <!-- YAHAN MERA NAYA TRANSACTION BUTTON HAI -->
+        <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
+        
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
 
@@ -187,7 +197,7 @@
         </div>
     </div>
 
-    <!-- NAYA MODAL - WELCOME MESSAGE (FIRST TIME JOINING) -->
+    <!-- MODAL - WELCOME MESSAGE (FIRST TIME JOINING) -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
@@ -291,32 +301,18 @@
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
             </div>
 
-            <!-- Latest Activity (Transactions) -->
+            <!-- Dashboard Preview (Dummy Activity) -->
             <div class="section-title">Latest Activity</div>
             <div class="activity-list">
-                <div class="activity-header">
-                    <span>Name</span>
-                    <span>Amount</span>
-                </div>
-                <div class="activity-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
+                <div class="activity-item clickable-list-item" onclick="loadTransactions()">
                     <div class="act-left">
-                        <div class="act-icon"><i class="fa-solid fa-user-plus"></i></div>
+                        <div class="act-icon"><i class="fa-solid fa-list-check"></i></div>
                         <div class="act-details">
-                            <h4>Slot 2 Upgrade</h4>
-                            <p>From ID 3</p>
+                            <h4>View All Transactions</h4>
+                            <p>Check history on Blockchain</p>
                         </div>
                     </div>
-                    <div class="act-right">+ 30.0 POL</div>
-                </div>
-                <div class="activity-item clickable-list-item" onclick="window.open('https://polygonscan.com/', '_blank')">
-                    <div class="act-left">
-                        <div class="act-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fa-solid fa-wallet"></i></div>
-                        <div class="act-details">
-                            <h4>Direct Income</h4>
-                            <p>From ID 5</p>
-                        </div>
-                    </div>
-                    <div class="act-right" style="color: #10b981;">+ 27.0 POL</div>
+                    <div class="act-right"><i class="fa-solid fa-arrow-right"></i></div>
                 </div>
             </div>
         </div>
@@ -351,7 +347,26 @@
             </div>
         </div>
 
+        <!-- 5. YAHAN HAI NAYA TRANSACTION VIEW PAGE -->
+        <div id="transactionView" class="view-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h3 style="color: var(--gold); font-size: 18px;">Transactions</h3>
+            </div>
+            
+            <div class="activity-list" id="transactionListContainer">
+                <!-- Ye JavaScript se auto-fill hoga -->
+            </div>
+        </div>
+
     </main>
+
+    <!-- Floating AI Chat Bot -->
+    <div class="chat-fab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
+        <div class="chat-body" id="chatBody"><div class="chat-msg">🙏 Namaste VIP! Main aapki kaise madad kar sakta hu?</div></div>
+    </div>
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
@@ -364,6 +379,8 @@
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
         let globalRootAddress = "";
+
+        const slotPrices = [0, 30, 60, 120, 240, 480, 960, 1920];
 
         const headerWallet = document.getElementById('headerWallet');
         const menuBtn = document.getElementById('menuBtn');
@@ -393,13 +410,41 @@
 
         function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
         
-        // Welcome Modal cut karne par Dashboard khulega
         window.closeWelcomeModal = function() {
             welcomeModal.style.display = 'none';
             loadDashboardData(userAddress, false);
         }
 
-        // --- NEW FEATURE 3: 7 SLOTS AUTO UI (NO BUY BUTTONS) ---
+        // --- NAYA FUNCTION: TRANSACTION PAGE LOAD KARNA ---
+        function loadTransactions() {
+            switchView('transactionView');
+            const container = document.getElementById('transactionListContainer');
+            // Polygonscan ke live address link se details connect karna
+            let scanAddress = userAddress ? userAddress : CONTRACT_ADDRESS;
+            
+            container.innerHTML = `
+                <div class="activity-header">
+                    <span>Details</span>
+                    <span>Status</span>
+                </div>
+                <div class="activity-item clickable-list-item" onclick="window.open('https://polygonscan.com/address/${scanAddress}#tokentxns', '_blank')">
+                    <div class="act-left">
+                        <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div>
+                        <div class="act-details">
+                            <h4>View on PolygonScan</h4>
+                            <p>Live Blockchain Records</p>
+                        </div>
+                    </div>
+                    <div class="act-right" style="color: var(--gold); font-size: 12px;">Check <i class="fa-solid fa-external-link"></i></div>
+                </div>
+                <div style="padding: 20px; font-size: 12px; color: var(--text-gray); text-align: center;">
+                    * All P2P matrix transactions are instantly routed via Smart Contract. 
+                    <br><br>Click above to see your 100% transparent live earning history directly on the blockchain.
+                </div>
+            `;
+        }
+
+        // --- 7 SLOTS AUTO UI ---
         function renderSlots(currentSlot) {
             const container = document.getElementById('slotsContainer');
             if(!container) return;
@@ -428,7 +473,7 @@
             container.innerHTML = html;
         }
 
-        // --- TREE VIEW LOGIC (HOLD FOR DETAILS, CLICK FOR DASHBOARD) ---
+        // --- TREE VIEW LOGIC (HOLD & CLICK) ---
         let pressStartTime = 0;
         let pressTimer;
 
@@ -465,7 +510,6 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                // Quick Click -> View that user's Dashboard/Menu
                 loadDashboardData(addr, true); 
             }
         };
@@ -596,8 +640,7 @@
             }
         }
 
-        // --- NEW FEATURE 1: ONE CLICK SMART AUTH ---
-        // Auto-fill Link
+        // --- ONE CLICK SMART AUTH ---
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) {
@@ -608,10 +651,8 @@
             if (window.ethereum || window.web3) {
                 try {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-                    
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     await provider.send("eth_requestAccounts", []);
-                    
                     signer = provider.getSigner();
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     const accounts = await provider.listAccounts();
@@ -621,10 +662,8 @@
                     try { userInfo = await contract.users(addr); } catch(e){}
                     
                     if(userInfo && userInfo[0].toNumber() > 0) {
-                        // Purana User: Seedha Login
                         await loadDashboardData(addr, false);
                     } else {
-                        // Naya User: Registration Process Shuru
                         const uplineAddr = document.getElementById('uplineInput').value.trim();
                         if(!uplineAddr || uplineAddr.length !== 42) {
                             showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true);
@@ -634,16 +673,12 @@
 
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
-                        
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                        await tx.wait(); // Transaction Pass
-                        
+                        await tx.wait(); 
                         userAddress = addr;
-                        // NEW FEATURE 2: Dikhaye Welcome Message
                         welcomeModal.style.display = 'flex';
                     }
                 } catch (error) {
-                    console.error(error);
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
                     showAlert('authAlert', 'Transaction Failed! Fund low or User Rejected.', true);
                 }
@@ -678,6 +713,10 @@
 
         function loadSlots() { switchView('slotsView'); }
         function loadNetwork() { loadTreeMatrix(); }
+        function toggleChat() {
+            const modal = document.getElementById('chatModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
     </script>
 </body>
 </html>
