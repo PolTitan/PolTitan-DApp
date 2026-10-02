@@ -565,45 +565,88 @@
 
         function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
 
+        // --- POINT 1: UPDATED GENEALOGY TO SHOW UNILEVEL REFERRAL TREE INSTEAD OF BINARY ---
         async function loadGenealogyFull(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Full Tree...</div>';
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Full Genealogy...</div>';
+
             try {
-                const root = await getNodeData(targetAddress);
-                if(!root) return;
-                const left = await getNodeData(root.left);
-                const right = await getNodeData(root.right);
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(root.address, 0)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul>`;
-                if(left) {
-                    html += `<li><a ${getSmartEvents(left.address, 0)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a>`;
-                    const leftL = await getNodeData(left.left);
-                    const leftR = await getNodeData(left.right);
-                    if(leftL || leftR) {
+                let allNodes = {}; 
+                let childrenMap = {}; 
+                let queue = [targetAddress];
+                let visited = new Set();
+                
+                // Traverses the entire network to map everyone under this user
+                while(queue.length > 0 && visited.size < 300) { 
+                    let currentAddr = queue.shift();
+                    if(visited.has(currentAddr)) continue;
+                    visited.add(currentAddr);
+                    
+                    let info = await contract.users(currentAddr);
+                    if(info[0].toNumber() === 0) continue;
+                    
+                    allNodes[currentAddr] = {
+                        id: info[0].toNumber(),
+                        address: currentAddr,
+                        upline: info[2],
+                        directCount: info[3].toNumber()
+                    };
+                    
+                    // Group people EXACTLY by who sponsored them (Unilevel structure)
+                    let up = info[2].toLowerCase();
+                    if(!childrenMap[up]) childrenMap[up] = [];
+                    if(currentAddr.toLowerCase() !== targetAddress.toLowerCase()) {
+                        childrenMap[up].push(currentAddr);
+                    }
+                    
+                    // Keep scanning the binary matrix to find all descendants
+                    let left = info[7];
+                    let right = info[8];
+                    if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
+                    if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
+                }
+
+                if(!allNodes[targetAddress]) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">User not found</div>';
+                    return;
+                }
+
+                // Recursive builder that generates unlimited width level-wise tree
+                function buildTreeHTML(nodeAddr, level) {
+                    let node = allNodes[nodeAddr];
+                    if(!node) return '';
+                    
+                    let iconColor = level === 0 ? '#3b82f6' : (level === 1 ? '#f5c518' : '#a0a0a0');
+                    let iconClass = level === 0 ? 'fa-user-astronaut' : 'fa-user-check';
+                    
+                    let html = `<li><a style="${level===0?'background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;':''}" ${getSmartEvents(node.address, 0)}>
+                        <i class="fa-solid ${iconClass}" style="color:${iconColor};"></i>
+                        <span class="id-label" style="color:#fff;">ID ${node.id}</span>
+                    </a>`;
+                    
+                    // If this person sponsored people, show them branching down
+                    let children = childrenMap[nodeAddr.toLowerCase()] || [];
+                    if(children.length > 0) {
                         html += `<ul>`;
-                        html += leftL ? `<li><a ${getSmartEvents(leftL.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftL.id}</span></a></li>` : createEmptyNode();
-                        html += leftR ? `<li><a ${getSmartEvents(leftR.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftR.id}</span></a></li>` : createEmptyNode();
+                        for(let childAddr of children) {
+                            html += buildTreeHTML(childAddr, level + 1);
+                        }
                         html += `</ul>`;
                     }
                     html += `</li>`;
-                } else { html += createEmptyNode(); }
-                if(right) {
-                    html += `<li><a ${getSmartEvents(right.address, 0)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a>`;
-                    const rightL = await getNodeData(right.left);
-                    const rightR = await getNodeData(right.right);
-                    if(rightL || rightR) {
-                        html += `<ul>`;
-                        html += rightL ? `<li><a ${getSmartEvents(rightL.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightL.id}</span></a></li>` : createEmptyNode();
-                        html += rightR ? `<li><a ${getSmartEvents(rightR.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightR.id}</span></a></li>` : createEmptyNode();
-                        html += `</ul>`;
-                    }
-                    html += `</li>`;
-                } else { html += createEmptyNode(); }
-                html += `</ul></li></ul>`;
+                    return html;
+                }
+
+                let finalHtml = `<ul>${buildTreeHTML(targetAddress, 0)}</ul>`;
                 treeContainer.className = "tree";
-                treeContainer.innerHTML = html;
-            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>'; }
+                treeContainer.innerHTML = finalHtml;
+
+            } catch (error) { 
+                console.error(error);
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>'; 
+            }
         }
 
         async function loadSlot1Directs(targetAddress) {
@@ -739,22 +782,15 @@
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
-
-        // --- 1. AUTO-CONNECT ON PAGE LOAD (BILKUL BTITAN JAISE) ---
         window.addEventListener('load', async () => {
             if (window.ethereum) {
                 try {
-                    // Jaise hi user DApp browser me site khulega, auto wallet connect ka prompt jayega
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     let activeAddress = await provider.getSigner().getAddress();
-                    
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                    
                     let userInfo = await contract.users(activeAddress);
                     
-                    // Check karega agar ID lagi hai to automatic dashboard khul jayega
                     if(userInfo && userInfo[0].toNumber() > 0) { 
                         await loadDashboardData(activeAddress, false); 
                     } else {
@@ -767,20 +803,13 @@
             }
         });
 
-
-        // --- 2. 1-CLICK EXACT LOGIN BEHAVIOR (NEW REGISTRATION/MANUAL LOGIN KE LIYE) ---
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-                    
-                    // Wallet connection ka popup layega
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     signer = provider.getSigner(); 
-                    
-                    // YAHI HAI WOH JADOO: Jo exact address select kiya hai wahi nikalega
                     let activeAddress = await signer.getAddress();
                     
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
@@ -788,11 +817,7 @@
 
                     let userInfo; 
                     let isNetworkError = false;
-                    try { 
-                        userInfo = await contract.users(activeAddress); 
-                    } catch(e) { 
-                        isNetworkError = true; 
-                    }
+                    try { userInfo = await contract.users(activeAddress); } catch(e) { isNetworkError = true; }
                     
                     if (isNetworkError) { 
                         showAlert('authAlert', 'Network busy! Please try again.', true); 
@@ -814,7 +839,6 @@
                         const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
                         await tx.wait(); 
-                        
                         userAddress = activeAddress; 
                         welcomeModal.style.display = 'flex';
                     }
@@ -824,9 +848,7 @@
                     if(error.message && error.message.includes('network')) msg = 'Wrong Network! Switch to Polygon.';
                     showAlert('authAlert', msg, true);
                 }
-            } else { 
-                alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
-            }
+            } else { alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); }
         });
 
         async function inspectFromLogin() {
