@@ -224,7 +224,6 @@
                     <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
                 
-                <!-- 1-CLICK DAPP LOGIN BUTTON -->
                 <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Login / Register Wallet</button>
                 
                 <div id="authAlert" class="alert"></div>
@@ -740,32 +739,57 @@
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
-        // --- 1-CLICK SEAMLESS DAPP LOGIN FLOW (100% WEB3 STANDARD) ---
+
+        // --- 1. AUTO-CONNECT ON PAGE LOAD (BILKUL BTITAN JAISE) ---
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                try {
+                    // Jaise hi user DApp browser me site khulega, auto wallet connect ka prompt jayega
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    let activeAddress = await provider.getSigner().getAddress();
+                    
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                    
+                    let userInfo = await contract.users(activeAddress);
+                    
+                    // Check karega agar ID lagi hai to automatic dashboard khul jayega
+                    if(userInfo && userInfo[0].toNumber() > 0) { 
+                        await loadDashboardData(activeAddress, false); 
+                    } else {
+                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-link" style="color:#10b981;"></i> Connected`;
+                        document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Register';
+                    }
+                } catch (error) {
+                    console.log("Auto-connect ignored by user or wallet");
+                }
+            }
+        });
+
+
+        // --- 2. 1-CLICK EXACT LOGIN BEHAVIOR (NEW REGISTRATION/MANUAL LOGIN KE LIYE) ---
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
                     
-                    // 1. Immediately request wallet connection (Triggers Native MetaMask/TokenPocket Popup)
-                    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    let addr = accounts[0];
+                    // Wallet connection ka popup layega
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
                     
-                    // 2. Ensure we use the exact active account shown in the wallet's UI
-                    if(window.ethereum.selectedAddress && addr.toLowerCase() !== window.ethereum.selectedAddress.toLowerCase()) {
-                        addr = window.ethereum.selectedAddress;
-                    }
-
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     signer = provider.getSigner(); 
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     
+                    // YAHI HAI WOH JADOO: Jo exact address select kiya hai wahi nikalega
+                    let activeAddress = await signer.getAddress();
+                    
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
-                    // 3. Check if user is registered in the Smart Contract
                     let userInfo; 
                     let isNetworkError = false;
                     try { 
-                        userInfo = await contract.users(addr); 
+                        userInfo = await contract.users(activeAddress); 
                     } catch(e) { 
                         isNetworkError = true; 
                     }
@@ -776,12 +800,9 @@
                         return; 
                     }
                     
-                    // 4. If ID exists -> Open Dashboard Directly
                     if(userInfo && userInfo[0].toNumber() > 0) { 
-                        await loadDashboardData(addr, false); 
-                    } 
-                    // 5. If ID doesn't exist -> Process Registration (Untouched Logic)
-                    else {
+                        await loadDashboardData(activeAddress, false); 
+                    } else {
                         const uplineAddr = document.getElementById('uplineInput').value.trim();
                         if(!uplineAddr || uplineAddr.length !== 42) { 
                             showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); 
@@ -790,14 +811,11 @@
                         }
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
-                        
-                        // Triggers the MetaMask Transaction Popup for 30 POL
                         const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
-                        
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
                         await tx.wait(); 
                         
-                        userAddress = addr; 
+                        userAddress = activeAddress; 
                         welcomeModal.style.display = 'flex';
                     }
                 } catch (error) {
@@ -810,7 +828,6 @@
                 alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
             }
         });
-        // --- END OF SEAMLESS FLOW ---
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
