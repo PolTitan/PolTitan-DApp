@@ -370,6 +370,18 @@
         const welcomeModal = document.getElementById('welcomeModal');
         const masterConnectBtn = document.getElementById('masterConnectBtn');
 
+        // SMART ACCOUNT SWITCH DETECTOR - Automatically updates UI if user switches account in MetaMask
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (userAddress && accounts.length > 0 && accounts[0].toLowerCase() !== userAddress.toLowerCase()) {
+                    window.location.reload();
+                }
+            });
+            window.ethereum.on('chainChanged', function (chainId) {
+                window.location.reload();
+            });
+        }
+
         function showAlert(id, msg, isError) {
             const alertDiv = document.getElementById(id);
             if(!alertDiv) return;
@@ -732,16 +744,48 @@
             if (window.ethereum || window.web3) {
                 try {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+                    
+                    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    let addr = accounts[0];
+                    
+                    // SMART MISMATCH DETECTOR: Force MetaMask to switch if cached account doesn't match active UI account
+                    try {
+                        let activeAddr = window.ethereum.selectedAddress;
+                        if (activeAddr && addr.toLowerCase() !== activeAddr.toLowerCase()) {
+                            await window.ethereum.request({
+                                method: 'wallet_requestPermissions',
+                                params: [{ eth_accounts: {} }]
+                            });
+                            accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                            addr = accounts[0];
+                        }
+                    } catch(err) {
+                        console.log("Permission bypass used by wallet.");
+                    }
+
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                    const accounts = await provider.listAccounts(); const addr = accounts[0];
+                    signer = provider.getSigner(); 
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    
                     let userInfo; let isNetworkError = false;
                     try { userInfo = await contract.users(addr); } catch(e) { isNetworkError = true; }
-                    if (isNetworkError) { showAlert('authAlert', 'Network busy! Please try again.', true); masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; return; }
-                    if(userInfo && userInfo[0].toNumber() > 0) { await loadDashboardData(addr, false); } else {
+                    
+                    if (isNetworkError) { 
+                        showAlert('authAlert', 'Network busy! Please try again.', true); 
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; 
+                        return; 
+                    }
+                    
+                    if(userInfo && userInfo[0].toNumber() > 0) { 
+                        await loadDashboardData(addr, false); 
+                    } else {
+                        // REGISTRATION LOGIC - UNTOUCHED 
                         const uplineAddr = document.getElementById('uplineInput').value.trim();
-                        if(!uplineAddr || uplineAddr.length !== 42) { showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; return; }
+                        if(!uplineAddr || uplineAddr.length !== 42) { 
+                            showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); 
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; 
+                            return; 
+                        }
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
