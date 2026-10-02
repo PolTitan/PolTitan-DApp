@@ -223,6 +223,7 @@
                     <i class="fa-solid fa-user-tie" style="color: var(--gold); margin-right: 10px;"></i>
                     <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
+                <!-- Login Button - Two Step Logic Appled Here -->
                 <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Connect Wallet</button>
                 <div id="authAlert" class="alert"></div>
                 <div style="display: flex; align-items: center; margin: 25px 0; color: #555;">
@@ -360,6 +361,10 @@
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
         let globalRootAddress = "";
+        
+        // Two-step logic variables
+        let walletConnected = false;
+        let currentConnectedAddress = "";
 
         const slotPrices = [0, 30, 60, 120, 240, 480, 960, 1920];
 
@@ -370,14 +375,12 @@
         const welcomeModal = document.getElementById('welcomeModal');
         const masterConnectBtn = document.getElementById('masterConnectBtn');
 
-        // SMART ACCOUNT SWITCH DETECTOR - Automatically updates UI if user switches account in MetaMask
+        // RELOAD ON METAMASK ACCOUNT SWITCH TO PREVENT CACHE ERRORS
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', function (accounts) {
-                if (userAddress && accounts.length > 0 && accounts[0].toLowerCase() !== userAddress.toLowerCase()) {
-                    window.location.reload();
-                }
+            window.ethereum.on('accountsChanged', function () {
+                window.location.reload();
             });
-            window.ethereum.on('chainChanged', function (chainId) {
+            window.ethereum.on('chainChanged', function () {
                 window.location.reload();
             });
         }
@@ -606,7 +609,6 @@
             } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>'; }
         }
 
-        // FULLY AUTOMATIC BLOCKCHAIN SEARCH ALGORITHM FOR SLOT 1 (DIRECTS)
         async function loadSlot1Directs(targetAddress) {
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
@@ -740,65 +742,77 @@
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
+        // --- 2-STEP CONNECTION LOGIC START ---
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
-                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-                    
-                    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    let addr = accounts[0];
-                    
-                    // SMART MISMATCH DETECTOR: Force MetaMask to switch if cached account doesn't match active UI account
-                    try {
-                        let activeAddr = window.ethereum.selectedAddress;
-                        if (activeAddr && addr.toLowerCase() !== activeAddr.toLowerCase()) {
-                            await window.ethereum.request({
-                                method: 'wallet_requestPermissions',
-                                params: [{ eth_accounts: {} }]
-                            });
-                            accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                            addr = accounts[0];
+                    // STEP 1: ONLY CONNECT WALLET
+                    if (!walletConnected) {
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+                        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                        
+                        // Gets the active account without forcing buggy permissions
+                        const accounts = await provider.send("eth_requestAccounts", []);
+                        currentConnectedAddress = accounts[0];
+                        signer = provider.getSigner();
+                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                        
+                        walletConnected = true;
+                        
+                        // Update UI to Step 2
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login';
+                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-link" style="color:#10b981;"></i> Connected`;
+                        showAlert('authAlert', 'Wallet Connected! Click Activate / Login to proceed.', false);
+                    } 
+                    // STEP 2: CHECK BLOCKCHAIN AND LOGIN / REGISTER
+                    else {
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
+                        
+                        // Ensure we use the latest address in case it changed
+                        const accounts = await provider.send("eth_requestAccounts", []);
+                        currentConnectedAddress = accounts[0];
+                        
+                        let userInfo; let isNetworkError = false;
+                        try { 
+                            userInfo = await contract.users(currentConnectedAddress); 
+                        } catch(e) { 
+                            isNetworkError = true; 
                         }
-                    } catch(err) {
-                        console.log("Permission bypass used by wallet.");
-                    }
-
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    signer = provider.getSigner(); 
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                    
-                    let userInfo; let isNetworkError = false;
-                    try { userInfo = await contract.users(addr); } catch(e) { isNetworkError = true; }
-                    
-                    if (isNetworkError) { 
-                        showAlert('authAlert', 'Network busy! Please try again.', true); 
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; 
-                        return; 
-                    }
-                    
-                    if(userInfo && userInfo[0].toNumber() > 0) { 
-                        await loadDashboardData(addr, false); 
-                    } else {
-                        // REGISTRATION LOGIC - UNTOUCHED 
-                        const uplineAddr = document.getElementById('uplineInput').value.trim();
-                        if(!uplineAddr || uplineAddr.length !== 42) { 
-                            showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); 
-                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; 
+                        
+                        if (isNetworkError) { 
+                            showAlert('authAlert', 'Network busy! Please try again.', true); 
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login'; 
                             return; 
                         }
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
-                        const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                        await tx.wait(); userAddress = addr; welcomeModal.style.display = 'flex';
+                        
+                        if(userInfo && userInfo[0].toNumber() > 0) { 
+                            // ID found, go to dashboard
+                            await loadDashboardData(currentConnectedAddress, false); 
+                        } else {
+                            // REGISTRATION LOGIC - UNTOUCHED 
+                            const uplineAddr = document.getElementById('uplineInput').value.trim();
+                            if(!uplineAddr || uplineAddr.length !== 42) { 
+                                showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); 
+                                masterConnectBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login'; 
+                                return; 
+                            }
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
+                            const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                            await tx.wait(); 
+                            userAddress = currentConnectedAddress; 
+                            welcomeModal.style.display = 'flex';
+                        }
                     }
                 } catch (error) {
-                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
-                    let msg = 'Transaction Failed! Fund low or User Rejected.';
+                    masterConnectBtn.innerHTML = walletConnected ? '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login' : '<i class="fa-solid fa-wallet"></i> Connect Wallet';
+                    let msg = 'Transaction Failed or User Rejected.';
                     if(error.message && error.message.includes('network')) msg = 'Wrong Network! Switch to Polygon.';
                     showAlert('authAlert', msg, true);
                 }
             } else { alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); }
         });
+        // --- 2-STEP CONNECTION LOGIC END ---
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
@@ -807,7 +821,18 @@
 
         document.getElementById('copyRefBtn').addEventListener('click', () => { if(isViewOnly) return; navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Link Copied!")); });
 
-        function logoutWallet() { userAddress = null; isViewOnly = false; toggleMenu(); menuBtn.style.display = "none"; headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; switchView('authView'); }
+        function logoutWallet() { 
+            userAddress = null; 
+            isViewOnly = false; 
+            walletConnected = false; 
+            currentConnectedAddress = ""; 
+            toggleMenu(); 
+            menuBtn.style.display = "none"; 
+            headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
+            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; 
+            switchView('authView'); 
+        }
+        
         function toggleChat() { const modal = document.getElementById('chatModal'); modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex'; }
     </script>
 </body>
