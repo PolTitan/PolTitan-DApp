@@ -81,7 +81,6 @@
         
         .earning-box { background: linear-gradient(90deg, #1a1a1a, #0a0a0a); position: relative; overflow: hidden;}
         .earning-box .amount { font-size: 32px; color: var(--gold); font-weight: 800; display: flex; align-items: center; gap: 10px; }
-        /* Polygon Logo specific style */
         .pol-logo { width: 30px; height: 30px; border-radius: 50%; object-fit: contain; }
         .earning-box .sub-amt { font-size: 12px; color: var(--text-gray); margin-top: 5px; }
         .earning-icon { position: absolute; right: 10px; bottom: -10px; font-size: 80px; color: rgba(245, 197, 24, 0.05); }
@@ -128,7 +127,8 @@
 
         /* GRID FOR SLOT 1 */
         .direct-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px 0; }
-        .direct-node { border: 1px solid var(--gold); padding: 15px; border-radius: 12px; background: #111; width: 100px; text-align: center; }
+        .direct-node { border: 1px solid var(--gold); padding: 15px; border-radius: 12px; background: #111; width: 100px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .direct-node:hover { transform: translateY(-3px); background: rgba(245, 197, 24, 0.1); }
         .direct-node i { font-size: 24px; color: #3b82f6; margin-bottom: 10px; }
         .direct-node .d-id { color: var(--gold); font-weight: bold; font-size: 14px; }
 
@@ -168,13 +168,12 @@
         <div class="wallet-badge" id="headerWallet" onclick="event.stopPropagation();"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
 
-    <!-- B-TITAN STYLE SIDE MENU -->
+    <!-- SIDE MENU -->
     <div class="side-menu" id="sideMenu">
         <div class="close-menu" onclick="toggleMenu()"><i class="fa-solid fa-times"></i></div>
         <div class="menu-header">
             <h2><i class="fa-solid fa-crown"></i> PolTitan</h2>
         </div>
-        
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="loadMyPartners(); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
@@ -182,7 +181,7 @@
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
 
-    <!-- MODAL - UPLINE DETAILS -->
+    <!-- MODALS -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -201,7 +200,6 @@
         </div>
     </div>
 
-    <!-- MODAL - WELCOME MESSAGE -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
@@ -212,31 +210,24 @@
     </div>
 
     <main class="container">
-        
         <!-- 1. SMART AUTH VIEW -->
         <div id="authView" class="view-section">
             <div style="text-align: center; margin-bottom: 30px;">
-                <!-- Updated Polygon Logo visually via CSS custom image/svg style approach for PolTitan brand -->
                 <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" style="width: 70px; height: 70px; margin-bottom: 15px; filter: drop-shadow(0 0 15px rgba(130, 71, 229, 0.5));">
                 <h1 style="font-size: 28px; font-weight: 800; letter-spacing: 2px;">Pol<span style="color: var(--gold);">Titan</span></h1>
                 <p style="color: var(--text-gray); font-size: 12px; letter-spacing: 1px;">THE ULTIMATE MATRIX RUSH</p>
             </div>
-
             <div class="vip-card">
                 <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">Join Matrix / Login Dashboard</p>
-                
                 <div class="input-box" style="margin-bottom: 20px;">
                     <i class="fa-solid fa-user-tie" style="color: var(--gold); margin-right: 10px;"></i>
                     <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
-
                 <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Connect Wallet</button>
                 <div id="authAlert" class="alert"></div>
-
                 <div style="display: flex; align-items: center; margin: 25px 0; color: #555;">
                     <hr style="flex: 1; border-color: #333;"> <span style="margin: 0 10px; font-size: 12px;">VIEW MODE</span> <hr style="flex: 1; border-color: #333;">
                 </div>
-                
                 <div class="input-box">
                     <input type="text" id="inspectAddressInput" placeholder="Enter Wallet Address to View">
                 </div>
@@ -246,12 +237,10 @@
 
         <!-- 2. DASHBOARD VIEW -->
         <div id="dashboardView" class="view-section">
-            
             <div id="readOnlyBanner" style="display: none; background: #ff4d4d; color: #fff; text-align: center; padding: 10px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
                 <i class="fa-solid fa-eye"></i> You are viewing someone else's Dashboard <br>
                 <button onclick="logoutWallet()" style="margin-top: 8px; padding: 5px 10px; border-radius: 5px; border: none; background: #fff; color: #ff4d4d; font-weight: bold; cursor: pointer;">Exit View Mode</button>
             </div>
-
             <div class="profile-card">
                 <div class="profile-header">
                     <div class="avatar"><i class="fa-solid fa-user-astronaut"></i></div>
@@ -296,15 +285,12 @@
             <div class="action-box earning-box">
                 <h4>Total Earning <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="amount">
-                    <!-- Point 1: Original Polygon Logo added, Eth removed -->
                     <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo"> 
                     <span id="totalIncomeDisplay">0.00</span> POL
                 </div>
-                <!-- Point 1: Text removed from here -->
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
             </div>
 
-            <!-- Dashboard Preview -->
             <div class="section-title">Latest Activity</div>
             <div class="activity-list">
                 <div class="activity-item clickable-list-item" onclick="loadTransactions()">
@@ -335,14 +321,12 @@
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
-            
             <div class="vip-card" style="padding: 10px;">
                 <div class="tree-container">
                     <div class="tree" id="matrixTreeDisplay">
                         <div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Tree...</div>
                     </div>
                 </div>
-                <!-- Point 3,4,5: Active ID / Empty Slot text completely removed from here -->
             </div>
         </div>
 
@@ -352,13 +336,10 @@
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">Transactions</h3>
             </div>
-            
-            <!-- Point 2: 5 Transactions details dynamically loaded here -->
             <div class="activity-list" id="transactionListContainer">
                 <div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching 5 Latest Transactions...</div>
             </div>
         </div>
-
     </main>
 
     <!-- Chat Bot -->
@@ -415,34 +396,21 @@
             loadDashboardData(userAddress, false);
         }
 
-        // Point 2 Logic: Fetching last 5 real transactions of the user address using PolygonScan public API
         async function loadTransactions() {
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
             let scanAddress = userAddress ? userAddress : CONTRACT_ADDRESS;
-            
             container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching 5 Latest Transactions...</div>`;
-
             try {
-                // Using Polygonscan API to get latest standard TXNs
                 let response = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${scanAddress}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc`);
                 let data = await response.json();
-                
-                let html = `
-                    <div class="activity-header">
-                        <span>Date & Details</span>
-                        <span>Txn Hash</span>
-                    </div>
-                `;
-
+                let html = `<div class="activity-header"><span>Date & Details</span><span>Txn Hash</span></div>`;
                 if(data.status === "1" && data.result.length > 0) {
                     data.result.forEach(tx => {
                         let dateObj = new Date(tx.timeStamp * 1000);
                         let dateStr = dateObj.toLocaleDateString();
                         let timeStr = dateObj.toLocaleTimeString();
                         let hashShort = tx.hash.substring(0, 8) + "...";
-                        
-                        // New tab link directly to this transaction hash
                         html += `
                         <a href="https://polygonscan.com/tx/${tx.hash}" target="_blank" style="text-decoration:none; display: block;">
                             <div class="activity-item">
@@ -460,7 +428,6 @@
                         </a>`;
                     });
                 } else {
-                    // Fallback if no records found or API limit
                     html += `
                         <a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;">
                         <div class="activity-item clickable-list-item">
@@ -475,33 +442,13 @@
                         </div>
                         </a>`;
                 }
-
-                html += `
-                    <div style="padding: 20px; font-size: 11px; color: var(--text-gray); text-align: center;">
-                        * Showing Latest 5 Transactions.<br>Click any transaction to verify directly on the Polygon Blockchain.
-                    </div>
-                `;
+                html += `<div style="padding: 20px; font-size: 11px; color: var(--text-gray); text-align: center;">* Showing Latest 5 Transactions.<br>Click any transaction to verify directly on the Polygon Blockchain.</div>`;
                 container.innerHTML = html;
             } catch(e) {
-                // Fallback UI in case API fails
-                container.innerHTML = `
-                    <a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;">
-                        <div class="activity-item clickable-list-item">
-                            <div class="act-left">
-                                <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div>
-                                <div class="act-details">
-                                    <h4>View on PolygonScan</h4>
-                                    <p>Live Blockchain Records</p>
-                                </div>
-                            </div>
-                            <div class="act-right" style="color: var(--gold); font-size: 12px;">Check <i class="fa-solid fa-external-link"></i></div>
-                        </div>
-                    </a>
-                `;
+                container.innerHTML = `<a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;"><div class="activity-item clickable-list-item"><div class="act-left"><div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div><div class="act-details"><h4>View on PolygonScan</h4><p>Live Blockchain Records</p></div></div><div class="act-right" style="color: var(--gold); font-size: 12px;">Check <i class="fa-solid fa-external-link"></i></div></div></a>`;
             }
         }
 
-        // Point 5: Full Genealogy Automated
         function loadMyPartners() {
             document.getElementById('treeViewTitle').innerText = "My Partners Genealogy";
             loadGenealogyFull(userAddress); 
@@ -511,7 +458,6 @@
             const container = document.getElementById('slotsContainer');
             if(!container) return;
             let html = '';
-            
             for(let i=1; i<=7; i++) {
                 if(i <= currentSlot) {
                     html += `
@@ -535,7 +481,6 @@
             container.innerHTML = html;
         }
 
-        // Handle slot specific clicks (Point 3 and 4 logic router)
         function handleSlotClick(slotNum, address) {
             if(slotNum === 1) {
                 document.getElementById('treeViewTitle').innerText = "Slot 1 (All Directs)";
@@ -545,11 +490,10 @@
                 loadSlot2Matrix(address);
             } else {
                 document.getElementById('treeViewTitle').innerText = `Slot ${slotNum} Matrix`;
-                loadGenealogyFull(address); // Fallback to normal tree for others if needed
+                loadGenealogyFull(address); 
             }
         }
 
-        // --- TREE VIEW LOGIC ---
         let pressStartTime = 0;
         let pressTimer;
 
@@ -586,17 +530,13 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                // Re-render based on current context
                 if(currentSlotContext === 1) loadSlot1Directs(addr);
                 else if(currentSlotContext === 2) loadSlot2Matrix(addr);
                 else loadGenealogyFull(addr); 
             }
         };
 
-        window.cancelNodePress = function() {
-            clearTimeout(pressTimer);
-            pressStartTime = 0;
-        };
+        window.cancelNodePress = function() { clearTimeout(pressTimer); pressStartTime = 0; };
 
         function getSmartEvents(addr, context) {
             return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
@@ -611,25 +551,19 @@
             } catch (e) { return null; }
         }
 
-        function createEmptyNode() {
-            return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`;
-        }
+        function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
 
-        // Point 5: Full Genealogy Tree Auto
         async function loadGenealogyFull(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Full Tree...</div>';
-
             try {
                 const root = await getNodeData(targetAddress);
                 if(!root) return;
                 const left = await getNodeData(root.left);
                 const right = await getNodeData(root.right);
-
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(root.address, 0)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul>`;
-
                 if(left) {
                     html += `<li><a ${getSmartEvents(left.address, 0)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a>`;
                     const leftL = await getNodeData(left.left);
@@ -642,7 +576,6 @@
                     }
                     html += `</li>`;
                 } else { html += createEmptyNode(); }
-
                 if(right) {
                     html += `<li><a ${getSmartEvents(right.address, 0)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a>`;
                     const rightL = await getNodeData(right.left);
@@ -655,161 +588,127 @@
                     }
                     html += `</li>`;
                 } else { html += createEmptyNode(); }
-
                 html += `</ul></li></ul>`;
                 treeContainer.className = "tree";
                 treeContainer.innerHTML = html;
-
-            } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>';
-            }
+            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>'; }
         }
 
-        // Point 3: Slot 1 - Shows ALL directs only (Level 1 grid format)
+        // FULLY AUTOMATIC BLOCKCHAIN SEARCH ALGORITHM FOR SLOT 1 (DIRECTS)
         async function loadSlot1Directs(targetAddress) {
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Level 1 Partners...</div>';
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching All Direct Partners from Blockchain...</div>';
 
             try {
-                const root = await getNodeData(targetAddress);
-                if(!root) return;
+                const rootInfo = await contract.users(targetAddress);
+                if(rootInfo[0].toNumber() === 0) return;
+                
+                let directCount = rootInfo[3].toNumber();
+                let rootId = rootInfo[0].toNumber();
                 
                 let html = `<div style="margin-bottom: 20px;">
                     <div style="display:inline-block; padding:15px; background:rgba(59, 130, 246, 0.2); border:1px solid #3b82f6; border-radius:12px; margin-bottom:15px;">
                         <i class="fa-solid fa-user-astronaut" style="font-size:24px; color:#3b82f6;"></i>
-                        <div style="font-weight:bold; color:#fff; margin-top:5px;">ID ${root.id}</div>
+                        <div style="font-weight:bold; color:#fff; margin-top:5px;">ID ${rootId}</div>
                     </div>
-                    <div style="color: var(--text-gray); font-size: 12px;">Total Level 1 Directs: <span style="color:var(--gold); font-weight:bold;">${root.directCount}</span></div>
+                    <div style="color: var(--text-gray); font-size: 12px;">Total Level 1 Directs: <span style="color:var(--gold); font-weight:bold;">${directCount}</span></div>
                     <hr style="border-color:#333; margin:15px 0;">
                 </div>
                 <div class="direct-grid">`;
 
-                // Smart Contract logic specific: Since we only have specific mappings, we fetch left/right.
-                // In actual deployment, if there's no array array to loop, we simulate layout for UI visual representation based on directCount.
-                const left = await getNodeData(root.left);
-                const right = await getNodeData(root.right);
-                
-                let foundDirects = 0;
-                
-                if(left) {
-                    html += `<div class="direct-node" ${getSmartEvents(left.address, 1)}>
-                                <i class="fa-solid fa-user-check"></i>
-                                <div class="d-id">ID ${left.id}</div>
-                             </div>`;
-                    foundDirects++;
-                }
-                if(right) {
-                    html += `<div class="direct-node" ${getSmartEvents(right.address, 1)}>
-                                <i class="fa-solid fa-user-check"></i>
-                                <div class="d-id">ID ${right.id}</div>
-                             </div>`;
-                    foundDirects++;
-                }
-                
-                // Show placeholders for remaining directs dynamically to complete the layout logic requested
-                let remaining = root.directCount - foundDirects;
-                for(let i=0; i<remaining; i++) {
-                    html += `<div class="direct-node">
-                                <i class="fa-solid fa-user" style="color:#555;"></i>
-                                <div class="d-id" style="color:#888;">Direct</div>
-                             </div>`;
-                }
-                
-                if(root.directCount === 0) {
+                if(directCount > 0) {
+                    let directsFound = [];
+                    let queue = [targetAddress];
+                    let visited = new Set();
+                    
+                    while(queue.length > 0 && directsFound.length < directCount) {
+                        let currentAddr = queue.shift();
+                        if(visited.has(currentAddr)) continue;
+                        visited.add(currentAddr);
+
+                        let nodeInfo = await contract.users(currentAddr);
+                        if(nodeInfo[0].toNumber() === 0) continue;
+
+                        if(currentAddr.toLowerCase() !== targetAddress.toLowerCase()) {
+                            if(nodeInfo[2].toLowerCase() === targetAddress.toLowerCase()) {
+                                directsFound.push({ id: nodeInfo[0].toNumber(), address: currentAddr });
+                            }
+                        }
+
+                        let left = nodeInfo[7];
+                        let right = nodeInfo[8];
+                        if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
+                        if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
+                    }
+
+                    directsFound.forEach(direct => {
+                        html += `<div class="direct-node" ${getSmartEvents(direct.address, 1)}>
+                                    <i class="fa-solid fa-user-check"></i>
+                                    <div class="d-id">ID ${direct.id}</div>
+                                 </div>`;
+                    });
+                    
+                    let remaining = directCount - directsFound.length;
+                    for(let i=0; i<remaining; i++) {
+                        html += `<div class="direct-node">
+                                    <i class="fa-solid fa-spinner fa-spin" style="color:#555;"></i>
+                                    <div class="d-id" style="color:#888;">Syncing...</div>
+                                 </div>`;
+                    }
+                } else {
                     html += `<div style="color: #555; padding: 20px; width: 100%;">No directs in Slot 1 yet.</div>`;
                 }
 
                 html += `</div>`;
-                treeContainer.className = ""; // Remove CSS Tree lines for grid view
+                treeContainer.className = ""; 
                 treeContainer.innerHTML = html;
-
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Level 1</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error fetching Level 1 data from Blockchain</div>';
             }
         }
 
-        // Point 4: Slot 2 - Shows MAX 4 people in Level 1 only.
         async function loadSlot2Matrix(targetAddress) {
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Slot 2 Matrix...</div>';
-
             try {
                 const root = await getNodeData(targetAddress);
                 if(!root) return;
-                
-                // Max 4 layout visualization logic
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(root.address, 2)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul style="padding-top: 20px;">`;
-
-                // Fetch real left/right
                 const left = await getNodeData(root.left);
                 const right = await getNodeData(root.right);
-                
-                // Generating 4 Nodes visually in one level
-                // Node 1
                 if(left) { html += `<li><a ${getSmartEvents(left.address, 2)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a></li>`; }
                 else { html += createEmptyNode(); }
-                // Node 2
                 if(right) { html += `<li><a ${getSmartEvents(right.address, 2)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a></li>`; }
                 else { html += createEmptyNode(); }
-                // Node 3 & 4 (Placeholders for max 4 limit structure)
                 html += createEmptyNode();
                 html += createEmptyNode();
-
                 html += `</ul></li></ul>`;
-                
                 treeContainer.className = "tree";
                 treeContainer.innerHTML = html;
-
-            } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2</div>';
-            }
+            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2</div>'; }
         }
 
-        // --- DASHBOARD LOADER & INCOME CALCULATION ---
         async function loadDashboardData(address, viewMode) {
             try {
-                userAddress = address; 
-                globalRootAddress = address; 
-                isViewOnly = viewMode;
-
-                if(!provider) {
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    signer = provider.getSigner();
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                }
-
+                userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
+                if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
                 let userId = 0; let userInfo = null;
-                try {
-                    userInfo = await contract.users(userAddress);
-                    userId = userInfo[0].toNumber(); 
-                } catch (dataError) { userId = 0; }
-
+                try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
-                    
                     let upline = userInfo[2];
-                    if(upline !== "0x0000000000000000000000000000000000000000") {
-                        const uInfo = await contract.users(upline);
-                        document.getElementById('displayUplineId').innerText = uInfo[0].toNumber();
-                    }
-                    
+                    if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await contract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
-                    
-                    // Fixed Income Logic: First 2 goes to upgrade, rest 27 POL per direct
                     let calculatedIncome = 0;
-                    if(directCount > 2) {
-                        calculatedIncome = (directCount - 2) * 27;
-                    }
+                    if(directCount > 2) { calculatedIncome = (directCount - 2) * 27; }
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
-                    
                     userCurrentSlotNum = userInfo[4].toNumber();
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
                     renderSlots(userCurrentSlotNum);
-                    
                     if(isViewOnly) {
                         headerWallet.innerHTML = `<i class="fa-solid fa-eye"></i> ID ${userId}`;
                         document.getElementById('readOnlyBanner').style.display = "block";
@@ -820,23 +719,14 @@
                         document.getElementById('personalLinkBox').style.display = "block";
                         document.getElementById('displayRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     }
-
-                    menuBtn.style.display = "block"; 
-                    switchView('dashboardView');
-                } else {
-                    showAlert('authAlert', 'Address not found in Matrix!', true);
-                }
-            } catch (error) {
-                showAlert('authAlert', 'Network Error!', true);
-            }
+                    menuBtn.style.display = "block"; switchView('dashboardView');
+                } else { showAlert('authAlert', 'Address not found in Matrix!', true); }
+            } catch (error) { showAlert('authAlert', 'Network Error!', true); }
         }
 
-        // --- BULLETPROOF ONE CLICK SMART AUTH ---
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
-        if (refParam && refParam.length === 42) {
-            document.getElementById('uplineInput').value = refParam;
-        }
+        if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
@@ -844,41 +734,18 @@
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                    const accounts = await provider.listAccounts();
-                    const addr = accounts[0];
-                    
-                    let userInfo;
-                    let isNetworkError = false;
-                    try { 
-                        userInfo = await contract.users(addr); 
-                    } catch(e) {
-                        isNetworkError = true;
-                    }
-                    
-                    if (isNetworkError) {
-                        showAlert('authAlert', 'Network busy! Please try again.', true);
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
-                        return;
-                    }
-                    
-                    if(userInfo && userInfo[0].toNumber() > 0) {
-                        await loadDashboardData(addr, false);
-                    } else {
+                    signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    const accounts = await provider.listAccounts(); const addr = accounts[0];
+                    let userInfo; let isNetworkError = false;
+                    try { userInfo = await contract.users(addr); } catch(e) { isNetworkError = true; }
+                    if (isNetworkError) { showAlert('authAlert', 'Network busy! Please try again.', true); masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; return; }
+                    if(userInfo && userInfo[0].toNumber() > 0) { await loadDashboardData(addr, false); } else {
                         const uplineAddr = document.getElementById('uplineInput').value.trim();
-                        if(!uplineAddr || uplineAddr.length !== 42) {
-                            showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true);
-                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
-                            return;
-                        }
-
+                        if(!uplineAddr || uplineAddr.length !== 42) { showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; return; }
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                        await tx.wait(); 
-                        userAddress = addr;
-                        welcomeModal.style.display = 'flex';
+                        await tx.wait(); userAddress = addr; welcomeModal.style.display = 'flex';
                     }
                 } catch (error) {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
@@ -886,39 +753,18 @@
                     if(error.message && error.message.includes('network')) msg = 'Wrong Network! Switch to Polygon.';
                     showAlert('authAlert', msg, true);
                 }
-            } else { 
-                alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
-            }
+            } else { alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); }
         });
 
-        // VIEW MODE LOGIN
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
-            if(inputAddr.length === 42) {
-                provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                await loadDashboardData(inputAddr, true);
-            } else {
-                showAlert('authAlert', 'Invalid Address Format', true);
-            }
+            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
         }
 
-        document.getElementById('copyRefBtn').addEventListener('click', () => {
-            if(isViewOnly) return;
-            navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Link Copied!"));
-        });
+        document.getElementById('copyRefBtn').addEventListener('click', () => { if(isViewOnly) return; navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Link Copied!")); });
 
-        function logoutWallet() {
-            userAddress = null; isViewOnly = false; toggleMenu(); menuBtn.style.display = "none"; 
-            headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
-            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet';
-            switchView('authView'); 
-        }
-
-        function toggleChat() {
-            const modal = document.getElementById('chatModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        }
+        function logoutWallet() { userAddress = null; isViewOnly = false; toggleMenu(); menuBtn.style.display = "none"; headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; switchView('authView'); }
+        function toggleChat() { const modal = document.getElementById('chatModal'); modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex'; }
     </script>
 </body>
 </html>
