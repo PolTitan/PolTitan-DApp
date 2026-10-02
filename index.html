@@ -565,7 +565,7 @@
 
         function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
 
-        // --- POINT 1: UPDATED GENEALOGY TO SHOW UNILEVEL REFERRAL TREE INSTEAD OF BINARY ---
+        // --- NEW UPDATED UNILEVEL GENEALOGY ALGORITHM (100% Correct) ---
         async function loadGenealogyFull(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
@@ -578,8 +578,8 @@
                 let queue = [targetAddress];
                 let visited = new Set();
                 
-                // Traverses the entire network to map everyone under this user
-                while(queue.length > 0 && visited.size < 300) { 
+                // BFS to find all downline members in the network
+                while(queue.length > 0 && visited.size < 500) { 
                     let currentAddr = queue.shift();
                     if(visited.has(currentAddr)) continue;
                     visited.add(currentAddr);
@@ -587,35 +587,37 @@
                     let info = await contract.users(currentAddr);
                     if(info[0].toNumber() === 0) continue;
                     
-                    allNodes[currentAddr] = {
+                    allNodes[currentAddr.toLowerCase()] = {
                         id: info[0].toNumber(),
                         address: currentAddr,
-                        upline: info[2],
+                        upline: info[2].toLowerCase(),
                         directCount: info[3].toNumber()
                     };
                     
-                    // Group people EXACTLY by who sponsored them (Unilevel structure)
+                    // Map by Direct Sponsor (Unilevel Mapping)
                     let up = info[2].toLowerCase();
                     if(!childrenMap[up]) childrenMap[up] = [];
                     if(currentAddr.toLowerCase() !== targetAddress.toLowerCase()) {
-                        childrenMap[up].push(currentAddr);
+                        if(!childrenMap[up].includes(currentAddr.toLowerCase())) {
+                            childrenMap[up].push(currentAddr.toLowerCase());
+                        }
                     }
                     
-                    // Keep scanning the binary matrix to find all descendants
+                    // Traverse binary matrix simply to discover everyone
                     let left = info[7];
                     let right = info[8];
                     if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
                     if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
                 }
 
-                if(!allNodes[targetAddress]) {
+                if(!allNodes[targetAddress.toLowerCase()]) {
                     treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">User not found</div>';
                     return;
                 }
 
-                // Recursive builder that generates unlimited width level-wise tree
-                function buildTreeHTML(nodeAddr, level) {
-                    let node = allNodes[nodeAddr];
+                // Recursive function to build unlimited width tree
+                function buildTreeHTML(nodeAddrLower, level) {
+                    let node = allNodes[nodeAddrLower];
                     if(!node) return '';
                     
                     let iconColor = level === 0 ? '#3b82f6' : (level === 1 ? '#f5c518' : '#a0a0a0');
@@ -626,12 +628,11 @@
                         <span class="id-label" style="color:#fff;">ID ${node.id}</span>
                     </a>`;
                     
-                    // If this person sponsored people, show them branching down
-                    let children = childrenMap[nodeAddr.toLowerCase()] || [];
+                    let children = childrenMap[nodeAddrLower] || [];
                     if(children.length > 0) {
                         html += `<ul>`;
-                        for(let childAddr of children) {
-                            html += buildTreeHTML(childAddr, level + 1);
+                        for(let childAddrLower of children) {
+                            html += buildTreeHTML(childAddrLower, level + 1);
                         }
                         html += `</ul>`;
                     }
@@ -639,7 +640,7 @@
                     return html;
                 }
 
-                let finalHtml = `<ul>${buildTreeHTML(targetAddress, 0)}</ul>`;
+                let finalHtml = `<ul>${buildTreeHTML(targetAddress.toLowerCase(), 0)}</ul>`;
                 treeContainer.className = "tree";
                 treeContainer.innerHTML = finalHtml;
 
@@ -648,6 +649,7 @@
                 treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>'; 
             }
         }
+        // --- END OF NEW UNILEVEL GENEALOGY ALGORITHM ---
 
         async function loadSlot1Directs(targetAddress) {
             switchView('treeView');
@@ -839,6 +841,7 @@
                         const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
                         await tx.wait(); 
+                        
                         userAddress = activeAddress; 
                         welcomeModal.style.display = 'flex';
                     }
