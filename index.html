@@ -223,8 +223,10 @@
                     <i class="fa-solid fa-user-tie" style="color: var(--gold); margin-right: 10px;"></i>
                     <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
-                <!-- Login Button - Two Step Logic Appled Here -->
-                <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Connect Wallet</button>
+                
+                <!-- 1-CLICK DAPP LOGIN BUTTON -->
+                <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Login / Register Wallet</button>
+                
                 <div id="authAlert" class="alert"></div>
                 <div style="display: flex; align-items: center; margin: 25px 0; color: #555;">
                     <hr style="flex: 1; border-color: #333;"> <span style="margin: 0 10px; font-size: 12px;">VIEW MODE</span> <hr style="flex: 1; border-color: #333;">
@@ -361,10 +363,6 @@
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
         let globalRootAddress = "";
-        
-        // Two-step logic variables
-        let walletConnected = false;
-        let currentConnectedAddress = "";
 
         const slotPrices = [0, 30, 60, 120, 240, 480, 960, 1920];
 
@@ -375,7 +373,7 @@
         const welcomeModal = document.getElementById('welcomeModal');
         const masterConnectBtn = document.getElementById('masterConnectBtn');
 
-        // RELOAD ON METAMASK ACCOUNT SWITCH TO PREVENT CACHE ERRORS
+        // RELOAD ON METAMASK ACCOUNT SWITCH
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function () {
                 window.location.reload();
@@ -742,77 +740,77 @@
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
-        // --- 2-STEP CONNECTION LOGIC START ---
+        // --- 1-CLICK SEAMLESS DAPP LOGIN FLOW (100% WEB3 STANDARD) ---
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
-                    // STEP 1: ONLY CONNECT WALLET
-                    if (!walletConnected) {
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
-                        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                        
-                        // Gets the active account without forcing buggy permissions
-                        const accounts = await provider.send("eth_requestAccounts", []);
-                        currentConnectedAddress = accounts[0];
-                        signer = provider.getSigner();
-                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                        
-                        walletConnected = true;
-                        
-                        // Update UI to Step 2
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login';
-                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-link" style="color:#10b981;"></i> Connected`;
-                        showAlert('authAlert', 'Wallet Connected! Click Activate / Login to proceed.', false);
+                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+                    
+                    // 1. Immediately request wallet connection (Triggers Native MetaMask/TokenPocket Popup)
+                    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    let addr = accounts[0];
+                    
+                    // 2. Ensure we use the exact active account shown in the wallet's UI
+                    if(window.ethereum.selectedAddress && addr.toLowerCase() !== window.ethereum.selectedAddress.toLowerCase()) {
+                        addr = window.ethereum.selectedAddress;
+                    }
+
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    signer = provider.getSigner(); 
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    
+                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
+
+                    // 3. Check if user is registered in the Smart Contract
+                    let userInfo; 
+                    let isNetworkError = false;
+                    try { 
+                        userInfo = await contract.users(addr); 
+                    } catch(e) { 
+                        isNetworkError = true; 
+                    }
+                    
+                    if (isNetworkError) { 
+                        showAlert('authAlert', 'Network busy! Please try again.', true); 
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
+                        return; 
+                    }
+                    
+                    // 4. If ID exists -> Open Dashboard Directly
+                    if(userInfo && userInfo[0].toNumber() > 0) { 
+                        await loadDashboardData(addr, false); 
                     } 
-                    // STEP 2: CHECK BLOCKCHAIN AND LOGIN / REGISTER
+                    // 5. If ID doesn't exist -> Process Registration (Untouched Logic)
                     else {
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
-                        
-                        // Ensure we use the latest address in case it changed
-                        const accounts = await provider.send("eth_requestAccounts", []);
-                        currentConnectedAddress = accounts[0];
-                        
-                        let userInfo; let isNetworkError = false;
-                        try { 
-                            userInfo = await contract.users(currentConnectedAddress); 
-                        } catch(e) { 
-                            isNetworkError = true; 
-                        }
-                        
-                        if (isNetworkError) { 
-                            showAlert('authAlert', 'Network busy! Please try again.', true); 
-                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login'; 
+                        const uplineAddr = document.getElementById('uplineInput').value.trim();
+                        if(!uplineAddr || uplineAddr.length !== 42) { 
+                            showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); 
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
                             return; 
                         }
                         
-                        if(userInfo && userInfo[0].toNumber() > 0) { 
-                            // ID found, go to dashboard
-                            await loadDashboardData(currentConnectedAddress, false); 
-                        } else {
-                            // REGISTRATION LOGIC - UNTOUCHED 
-                            const uplineAddr = document.getElementById('uplineInput').value.trim();
-                            if(!uplineAddr || uplineAddr.length !== 42) { 
-                                showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); 
-                                masterConnectBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login'; 
-                                return; 
-                            }
-                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
-                            const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
-                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                            await tx.wait(); 
-                            userAddress = currentConnectedAddress; 
-                            welcomeModal.style.display = 'flex';
-                        }
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
+                        
+                        // Triggers the MetaMask Transaction Popup for 30 POL
+                        const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
+                        
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                        await tx.wait(); 
+                        
+                        userAddress = addr; 
+                        welcomeModal.style.display = 'flex';
                     }
                 } catch (error) {
-                    masterConnectBtn.innerHTML = walletConnected ? '<i class="fa-solid fa-right-to-bracket"></i> Activate / Login' : '<i class="fa-solid fa-wallet"></i> Connect Wallet';
+                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
                     let msg = 'Transaction Failed or User Rejected.';
                     if(error.message && error.message.includes('network')) msg = 'Wrong Network! Switch to Polygon.';
                     showAlert('authAlert', msg, true);
                 }
-            } else { alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); }
+            } else { 
+                alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
+            }
         });
-        // --- 2-STEP CONNECTION LOGIC END ---
+        // --- END OF SEAMLESS FLOW ---
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
@@ -824,12 +822,10 @@
         function logoutWallet() { 
             userAddress = null; 
             isViewOnly = false; 
-            walletConnected = false; 
-            currentConnectedAddress = ""; 
             toggleMenu(); 
             menuBtn.style.display = "none"; 
             headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
-            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Wallet'; 
+            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
             switchView('authView'); 
         }
         
