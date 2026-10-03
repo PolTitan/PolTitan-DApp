@@ -88,6 +88,7 @@
         /* BUTTONS & INPUTS */
         .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .btn-gold:hover { background: var(--gold-dark); }
+        .btn-gold:disabled { background: #555; cursor: not-allowed; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: #fff; padding: 15px; width: 100%; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
         .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
@@ -105,7 +106,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; }
 
-        /* PERFECT MOBILE-FIT GENEALOGY MATRIX UI (UNILEVEL) */
+        /* TREE Matrix Styling */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 20px 0 40px 0; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 20px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
@@ -293,6 +294,18 @@
                 </div>
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
             </div>
+            
+            <!-- REFUND SECTION ADDED HERE -->
+            <div class="action-box">
+                <h4>Hold Amount (Refundable) <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <div style="font-size: 24px; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 8px;">
+                        <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo" style="width: 20px; height: 20px;">
+                        <span id="holdAmountDisplay">0.00</span>
+                    </div>
+                    <button class="btn-gold" id="claimRefundBtn" style="width: auto; padding: 10px 15px; font-size: 12px; margin: 0;" onclick="claimMyRefund()"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund</button>
+                </div>
+            </div>
 
             <div class="section-title">Latest Activity</div>
             <div class="activity-list">
@@ -354,9 +367,13 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        const CONTRACT_ADDRESS = "0xa7C92BDcFA2FdD708FCB59660343Eba47f01947B";
+        // UPDATED: Correct Proxy Contract Address
+        const CONTRACT_ADDRESS = "0x1cbb6d987abed3973de18";
+        
+        // UPDATED: Added claimRefund and other functions to the ABI
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
+            "function claimRefund() external",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)"
         ];
 
@@ -561,9 +578,6 @@
 
         function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
 
-        // =========================================================================
-        // 100% PERFECT UNILEVEL (SPONSOR) GENEALOGY ALGORITHM & MOBILE FIX
-        // =========================================================================
         async function loadGenealogyFull(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
@@ -654,7 +668,6 @@
                 treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>';
             }
         }
-        // =========================================================================
 
         async function loadSlot1Directs(targetAddress) {
             switchView('treeView');
@@ -773,32 +786,67 @@
                 if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
                 let userId = 0; let userInfo = null;
                 try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
+                
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     let upline = userInfo[2];
                     if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await contract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
+                    
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
+                    
                     let calculatedIncome = 0;
                     if(directCount > 2) { calculatedIncome = (directCount - 2) * 27; }
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
+                    
+                    // SHOW HOLD AMOUNT FOR REFUND
+                    let holdAmountWei = userInfo[5];
+                    document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
+                    
                     userCurrentSlotNum = userInfo[4].toNumber();
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
                     renderSlots(userCurrentSlotNum);
+                    
                     if(isViewOnly) {
                         headerWallet.innerHTML = `<i class="fa-solid fa-eye"></i> ID ${userId}`;
                         document.getElementById('readOnlyBanner').style.display = "block";
                         document.getElementById('personalLinkBox').style.display = "none";
+                        document.getElementById('claimRefundBtn').style.display = "none";
                     } else {
                         headerWallet.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${userAddress.substring(0,4)}...`;
                         document.getElementById('readOnlyBanner').style.display = "none";
                         document.getElementById('personalLinkBox').style.display = "block";
+                        document.getElementById('claimRefundBtn').style.display = "block";
                         document.getElementById('displayRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     }
                     menuBtn.style.display = "block"; switchView('dashboardView');
                 } else { showAlert('authAlert', 'Address not found in Matrix!', true); }
             } catch (error) { showAlert('authAlert', 'Network Error!', true); }
+        }
+
+        // NEW LOGIC: Function to claim Refund
+        async function claimMyRefund() {
+            if (isViewOnly) { alert("Action not allowed in view mode!"); return; }
+            const btn = document.getElementById('claimRefundBtn');
+            try {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                btn.disabled = true;
+                const tx = await contract.claimRefund();
+                await tx.wait();
+                alert("Refund Claimed Successfully!");
+                await loadDashboardData(userAddress, false); // Reload to update numbers
+            } catch (error) {
+                let msg = 'Refund Failed or Cancelled.';
+                // Catch the active system error we tested in remix
+                if(error.message && error.message.includes('System is still active')) {
+                    msg = 'System is active, refund not allowed!';
+                }
+                alert(msg);
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund';
+                btn.disabled = false;
+            }
         }
 
         const urlParams = new URLSearchParams(window.location.search);
