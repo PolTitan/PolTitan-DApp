@@ -367,7 +367,7 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        const CONTRACT_ADDRESS = "0x1Bf61ce2D1Eb91D92d024bb78B8B3618213377B2";
+        const CONTRACT_ADDRESS = "0x1bf61ce2d1eb91d92d024bb78b8b3618213377b2";
         
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
@@ -783,7 +783,7 @@
                 userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
                 
                 // HIGH SPEED NODE (MetaMask bypass for reading)
-                const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
                 const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
 
                 if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
@@ -862,7 +862,7 @@
                 try {
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
                     
-                    const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                    const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
                     const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
                     
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
@@ -895,7 +895,7 @@
                     }
 
                     // HIGH SPEED NODE (MetaMask bypass for reading)
-                    const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                    const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
                     const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
                     
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
@@ -950,7 +950,7 @@
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
-            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
+            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
         }
 
         document.getElementById('copyRefBtn').addEventListener('click', () => { if(isViewOnly) return; navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Link Copied!")); });
