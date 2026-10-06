@@ -367,10 +367,8 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        // UPDATED: Correct Proxy Contract Address (User's Final Active Address)
         const CONTRACT_ADDRESS = "0xF83186DBbE4A290253cEAEA42559E4864b3B742b";
         
-        // UPDATED: Added claimRefund and other functions to the ABI
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
             "function claimRefund() external",
@@ -729,7 +727,7 @@
                         let left = nodeInfo[7];
                         let right = nodeInfo[8];
                         if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
-                        if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
+                        if(right !== "0x0000000000000000000000000000000000000000") queuepush(right);
                     }
 
                     directsFound.forEach(direct => {
@@ -897,6 +895,7 @@
                     try { 
                         userInfo = await contract.users(addr); 
                     } catch(e) { 
+                        alert("Real Error: " + e.message); // YAHAN ALERT ADD KIYA HAI TAAKI ASLI Galti DIKHE
                         isNetworkError = true; 
                     }
                     
