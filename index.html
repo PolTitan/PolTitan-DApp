@@ -727,7 +727,7 @@
                         let left = nodeInfo[7];
                         let right = nodeInfo[8];
                         if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
-                        if(right !== "0x0000000000000000000000000000000000000000") queuepush(right);
+                        if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
                     }
 
                     directsFound.forEach(direct => {
@@ -781,15 +781,24 @@
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
+                
+                // HIGH SPEED NODE (MetaMask bypass for reading)
+                const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
+
                 if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
+                
                 let userId = 0; let userInfo = null;
-                try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
+                try { 
+                    userInfo = await readContract.users(userAddress); 
+                    userId = userInfo[0].toNumber(); 
+                } catch (dataError) { userId = 0; }
                 
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     let upline = userInfo[2];
-                    if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await contract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
+                    if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await readContract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
                     
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
@@ -798,7 +807,6 @@
                     if(directCount > 2) { calculatedIncome = (directCount - 2) * 27; }
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
                     
-                    // SHOW HOLD AMOUNT FOR REFUND
                     let holdAmountWei = userInfo[5];
                     document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
                     
@@ -823,7 +831,6 @@
             } catch (error) { showAlert('authAlert', 'Network Error!', true); }
         }
 
-        // NEW LOGIC: Function to claim Refund
         async function claimMyRefund() {
             if (isViewOnly) { alert("Action not allowed in view mode!"); return; }
             const btn = document.getElementById('claimRefundBtn');
@@ -833,10 +840,9 @@
                 const tx = await contract.claimRefund();
                 await tx.wait();
                 alert("Refund Claimed Successfully!");
-                await loadDashboardData(userAddress, false); // Reload to update numbers
+                await loadDashboardData(userAddress, false);
             } catch (error) {
                 let msg = 'Refund Failed or Cancelled.';
-                // Catch the active system error we tested in remix
                 if(error.message && error.message.includes('System is still active')) {
                     msg = 'System is active, refund not allowed!';
                 }
@@ -855,10 +861,14 @@
             if (window.ethereum) {
                 try {
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                    const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
+                    
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     let activeAddress = await provider.getSigner().getAddress();
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                    let userInfo = await contract.users(activeAddress);
+                    
+                    let userInfo = await readContract.users(activeAddress);
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
                         await loadDashboardData(activeAddress, false); 
@@ -884,26 +894,30 @@
                         addr = window.ethereum.selectedAddress;
                     }
 
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    signer = provider.getSigner(); 
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    // HIGH SPEED NODE (MetaMask bypass for reading)
+                    const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                    const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
                     
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
                     let userInfo; 
                     let isNetworkError = false;
                     try { 
-                        userInfo = await contract.users(addr); 
+                        userInfo = await readContract.users(addr); 
                     } catch(e) { 
-                        alert("Real Error: " + e.message); // YAHAN ALERT ADD KIYA HAI TAAKI ASLI Galti DIKHE
+                        alert("ERROR! Address / ABI Mismatch.\n\nTip: Please check Remix to make sure you pasted the PROXY address, not the Logic address."); 
                         isNetworkError = true; 
                     }
                     
                     if (isNetworkError) { 
-                        showAlert('authAlert', 'Network busy! Please try again.', true); 
+                        showAlert('authAlert', 'Address Error! Please check Remix.', true); 
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
                         return; 
                     }
+
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    signer = provider.getSigner(); 
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
                         await loadDashboardData(addr, false); 
