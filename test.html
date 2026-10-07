@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raw Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body style="padding: 50px; font-family: Arial;">
+    <h2>Smart Contract Diagnostic Tool</h2>
+    
+    <p>Upline Address:</p>
+    <input type="text" id="upline" value="0x718281ff466780a58986e7364906075fa5893693" style="width: 400px; padding: 10px;">
+    
+    <br><br>
+    <button onclick="checkID()" style="padding: 10px 20px;">1. Check My ID</button>
+    <button onclick="testJoin()" style="padding: 10px 20px; background: gold;">2. Test Join (30 POL)</button>
+
+    <p style="color: red; font-weight: bold; margin-top: 20px;" id="log"></p>
+
+    <script>
+        const CONTRACT_ADDRESS = "0x2bd2b4d2d2379ce31c62f35813bd05863980be05";
+        const ABI = [
+            "function register(address _upline) external payable",
+            "function users(address) external view returns (uint256 id, address wallet, address upline)"
+        ];
+
+        async function getContract() {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            return new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+        }
+
+        async function checkID() {
+            try {
+                document.getElementById('log').innerText = "Checking...";
+                const contract = await getContract();
+                const myAddr = await contract.signer.getAddress();
+                const data = await contract.users(myAddr);
+                document.getElementById('log').innerText = "Aapki ID hai: " + data.id.toString();
+            } catch(e) {
+                document.getElementById('log').innerText = "ERROR in Check ID: " + e.message;
+            }
+        }
+
+        async function testJoin() {
+            try {
+                document.getElementById('log').innerText = "Sending 30 POL to contract...";
+                const contract = await getContract();
+                const upline = document.getElementById('upline').value;
+                
+                const tx = await contract.register(upline, { 
+                    value: ethers.utils.parseEther("30"),
+                    gasLimit: 3000000 
+                });
+                
+                document.getElementById('log').innerText = "Transaction Sent! Hash: " + tx.hash;
+            } catch(e) {
+                console.error(e);
+                // Yeh sabse zaroori line hai, ye exact reason batayegi ki contract ne kya roka
+                document.getElementById('log').innerText = "REJECTED BY CONTRACT: " + (e.reason || e.message);
+            }
+        }
+    </script>
+</body>
+</html>
