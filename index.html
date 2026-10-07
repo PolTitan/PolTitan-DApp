@@ -379,7 +379,7 @@
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
         let globalRootAddress = "";
-        let isWalletConnected = false; // State to track if wallet is connected
+        let isWalletConnected = false;
 
         const slotPrices = [0, 30, 60, 120, 240, 480, 960, 1920];
 
@@ -784,7 +784,6 @@
             try {
                 userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
                 
-                // HIGH SPEED NODE (MetaMask bypass for reading)
                 const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
                 const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
 
@@ -887,7 +886,6 @@
             try {
                 masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
                 
-                // Get Wallet Address directly from MetaMask provider to ensure accurate state
                 const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
                 await web3Provider.send("eth_requestAccounts", []);
                 const currentSigner = web3Provider.getSigner();
@@ -895,24 +893,27 @@
                 
                 document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${addr.substring(0,4)}...`;
                 
-                masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
+                masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID on Blockchain...';
 
-                // Check blockchain using direct provider
-                const directReadContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, web3Provider);
+                // FORCE PUBLIC RPC FOR RELIABLE READ
+                const publicProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
+                const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, publicProvider);
                 
                 let userId = 0;
                 try { 
-                    let userInfoResult = await directReadContract.users(addr);
+                    let userInfoResult = await readContract.users(addr);
                     userId = userInfoResult[0].toNumber();
-                    console.log("Checked User ID:", userId);
                 } catch(e) { 
-                    console.log("Error checking user info:", e);
+                    // AGAR BLOCKCHAIN SE DATA PADHNE MEIN KOI DIKKAT HUI (JAISE ABI MISMATCH)
+                    // TOH YEH CODE CHUPCHAP NAHI BAITHEGA, SEEDHA SCREEN PAR ERROR DIKHAYEGA!
+                    alert("CRITICAL ERROR: System aapki ID check nahi kar pa raha hai!\n\nReason: " + e.message + "\n\nPlease take a screenshot and share.");
+                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
+                    return; // Yahin par rok dega, aage 30 POL katne nahi dega!
                 }
 
-                // Initialize Global variables
                 provider = web3Provider;
                 signer = currentSigner; 
-                contract = directReadContract.connect(signer);
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 
                 // --- THE CORE DECISION LOGIC ---
                 if(userId > 0) { 
