@@ -784,13 +784,16 @@
                 if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
                 let userId = 0; let userInfo = null;
                 try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
+                
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     let upline = userInfo[2];
                     if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await contract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
+                    
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
+                    
                     let calculatedIncome = 0;
                     if(directCount > 2) { calculatedIncome = (directCount - 2) * 27; }
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
@@ -801,6 +804,7 @@
                     userCurrentSlotNum = userInfo[4].toNumber();
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
                     renderSlots(userCurrentSlotNum);
+                    
                     if(isViewOnly) {
                         headerWallet.innerHTML = `<i class="fa-solid fa-eye"></i> ID ${userId}`;
                         document.getElementById('readOnlyBanner').style.display = "block";
@@ -853,7 +857,12 @@
                     
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                     
-                    let userInfo = await contract.users(activeAddress);
+                    let userInfo;
+                    try {
+                        userInfo = await contract.users(activeAddress);
+                    } catch(e) {
+                        userInfo = null;
+                    }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
                         await loadDashboardData(activeAddress, false); 
@@ -867,9 +876,6 @@
             }
         });
 
-        // ==========================================
-        // YAHAN PAR EXACT PURANA LOGIC HAI
-        // ==========================================
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
@@ -892,8 +898,6 @@
                     try { 
                         userInfo = await contract.users(addr); 
                     } catch(e) { 
-                        // Humne Network Error ka pura message hata diya hai, ab sirf silently catch karega
-                        console.log("Reading error softly caught, processing forward.");
                         userInfo = null; 
                     }
                     
@@ -909,11 +913,9 @@
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         
-                        // SIRF GAS LIMIT ADD KI HAI TAQI TRANSACTION REJECT NA HO
-                        const tx = await contract.register(uplineAddr, { 
-                            value: ethers.utils.parseEther("30"),
-                            gasLimit: ethers.utils.hexlify(3000000) 
-                        });
+                        // YAHAN BADLAAV HAI: Gas limit hatayi gayi hai
+                        const txValue = ethers.utils.parseEther("30");
+                        const tx = await contract.register(uplineAddr, { value: txValue });
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
                         await tx.wait(); 
@@ -926,12 +928,12 @@
                     let msg = 'Transaction Failed or User Rejected.';
                     if(error.message && error.message.includes('network')) msg = 'Wrong Network! Switch to Polygon.';
                     showAlert('authAlert', msg, true);
+                    console.error("Full Error Details:", error);
                 }
             } else { 
                 alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
             }
         });
-        // ==========================================
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
