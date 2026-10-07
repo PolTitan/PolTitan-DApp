@@ -894,18 +894,19 @@
                         addr = window.ethereum.selectedAddress;
                     }
 
-                    const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
-                    const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
-                    
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
-                    // MAIN BUG FIX YAHI PAR HAI
                     let userId = 0;
                     try { 
-                        let userInfoResult = await readContract.users(addr);
+                        // Hum yahan provider aur readContract ko dobara define kar rahe hain
+                        // taaki connection fresh rahe aur error na aaye
+                        const currentProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                        const directReadContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, currentProvider);
+                        
+                        let userInfoResult = await directReadContract.users(addr);
                         userId = userInfoResult[0].toNumber();
                     } catch(e) { 
-                        console.log("Error checking user info");
+                        console.log("Error checking user info:", e);
                     }
 
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
