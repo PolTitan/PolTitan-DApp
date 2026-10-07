@@ -784,7 +784,7 @@
             try {
                 userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
                 
-                // HIGH SPEED NODE
+                // HIGH SPEED NODE (MetaMask bypass for reading)
                 const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
                 const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
 
