@@ -367,8 +367,10 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        const CONTRACT_ADDRESS = "0x1bf61ce2d1eb91d92d024bb78b8b3618213377b2";
+        // NAYA CONTRACT ADDRESS UPDATE KIYA GAYA HAI YAHAN 👇
+        const CONTRACT_ADDRESS = "0x2bd2b4d2d2379ce31c62f35813bd05863980be05";
         
+        // ABI EKDUM PERFECT HAI ISME KUCH BHI CHANGE KI ZAROORAT NAHI
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
             "function claimRefund() external",
@@ -905,12 +907,13 @@
                     try { 
                         userInfo = await readContract.users(addr); 
                     } catch(e) { 
-                        alert("ERROR! Address / ABI Mismatch.\n\nTip: Please check Remix to make sure you pasted the PROXY address, not the Logic address."); 
+                        // PROXY KA ERROR MESSAGE YAHAN SE HATA DIYA GAYA HAI 👇
+                        alert("ERROR! Address / ABI Mismatch or Network Issue.\n\nPlease check your internet connection or reload the page."); 
                         isNetworkError = true; 
                     }
                     
                     if (isNetworkError) { 
-                        showAlert('authAlert', 'Address Error! Please check Remix.', true); 
+                        showAlert('authAlert', 'Address/Network Error! Please refresh.', true); 
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
                         return; 
                     }
