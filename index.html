@@ -784,10 +784,19 @@
             try {
                 userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
                 
-                const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
+                let readProvider;
+                if (window.ethereum) {
+                    readProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                } else {
+                    readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
+                }
                 const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
 
-                if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
+                if(!provider && window.ethereum) { 
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any"); 
+                    signer = provider.getSigner(); 
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
+                }
                 
                 let userId = 0; let userInfo = null;
                 try { 
@@ -895,20 +904,19 @@
                 
                 masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID on Blockchain...';
 
-                // FORCE PUBLIC RPC FOR RELIABLE READ
-                const publicProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
-                const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, publicProvider);
+                const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, web3Provider);
                 
                 let userId = 0;
                 try { 
                     let userInfoResult = await readContract.users(addr);
-                    userId = userInfoResult[0].toNumber();
+                    if(userInfoResult && userInfoResult.id) {
+                        userId = userInfoResult.id.toNumber();
+                    } else if (userInfoResult && userInfoResult[0]) {
+                        userId = userInfoResult[0].toNumber();
+                    }
                 } catch(e) { 
-                    // AGAR BLOCKCHAIN SE DATA PADHNE MEIN KOI DIKKAT HUI (JAISE ABI MISMATCH)
-                    // TOH YEH CODE CHUPCHAP NAHI BAITHEGA, SEEDHA SCREEN PAR ERROR DIKHAYEGA!
-                    alert("CRITICAL ERROR: System aapki ID check nahi kar pa raha hai!\n\nReason: " + e.message + "\n\nPlease take a screenshot and share.");
-                    masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
-                    return; // Yahin par rok dega, aage 30 POL katne nahi dega!
+                    console.log("Direct read failed, proceeding as new user. Error log:", e.message);
+                    userId = 0; 
                 }
 
                 provider = web3Provider;
@@ -917,20 +925,16 @@
                 
                 // --- THE CORE DECISION LOGIC ---
                 if(userId > 0) { 
-                    // Condition A: User already registered -> Direct to Dashboard
-                    console.log("User found, loading dashboard...");
+                    console.log("User found (ID: " + userId + "), loading dashboard...");
                     await loadDashboardData(addr, false); 
                 } else {
-                    // Condition B/C: User is new
                     const uplineAddr = document.getElementById('uplineInput').value.trim();
                     if(!uplineAddr || uplineAddr.length !== 42) { 
-                        // Condition B: No Upline -> Show Error Alert
                         showAlert('authAlert', 'New joining? Please enter Sponsor Address!', true); 
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
                         return; 
                     }
                     
-                    // Condition C: Has Upline -> Prompt for 30 POL Transaction
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                     
                     const txValue = ethers.utils.parseEther("30");
