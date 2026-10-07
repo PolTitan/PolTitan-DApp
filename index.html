@@ -88,6 +88,7 @@
         /* BUTTONS & INPUTS */
         .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .btn-gold:hover { background: var(--gold-dark); }
+        .btn-gold:disabled { background: #555; cursor: not-allowed; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: #fff; padding: 15px; width: 100%; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
         .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
@@ -105,10 +106,11 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; }
 
-        /* GENEALOGY MATRIX UI */
-        .tree-container { overflow-x: auto; padding: 20px 0; text-align: center; }
-        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; padding-left: 0; }
-        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; }
+        /* TREE Matrix Styling */
+        .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 20px 0 40px 0; text-align: center; }
+        .tree { display: inline-block; min-width: max-content; text-align: center; }
+        .tree ul { display: flex; justify-content: center; padding-top: 20px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
+        .tree li { display: inline-block; vertical-align: top; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
         .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid var(--gold); width: 50%; height: 20px; }
         .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--gold); }
         .tree li:only-child::after, .tree li:only-child::before { display: none; }
@@ -292,6 +294,18 @@
                 </div>
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
             </div>
+            
+            <!-- REFUND SECTION ADDED HERE -->
+            <div class="action-box">
+                <h4>Hold Amount (Refundable) <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <div style="font-size: 24px; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 8px;">
+                        <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo" style="width: 20px; height: 20px;">
+                        <span id="holdAmountDisplay">0.00</span>
+                    </div>
+                    <button class="btn-gold" id="claimRefundBtn" style="width: auto; padding: 10px 15px; font-size: 12px; margin: 0;" onclick="claimMyRefund()"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund</button>
+                </div>
+            </div>
 
             <div class="section-title">Latest Activity</div>
             <div class="activity-list">
@@ -323,7 +337,7 @@
                 <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
-            <div class="vip-card" style="padding: 10px;">
+            <div class="vip-card" style="padding: 10px; overflow-x: hidden;">
                 <div class="tree-container">
                     <div class="tree" id="matrixTreeDisplay">
                         <div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Tree...</div>
@@ -354,8 +368,10 @@
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0x2bd2b4d2d2379ce31c62f35813bd05863980be05";
+        
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
+            "function claimRefund() external",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)"
         ];
 
@@ -372,14 +388,9 @@
         const welcomeModal = document.getElementById('welcomeModal');
         const masterConnectBtn = document.getElementById('masterConnectBtn');
 
-        // RELOAD ON METAMASK ACCOUNT SWITCH
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', function () {
-                window.location.reload();
-            });
-            window.ethereum.on('chainChanged', function () {
-                window.location.reload();
-            });
+            window.ethereum.on('accountsChanged', function () { window.location.reload(); });
+            window.ethereum.on('chainChanged', function () { window.location.reload(); });
         }
 
         function showAlert(id, msg, isError) {
@@ -569,41 +580,91 @@
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Full Tree...</div>';
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Full Genealogy...</div>';
+
             try {
-                const root = await getNodeData(targetAddress);
-                if(!root) return;
-                const left = await getNodeData(root.left);
-                const right = await getNodeData(root.right);
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(root.address, 0)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${root.id}</span></a><ul>`;
-                if(left) {
-                    html += `<li><a ${getSmartEvents(left.address, 0)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${left.id}</span></a>`;
-                    const leftL = await getNodeData(left.left);
-                    const leftR = await getNodeData(left.right);
-                    if(leftL || leftR) {
+                let sponsorMap = {};
+                try {
+                    let res = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&sort=asc`);
+                    let data = await res.json();
+                    if(data.status === "1") {
+                        data.result.forEach(tx => {
+                            if(tx.isError === "0" && tx.input.length >= 74) {
+                                let trueSponsor = "0x" + tx.input.substring(34, 74);
+                                sponsorMap[tx.from.toLowerCase()] = trueSponsor.toLowerCase();
+                            }
+                        });
+                    }
+                } catch(e) {}
+
+                let allNodes = {};
+                let childrenMap = {};
+                let queue = [targetAddress];
+                let visited = new Set();
+
+                while(queue.length > 0 && visited.size < 500) {
+                    let currentAddr = queue.shift();
+                    if(visited.has(currentAddr)) continue;
+                    visited.add(currentAddr);
+
+                    let info = await contract.users(currentAddr);
+                    if(info[0].toNumber() === 0) continue;
+
+                    allNodes[currentAddr.toLowerCase()] = {
+                        id: info[0].toNumber(),
+                        address: currentAddr
+                    };
+
+                    let trueUpline = sponsorMap[currentAddr.toLowerCase()] || info[2].toLowerCase();
+
+                    if(!childrenMap[trueUpline]) childrenMap[trueUpline] = [];
+                    if(currentAddr.toLowerCase() !== targetAddress.toLowerCase() && !childrenMap[trueUpline].includes(currentAddr.toLowerCase())) {
+                        childrenMap[trueUpline].push(currentAddr.toLowerCase());
+                    }
+
+                    let left = info[7];
+                    let right = info[8];
+                    if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
+                    if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
+                }
+
+                if(!allNodes[targetAddress.toLowerCase()]) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">User not found</div>';
+                    return;
+                }
+
+                function buildTreeHTML(nodeAddrLower, level) {
+                    let node = allNodes[nodeAddrLower];
+                    if(!node) return '';
+
+                    let iconColor = level === 0 ? '#3b82f6' : (level === 1 ? '#f5c518' : '#a0a0a0');
+                    let iconClass = level === 0 ? 'fa-user-astronaut' : 'fa-user-check';
+
+                    let html = `<li><a style="${level===0?'background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;':''}" ${getSmartEvents(node.address, 0)}>
+                        <i class="fa-solid ${iconClass}" style="color:${iconColor};"></i>
+                        <span class="id-label" style="color:#fff;">ID ${node.id}</span>
+                    </a>`;
+
+                    let children = childrenMap[nodeAddrLower] || [];
+                    if(children.length > 0) {
                         html += `<ul>`;
-                        html += leftL ? `<li><a ${getSmartEvents(leftL.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftL.id}</span></a></li>` : createEmptyNode();
-                        html += leftR ? `<li><a ${getSmartEvents(leftR.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${leftR.id}</span></a></li>` : createEmptyNode();
+                        for(let childAddrLower of children) {
+                            html += buildTreeHTML(childAddrLower, level + 1);
+                        }
                         html += `</ul>`;
                     }
                     html += `</li>`;
-                } else { html += createEmptyNode(); }
-                if(right) {
-                    html += `<li><a ${getSmartEvents(right.address, 0)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${right.id}</span></a>`;
-                    const rightL = await getNodeData(right.left);
-                    const rightR = await getNodeData(right.right);
-                    if(rightL || rightR) {
-                        html += `<ul>`;
-                        html += rightL ? `<li><a ${getSmartEvents(rightL.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightL.id}</span></a></li>` : createEmptyNode();
-                        html += rightR ? `<li><a ${getSmartEvents(rightR.address, 0)}><i class="fa-solid fa-user"></i><span class="id-label">ID ${rightR.id}</span></a></li>` : createEmptyNode();
-                        html += `</ul>`;
-                    }
-                    html += `</li>`;
-                } else { html += createEmptyNode(); }
-                html += `</ul></li></ul>`;
+                    return html;
+                }
+
+                let finalHtml = `<ul>${buildTreeHTML(targetAddress.toLowerCase(), 0)}</ul>`;
                 treeContainer.className = "tree";
-                treeContainer.innerHTML = html;
-            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>'; }
+                treeContainer.innerHTML = finalHtml;
+
+            } catch (error) {
+                console.error(error);
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>';
+            }
         }
 
         async function loadSlot1Directs(targetAddress) {
@@ -655,8 +716,10 @@
                         let nodeInfo = await contract.users(currentAddr);
                         if(nodeInfo[0].toNumber() === 0) continue;
 
+                        let trueSponsor = sponsorMap[currentAddr.toLowerCase()] || nodeInfo[2].toLowerCase();
+
                         if(currentAddr.toLowerCase() !== targetAddress.toLowerCase()) {
-                            if(nodeInfo[2].toLowerCase() === targetAddress.toLowerCase()) {
+                            if(trueSponsor === targetAddress.toLowerCase()) {
                                 directsFound.push({ id: nodeInfo[0].toNumber(), address: currentAddr });
                             }
                         }
@@ -718,51 +781,15 @@
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
-                
-                let readProvider;
-                if (window.ethereum) {
-                    readProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                } else {
-                    readProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
-                }
-                const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
-
-                if(!provider && window.ethereum) { 
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any"); 
-                    signer = provider.getSigner(); 
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
-                }
-                
+                if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
                 let userId = 0; let userInfo = null;
-                try { 
-                    const directReadProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-                    const directReadContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, directReadProvider);
-                    userInfo = await directReadContract.users(userAddress); 
-                    userId = userInfo[0].toNumber(); 
-                } catch (dataError) { 
-                    try {
-                        userInfo = await contract.users(userAddress);
-                        userId = userInfo[0].toNumber();
-                    } catch(err) {
-                        userId = 0;
-                    }
-                }
+                try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
                 
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     let upline = userInfo[2];
-                    if(upline !== "0x0000000000000000000000000000000000000000") { 
-                        try {
-                            const directReadProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-                            const directReadContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, directReadProvider);
-                            const uInfo = await directReadContract.users(upline); 
-                            document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); 
-                        } catch(e) {
-                            const uInfo = await contract.users(upline); 
-                            document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); 
-                        }
-                    }
+                    if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await contract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
                     
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
@@ -770,6 +797,9 @@
                     let calculatedIncome = 0;
                     if(directCount > 2) { calculatedIncome = (directCount - 2) * 27; }
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
+                    
+                    let holdAmountWei = userInfo[5];
+                    document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
                     
                     userCurrentSlotNum = userInfo[4].toNumber();
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
@@ -779,10 +809,12 @@
                         headerWallet.innerHTML = `<i class="fa-solid fa-eye"></i> ID ${userId}`;
                         document.getElementById('readOnlyBanner').style.display = "block";
                         document.getElementById('personalLinkBox').style.display = "none";
+                        document.getElementById('claimRefundBtn').style.display = "none";
                     } else {
                         headerWallet.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--gold);"></i> ${userAddress.substring(0,4)}...`;
                         document.getElementById('readOnlyBanner').style.display = "none";
                         document.getElementById('personalLinkBox').style.display = "block";
+                        document.getElementById('claimRefundBtn').style.display = "block";
                         document.getElementById('displayRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     }
                     menuBtn.style.display = "block"; switchView('dashboardView');
@@ -790,10 +822,33 @@
             } catch (error) { showAlert('authAlert', 'Network Error!', true); }
         }
 
+        async function claimMyRefund() {
+            if (isViewOnly) { alert("Action not allowed in view mode!"); return; }
+            const btn = document.getElementById('claimRefundBtn');
+            try {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                btn.disabled = true;
+                const tx = await contract.claimRefund();
+                await tx.wait();
+                alert("Refund Claimed Successfully!");
+                await loadDashboardData(userAddress, false);
+            } catch (error) {
+                let msg = 'Refund Failed or Cancelled.';
+                if(error.message && error.message.includes('System is still active')) {
+                    msg = 'System is active, refund not allowed!';
+                }
+                alert(msg);
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund';
+                btn.disabled = false;
+            }
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
+        // EK DUM AAPKA OLD WALA LOGIC YAHAN HAI
         window.addEventListener('load', async () => {
             if (window.ethereum) {
                 try {
@@ -803,14 +858,7 @@
                     
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                     
-                    let userInfo;
-                    try {
-                        const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-                        const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
-                        userInfo = await readContract.users(activeAddress);
-                    } catch(e) {
-                        userInfo = await contract.users(activeAddress);
-                    }
+                    let userInfo = await contract.users(activeAddress);
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
                         await loadDashboardData(activeAddress, false); 
@@ -824,37 +872,41 @@
             }
         });
 
+        // EK DUM AAPKA OLD WALA LOGIC YAHAN HAI
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
                     
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    let addr = accounts[0];
                     
+                    if(window.ethereum.selectedAddress && addr.toLowerCase() !== window.ethereum.selectedAddress.toLowerCase()) {
+                        addr = window.ethereum.selectedAddress;
+                    }
+
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     signer = provider.getSigner(); 
-                    
-                    let activeAddress = await signer.getAddress();
-                    
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
                     let userInfo; 
+                    let isNetworkError = false;
                     try { 
-                        // PUBLIC NODE SE STRONG CHECK TAAKI NETWORK ERROR NA AAYE
-                        const readProvider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-                        const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
-                        userInfo = await readContract.users(activeAddress); 
+                        userInfo = await contract.users(addr); 
                     } catch(e) { 
-                        try {
-                            userInfo = await contract.users(activeAddress); 
-                        } catch(err) {
-                            userInfo = null; 
-                        }
+                        isNetworkError = true; 
+                    }
+                    
+                    if (isNetworkError) { 
+                        showAlert('authAlert', 'Network busy! Please try again.', true); 
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
+                        return; 
                     }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
-                        await loadDashboardData(activeAddress, false); 
+                        await loadDashboardData(addr, false); 
                     } else {
                         const uplineAddr = document.getElementById('uplineInput').value.trim();
                         if(!uplineAddr || uplineAddr.length !== 42) { 
@@ -865,14 +917,13 @@
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         
-                        // GAS LIMIT ADD KIYA HAI TAAKI TRANSACTION FAIL NA HO
-                        const options = { value: ethers.utils.parseEther("30"), gasLimit: 3000000 };
-                        const tx = await contract.register(uplineAddr, options);
+                        // YAHAN PAR SIRF GAS LIMIT FIX KIYA HAI TAAKI FAILED ERROR NA AAYE
+                        const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30"), gasLimit: 3000000 });
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
                         await tx.wait(); 
                         
-                        userAddress = activeAddress; 
+                        userAddress = addr; 
                         welcomeModal.style.display = 'flex';
                     }
                 } catch (error) {
@@ -888,7 +939,7 @@
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
-            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
+            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
         }
 
         document.getElementById('copyRefBtn').addEventListener('click', () => { if(isViewOnly) return; navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Link Copied!")); });
