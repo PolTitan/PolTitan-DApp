@@ -899,18 +899,20 @@
                     
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
-                    let userInfo; 
+                    // MAIN BUG FIX YAHI PAR HAI
+                    let userId = 0;
                     try { 
-                        userInfo = await readContract.users(addr); 
+                        let userInfoResult = await readContract.users(addr);
+                        userId = userInfoResult[0].toNumber();
                     } catch(e) { 
-                        console.log("New user or network read error, proceeding to direct read.");
+                        console.log("Error checking user info");
                     }
 
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     signer = provider.getSigner(); 
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     
-                    if(userInfo && userInfo[0].toNumber() > 0) { 
+                    if(userId > 0) { 
                         await loadDashboardData(addr, false); 
                     } else {
                         const uplineAddr = document.getElementById('uplineInput').value.trim();
@@ -922,7 +924,6 @@
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         
-                        // YAHAN GAS LIMIT MANUAL SET KI GAYI HAI TAAKI METAMASK REJECT NA KARE 👇
                         const txValue = ethers.utils.parseEther("30");
                         const options = {
                             value: txValue,
