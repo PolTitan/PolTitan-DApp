@@ -899,7 +899,6 @@
                     
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
-                    // YAHAN BYPASS LOGIC ADD KIYA GAYA HAI TAAKI PROXY ERROR NA AAYE 👇
                     let userInfo; 
                     try { 
                         userInfo = await readContract.users(addr); 
@@ -922,7 +921,15 @@
                         }
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
-                        const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30") });
+                        
+                        // YAHAN GAS LIMIT MANUAL SET KI GAYI HAI TAAKI METAMASK REJECT NA KARE 👇
+                        const txValue = ethers.utils.parseEther("30");
+                        const options = {
+                            value: txValue,
+                            gasLimit: 3000000 
+                        };
+                        const tx = await contract.register(uplineAddr, options);
+                        
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
                         await tx.wait(); 
                         
