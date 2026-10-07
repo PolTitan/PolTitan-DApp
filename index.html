@@ -106,7 +106,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; }
 
-        /* TREE Matrix Styling */
+        /* GENEALOGY MATRIX UI */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 20px 0 40px 0; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 20px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
@@ -367,6 +367,7 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
+        // NAYA CONTRACT ADDRESS
         const CONTRACT_ADDRESS = "0x2bd2b4d2d2379ce31c62f35813bd05863980be05";
         
         const CONTRACT_ABI = [
@@ -784,16 +785,13 @@
                 if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
                 let userId = 0; let userInfo = null;
                 try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
-                
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     let upline = userInfo[2];
                     if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await contract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
-                    
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
-                    
                     let calculatedIncome = 0;
                     if(directCount > 2) { calculatedIncome = (directCount - 2) * 27; }
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
@@ -804,7 +802,6 @@
                     userCurrentSlotNum = userInfo[4].toNumber();
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
                     renderSlots(userCurrentSlotNum);
-                    
                     if(isViewOnly) {
                         headerWallet.innerHTML = `<i class="fa-solid fa-eye"></i> ID ${userId}`;
                         document.getElementById('readOnlyBanner').style.display = "block";
@@ -848,7 +845,6 @@
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
-        // EK DUM AAPKA OLD WALA LOGIC YAHAN HAI
         window.addEventListener('load', async () => {
             if (window.ethereum) {
                 try {
@@ -858,7 +854,12 @@
                     
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                     
-                    let userInfo = await contract.users(activeAddress);
+                    let userInfo;
+                    try {
+                        userInfo = await contract.users(activeAddress);
+                    } catch(e) {
+                        userInfo = null;
+                    }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
                         await loadDashboardData(activeAddress, false); 
@@ -872,7 +873,7 @@
             }
         });
 
-        // EK DUM AAPKA OLD WALA LOGIC YAHAN HAI
+        // EXACTLY YOUR LOGIC WITH ONLY NETWORK-ERROR BLOCK REMOVED AND GASLIMIT ADDED
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
@@ -892,17 +893,11 @@
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
                     let userInfo; 
-                    let isNetworkError = false;
                     try { 
                         userInfo = await contract.users(addr); 
                     } catch(e) { 
-                        isNetworkError = true; 
-                    }
-                    
-                    if (isNetworkError) { 
-                        showAlert('authAlert', 'Network busy! Please try again.', true); 
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
-                        return; 
+                        console.log("Reading data skipped issue", e);
+                        userInfo = null;
                     }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
@@ -917,7 +912,7 @@
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
                         
-                        // YAHAN PAR SIRF GAS LIMIT FIX KIYA HAI TAAKI FAILED ERROR NA AAYE
+                        // ADDED GAS LIMIT SO NEW USER JOINING DOESN'T FAIL
                         const tx = await contract.register(uplineAddr, { value: ethers.utils.parseEther("30"), gasLimit: 3000000 });
                         
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
@@ -939,7 +934,7 @@
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
-            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
+            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
         }
 
         document.getElementById('copyRefBtn').addEventListener('click', () => { if(isViewOnly) return; navigator.clipboard.writeText(document.getElementById('displayRefLink').innerText).then(() => alert("Link Copied!")); });
