@@ -183,7 +183,6 @@
         </div>
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
         
-        <!-- NEW: INCOME HISTORY DROPDOWN MENU -->
         <div class="menu-item" onclick="toggleIncomeDropdown()">
             <i class="fa-solid fa-hand-holding-dollar"></i> Income History 
             <i class="fa-solid fa-chevron-down" id="incomeArrow" style="margin-left:auto; font-size:12px; transition:0.3s;"></i>
@@ -240,18 +239,13 @@
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
-            
             <video class="video-logo" autoplay loop muted playsinline style="margin-bottom: 15px; width: 140px; height: 45px; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 0 15px rgba(245, 197, 24, 0.4);">
                 <source src="poltitan-logo.mp4" type="video/mp4">
             </video>
-            
             <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
-            
             <p style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
             <p style="color: var(--text-gray); font-size: 10px; margin-bottom: 15px;">* Terms & Conditions apply.</p>
-            
             <h1 style="color: #10b981; font-size: 34px; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ACTIVE</h1>
-            
             <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
         </div>
     </div>
@@ -388,17 +382,13 @@
                 <h3 style="color: var(--gold); font-size: 18px;" id="incomeViewTitle">Income History</h3>
             </div>
             
-            <!-- Filter Tabs -->
             <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
                 <button class="btn-outline active-tab" id="tab-direct" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('direct')">Direct</button>
                 <button class="btn-outline" id="tab-slot" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('slot')">Slot Income</button>
                 <button class="btn-outline" id="tab-upline" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('upline')">Up/Downline</button>
             </div>
             
-            <!-- Data Container -->
-            <div class="activity-list" id="incomeListContainer">
-                <!-- Javascript will inject table here -->
-            </div>
+            <div class="activity-list" id="incomeListContainer"></div>
         </div>
 
         <!-- 3. SLOTS VIEW -->
@@ -497,7 +487,6 @@
         }
         function goToDashboard() { if (userAddress) switchView('dashboardView'); }
 
-        // NEW: Toggle Income Dropdown in Menu
         function toggleIncomeDropdown() {
             const dropdown = document.getElementById('incomeDropdown');
             const arrow = document.getElementById('incomeArrow');
@@ -510,10 +499,8 @@
             }
         }
 
-        // NEW: Load Income History Page (DEMO DATA UI)
         function loadIncomeHistory(type) {
             switchView('incomeView');
-            // Update tab styles
             document.getElementById('tab-direct').classList.remove('active-tab');
             document.getElementById('tab-slot').classList.remove('active-tab');
             document.getElementById('tab-upline').classList.remove('active-tab');
@@ -747,6 +734,7 @@
             } catch (e) { return null; }
         }
 
+        // FIXED: allNodes[a]?.id undefined error safe check added.
         async function loadGenealogyFull(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
@@ -820,7 +808,13 @@
                     </a>`;
 
                     let children = childrenMap[nodeAddrLower] || [];
-                    children.sort((a, b) => (allNodes[a]?.id || 0) - (allNodes[b]?.id || 0));
+                    
+                    // FIXED JAVASCRIPT ERROR HERE (Safe check applied)
+                    children.sort((a, b) => {
+                        let idA = allNodes[a] ? allNodes[a].id : 0;
+                        let idB = allNodes[b] ? allNodes[b].id : 0;
+                        return idA - idB;
+                    });
 
                     if(children.length > 0) {
                         html += `<ul>`;
@@ -1103,6 +1097,7 @@
             }
         });
 
+        // FIXED: The Login Button code is exactly the same, no changes here.
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
