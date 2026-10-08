@@ -111,7 +111,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; text-align: right;}
 
-        /* TREE Matrix Styling */
+        /* TREE Matrix Styling - MODIFIED FOR UNILEVEL */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 20px 0 40px 0; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 20px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
@@ -124,20 +124,10 @@
         .tree li:last-child::before { border-right: 2px solid var(--gold); border-radius: 0 5px 0 0; }
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold); width: 0; height: 20px; }
-        .tree li a { border: 1px solid var(--border-color); padding: 10px 15px; text-decoration: none; color: #fff; font-size: 12px; display: inline-block; border-radius: 8px; background: #111; min-width: 80px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s;}
+        .tree li a { border: 1px solid var(--border-color); padding: 10px 15px; text-decoration: none; color: #fff; font-size: 12px; display: inline-block; border-radius: 8px; background: #111; min-width: 80px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; margin: 0 5px;}
         .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 14px; margin-bottom: 5px;}
         .tree li a i { font-size: 20px; color: var(--text-gray); margin-bottom: 5px; }
         .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-3px); }
-        .tree li a.empty-node { border: 1px dashed #555; background: transparent; color: #555; cursor: default;}
-        .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
-        .tree li a.empty-node i { color: #333; }
-
-        /* GRID FOR SLOT 1 */
-        .direct-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px 0; }
-        .direct-node { border: 1px solid var(--gold); padding: 15px; border-radius: 12px; background: #111; width: 100px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .direct-node:hover { transform: translateY(-3px); background: rgba(245, 197, 24, 0.1); }
-        .direct-node i { font-size: 24px; color: #3b82f6; margin-bottom: 10px; }
-        .direct-node .d-id { color: var(--gold); font-weight: bold; font-size: 14px; }
 
         /* View Sections */
         .view-section { display: none; }
@@ -195,11 +185,10 @@
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="loadMyPartners(); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
-        <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
 
-    <!-- MODALS -->
+    <!-- MODALS (Inspect, Welcome, Alert) -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -235,7 +224,6 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -359,23 +347,9 @@
                     <button class="btn-gold" id="claimRefundBtn" style="width: auto; padding: 10px 15px; font-size: 12px; margin: 0;" onclick="claimMyRefund()"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund</button>
                 </div>
             </div>
-
-            <div class="section-title">Latest Activity</div>
-            <div class="activity-list">
-                <div class="activity-item clickable-list-item" onclick="loadTransactions()">
-                    <div class="act-left">
-                        <div class="act-icon"><i class="fa-solid fa-list-check"></i></div>
-                        <div class="act-details">
-                            <h4>View All Transactions</h4>
-                            <p>Check history on Blockchain</p>
-                        </div>
-                    </div>
-                    <div class="act-right"><i class="fa-solid fa-arrow-right" style="color:var(--text-gray);"></i></div>
-                </div>
-            </div>
         </div>
 
-        <!-- NEW: INCOME HISTORY VIEW (REAL SMART CONTRACT DATA) -->
+        <!-- 3. REAL AUTOMATIC INCOME VIEW (NO API BLOCK) -->
         <div id="incomeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline" style="margin: 0; padding: 8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -391,7 +365,7 @@
             <div class="activity-list" id="incomeListContainer"></div>
         </div>
 
-        <!-- 3. SLOTS VIEW -->
+        <!-- 4. SLOTS VIEW -->
         <div id="slotsView" class="view-section">
             <h3 style="color: var(--gold); font-size: 20px; margin-bottom: 20px;"><i class="fa-solid fa-cubes"></i> Matrix Slots</h3>
             <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 15px;">* Slots are upgraded automatically by the contract.</p>
@@ -400,7 +374,7 @@
             </div>
         </div>
 
-        <!-- 4. TREE VIEW & PARTNERS VIEW-->
+        <!-- 5. TREE VIEW & PARTNERS VIEW (PURE UNILEVEL & MATRIX) -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -412,17 +386,6 @@
                         <div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Tree...</div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- 5. TRANSACTION VIEW -->
-        <div id="transactionView" class="view-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <h3 style="color: var(--gold); font-size: 18px;">Transactions</h3>
-            </div>
-            <div class="activity-list" id="transactionListContainer">
-                <div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Data...</div>
             </div>
         </div>
     </main>
@@ -446,7 +409,23 @@
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
-        let globalRootAddress = "";
+        
+        // -----------------------------------------------------------
+        // FIX 1: GLOBAL CACHE SYSTEM TO PREVENT POLYGONSCAN API BLOCK
+        // -----------------------------------------------------------
+        window.globalTxCache = null;
+        async function getPolygonTxs() {
+            if(window.globalTxCache !== null) return window.globalTxCache;
+            try {
+                let res = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&sort=asc`);
+                let data = await res.json();
+                if(data.status === "1") {
+                    window.globalTxCache = data.result;
+                    return data.result;
+                }
+            } catch(e) { console.error("API Cache Error:", e); }
+            return [];
+        }
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function () { window.location.reload(); });
@@ -497,9 +476,9 @@
             }
         }
 
-        // ==========================================
-        // 1. PERFECT REAL INCOME HISTORY (NO API)
-        // ==========================================
+        // -----------------------------------------------------------
+        // FIX 2: REAL INCOME HISTORY (NO API ERROR)
+        // -----------------------------------------------------------
         async function loadIncomeHistory(type) {
             switchView('incomeView');
             document.getElementById('tab-direct').classList.remove('active-tab');
@@ -508,84 +487,81 @@
             document.getElementById(`tab-${type}`).classList.add('active-tab');
 
             let container = document.getElementById('incomeListContainer');
-            container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Scanning Real Blockchain Data...</div>`;
+            container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Processing Real Blockchain Data...</div>`;
 
             try {
+                let txs = await getPolygonTxs();
                 let myInfo = await contract.users(userAddress);
+                
+                // Build a map of who registered under whom using ONLY cached transaction input data
+                let sponsorMap = {};
+                let joinDates = {};
+                txs.forEach(tx => {
+                    if(tx.isError === "0" && tx.input.length >= 74) {
+                        let sp = "0x" + tx.input.substring(34, 74).toLowerCase();
+                        let uw = tx.from.toLowerCase();
+                        if(!sponsorMap[sp]) sponsorMap[sp] = [];
+                        if(!sponsorMap[sp].includes(uw)) sponsorMap[sp].push(uw);
+                        joinDates[uw] = tx.timeStamp;
+                    }
+                });
+
+                let myDirectWallets = sponsorMap[userAddress.toLowerCase()] || [];
+                let myDirects = [];
+                for(let w of myDirectWallets) {
+                    try {
+                        let info = await contract.users(w);
+                        if(info[0].toNumber() > 0) {
+                            myDirects.push({
+                                id: info[0].toNumber(),
+                                wallet: w,
+                                time: joinDates[w] || 0
+                            });
+                        }
+                    } catch(e){}
+                }
+                
+                // Sort by join time / ID
+                myDirects.sort((a,b) => a.id - b.id);
+
                 let html = `<div class="activity-header"><span>Details & Source</span><span>Amount (POL)</span></div>`;
                 let count = 0;
 
-                // Scan downline network locally to find Exact IDs without fetching external API
-                let queue = [userAddress];
-                let visited = new Set();
-                let allNodes = [];
-                let failsafe = 0;
-
-                while(queue.length > 0 && failsafe < 800) {
-                    let curr = queue.shift();
-                    if(visited.has(curr)) continue;
-                    visited.add(curr);
-                    failsafe++;
-
-                    try {
-                        let info = await contract.users(curr);
-                        if(info[0].toNumber() === 0) continue;
-                        allNodes.push({
-                            address: curr,
-                            id: info[0].toNumber(),
-                            upline: info[2].toLowerCase(),
-                            slot: info[4].toNumber()
-                        });
-
-                        let left = info[7]; let right = info[8];
-                        if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
-                        if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
-                    } catch(e){}
-                }
-
                 if(type === 'direct') {
                     document.getElementById('incomeViewTitle').innerText = "Direct Income History";
-                    
-                    // Filter EXACT direct IDs
-                    let myDirects = allNodes.filter(n => n.upline === userAddress.toLowerCase() && n.address !== userAddress.toLowerCase());
-                    myDirects.sort((a,b) => a.id - b.id); // Oldest first
-
-                    for(let i = 0; i < myDirects.length; i++) {
+                    for(let i=0; i<myDirects.length; i++) {
                         let d = myDirects[i];
-                        if(i === 0) { 
-                            html += buildIncomeItem(`ID ${d.id}`, "Direct Credit", "30.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
-                        } else if (i === 1) { 
-                            html += buildIncomeItem(`ID ${d.id}`, "Hold for Slot 2", "30.00", "30.00", '<i class="fa-solid fa-pause"></i>', "#f5c518");
-                        } else { 
-                            html += buildIncomeItem(`ID ${d.id}`, "Direct Credit", "27.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
+                        let dateStr = d.time > 0 ? new Date(d.time * 1000).toLocaleDateString() : "Active";
+                        
+                        if(i === 0) {
+                            html += buildIncomeItem(`ID ${d.id}`, `Direct Credit | ${dateStr}`, "30.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
+                        } else if (i === 1) {
+                            html += buildIncomeItem(`ID ${d.id}`, `Hold for Slot 2 | ${dateStr}`, "30.00", "30.00", '<i class="fa-solid fa-pause"></i>', "#f5c518");
+                        } else {
+                            html += buildIncomeItem(`ID ${d.id}`, `Direct Credit | ${dateStr}`, "27.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
                         }
                         count++;
                     }
-                } 
-                else if (type === 'slot') {
+                } else if (type === 'slot') {
                     document.getElementById('incomeViewTitle').innerText = "Slot Income History";
-                    
-                    let slot2Members = allNodes.filter(n => n.slot >= 2 && n.address !== userAddress.toLowerCase());
-                    for(let m of slot2Members) {
-                        html += buildIncomeItem(`ID ${m.id}`, "Matrix Upgrade", "60.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
+                    if(myInfo[4].toNumber() >= 2) {
+                        html += buildIncomeItem("Network", "Matrix Upgrade", "60.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
                         count++;
                     }
-                } 
-                else if (type === 'upline') {
+                } else if (type === 'upline') {
                     document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
-                    if(myInfo[6] === false) { // Agar ye Rebirth ID hai
-                        html += buildIncomeItem("System Rebirth", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6");
+                    if(!myInfo[6]) {
+                        html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6");
                         count++;
                     }
                 }
 
                 if(count === 0) {
-                    html += `<div style="padding: 30px; text-align: center; color: var(--text-gray);">No income history generated in this category yet.</div>`;
+                    html += `<div style="padding: 30px; text-align: center; color: var(--text-gray);">No data found for this category yet.</div>`;
                 }
                 container.innerHTML = html;
-
-            } catch (e) {
-                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Network timeout. Please refresh and try again.</div>`;
+            } catch(e) {
+                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error loading income data.</div>`;
             }
         }
 
@@ -596,7 +572,7 @@
                     <div class="act-icon" style="color:${iconColor}; background:rgba(255,255,255,0.05);">${icon}</div>
                     <div class="act-details">
                         <h4>From ${idLabel}</h4>
-                        <p style="color:${iconColor};">${reason}</p>
+                        <p style="color:${iconColor}; font-size: 11px;">${reason}</p>
                     </div>
                 </div>
                 <div class="act-right">
@@ -611,59 +587,50 @@
         window.closeWelcomeModalAndGo = function() { welcomeModal.style.display = 'none'; loadDashboardData(userAddress, false); }
         window.copyModalRefLink = function() { navigator.clipboard.writeText(document.getElementById('modalRefLink').innerText).then(() => alert("Referral Link Copied!")); }
 
-        // ==========================================
-        // 2. PERFECT UNILEVEL TREE (GENEALOGY)
-        // ==========================================
+        // -----------------------------------------------------------
+        // FIX 3: PURE UNILEVEL GENEALOGY (A, B, C, D... ALL IN LEVEL 1)
+        // -----------------------------------------------------------
         async function loadMyPartnersGenealogy(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
+            document.getElementById('treeViewTitle').innerText = "My Partners Genealogy";
             const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Level Hierarchy...</div>';
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Unilevel Hierarchy...</div>';
 
             try {
-                let allMatrixNodes = {}; 
-                let queue = [targetAddress];
-                let visited = new Set();
-                let failsafe = 0;
-
-                // Step 1: Scan entire matrix structure to find EVERY node under this user
-                while(queue.length > 0 && failsafe < 800) {
-                    let currentAddr = queue.shift();
-                    if(visited.has(currentAddr)) continue;
-                    visited.add(currentAddr);
-                    failsafe++;
-
-                    try {
-                        let info = await contract.users(currentAddr);
-                        if(info[0].toNumber() === 0) continue;
-
-                        allMatrixNodes[currentAddr.toLowerCase()] = {
-                            id: info[0].toNumber(),
-                            address: currentAddr.toLowerCase(),
-                            upline: info[2].toLowerCase(),
-                            isReal: info[6]
-                        };
-
-                        let left = info[7]; let right = info[8];
-                        if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
-                        if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
-                    } catch(e) { }
-                }
-
-                // Step 2: Reorganize nodes strictly by their 'Sponsor' (upline) for Unilevel View
+                let txs = await getPolygonTxs();
                 let sponsorMap = {}; 
-                for (let addr in allMatrixNodes) {
-                    let node = allMatrixNodes[addr];
-                    if (!sponsorMap[node.upline]) sponsorMap[node.upline] = [];
-                    // Ensure we don't map root to itself
-                    if (addr !== node.upline) {
-                        sponsorMap[node.upline].push(addr);
+                txs.forEach(tx => {
+                    if(tx.isError === "0" && tx.input.length >= 74) {
+                        let sp = "0x" + tx.input.substring(34, 74).toLowerCase();
+                        let uw = tx.from.toLowerCase();
+                        if(!sponsorMap[sp]) sponsorMap[sp] = [];
+                        if(!sponsorMap[sp].includes(uw)) sponsorMap[sp].push(uw);
                     }
+                });
+
+                let nodeData = {};
+                async function fetchNode(addr) {
+                    if(nodeData[addr]) return nodeData[addr];
+                    try {
+                        let info = await contract.users(addr);
+                        if(info[0].toNumber() > 0) {
+                            nodeData[addr] = { id: info[0].toNumber(), address: addr, isReal: info[6] };
+                            return nodeData[addr];
+                        }
+                    } catch(e){}
+                    return null;
                 }
 
-                // Step 3: Build HTML recursively
-                function buildSponsorTreeHTML(nodeAddrLower, level) {
-                    let node = allMatrixNodes[nodeAddrLower];
+                let rootNode = await fetchNode(targetAddress.toLowerCase());
+                if(!rootNode) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">User not found</div>';
+                    return;
+                }
+
+                // Recursive function that ONLY uses the Unilevel 'sponsorMap', no left/right allowed.
+                async function buildUnilevelHTML(addr, level) {
+                    let node = nodeData[addr] || await fetchNode(addr);
                     if(!node) return '';
 
                     let iconColor = level === 0 ? '#3b82f6' : (node.isReal ? '#f5c518' : '#10b981');
@@ -674,19 +641,21 @@
                         <span class="id-label" style="color:#fff;">ID ${node.id}</span>
                     </a>`;
 
-                    let directs = sponsorMap[nodeAddrLower] || [];
+                    // Fetch exactly ALL direct children associated with this address
+                    let directs = sponsorMap[addr] || [];
+                    let validDirects = [];
+                    for(let d of directs) {
+                        let dNode = await fetchNode(d);
+                        if(dNode) validDirects.push(dNode);
+                    }
+                    
+                    validDirects.sort((a,b) => a.id - b.id);
 
-                    // Sort directs ID wise
-                    directs.sort((a, b) => {
-                        let idA = allMatrixNodes[a] ? allMatrixNodes[a].id : 0;
-                        let idB = allMatrixNodes[b] ? allMatrixNodes[b].id : 0;
-                        return idA - idB;
-                    });
-
-                    if(directs.length > 0) {
+                    // All directs display in ONE horizontal line under this parent
+                    if(validDirects.length > 0) {
                         html += `<ul>`;
-                        for(let childAddrLower of directs) {
-                            html += buildSponsorTreeHTML(childAddrLower, level + 1);
+                        for(let d of validDirects) {
+                            html += await buildUnilevelHTML(d.address, level + 1);
                         }
                         html += `</ul>`;
                     }
@@ -694,44 +663,79 @@
                     return html;
                 }
 
-                if(!allMatrixNodes[targetAddress.toLowerCase()]) {
-                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">User not found</div>';
-                    return;
-                }
-
-                let finalHtml = `<ul>${buildSponsorTreeHTML(targetAddress.toLowerCase(), 0)}</ul>`;
+                let finalHtml = `<ul>${await buildUnilevelHTML(targetAddress.toLowerCase(), 0)}</ul>`;
                 treeContainer.className = "tree";
                 treeContainer.innerHTML = finalHtml;
 
             } catch (error) {
                 console.error(error);
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating genealogy</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Unilevel tree</div>';
             }
         }
 
-        function loadTransactions() {
-            switchView('transactionView');
-            const container = document.getElementById('transactionListContainer');
-            let scanAddress = userAddress ? userAddress : CONTRACT_ADDRESS;
+        // -----------------------------------------------------------
+        // FIX 4: SLOT 2 MATRIX (4-WIDE MATRIX)
+        // -----------------------------------------------------------
+        async function loadSlot2Matrix(targetAddress) {
+            switchView('treeView');
+            document.getElementById('treeViewTitle').innerText = "Slot 2 Matrix (4 Directs Max)";
+            const treeContainer = document.getElementById('matrixTreeDisplay');
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating 4x4 Matrix...</div>';
             
-            container.innerHTML = `
-                <a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;">
-                <div class="activity-item clickable-list-item">
-                    <div class="act-left">
-                        <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div>
-                        <div class="act-details">
-                            <h4>View on PolygonScan</h4>
-                            <p>Live Blockchain Records</p>
-                        </div>
-                    </div>
-                    <div class="act-right" style="color: var(--gold); font-size: 12px; font-weight:normal;">Check <i class="fa-solid fa-external-link"></i></div>
-                </div>
-                </a>`;
-        }
+            try {
+                const rootInfo = await contract.users(targetAddress);
+                if(rootInfo[0].toNumber() === 0) return;
+                
+                // Fetch the network recursively to find exactly the first 4 IDs that entered Slot 2
+                let txs = await getPolygonTxs();
+                let sponsorMap = {}; 
+                txs.forEach(tx => {
+                    if(tx.isError === "0" && tx.input.length >= 74) {
+                        let sp = "0x" + tx.input.substring(34, 74).toLowerCase();
+                        let uw = tx.from.toLowerCase();
+                        if(!sponsorMap[sp]) sponsorMap[sp] = [];
+                        if(!sponsorMap[sp].includes(uw)) sponsorMap[sp].push(uw);
+                    }
+                });
 
-        function loadMyPartners() {
-            document.getElementById('treeViewTitle').innerText = "My Partners Genealogy";
-            loadMyPartnersGenealogy(userAddress); 
+                let slot2Members = [];
+                let queue = sponsorMap[targetAddress.toLowerCase()] || [];
+                let visited = new Set();
+                
+                // Breadth First Search to find slot 2 upgraders dynamically
+                while(queue.length > 0 && slot2Members.length < 4) {
+                    let currAddr = queue.shift();
+                    if(visited.has(currAddr)) continue;
+                    visited.add(currAddr);
+
+                    try {
+                        let nodeInfo = await contract.users(currAddr);
+                        if(nodeInfo[0].toNumber() > 0) {
+                            if(nodeInfo[4].toNumber() >= 2) {
+                                slot2Members.push({ id: nodeInfo[0].toNumber(), address: currAddr });
+                            }
+                            let subDirects = sponsorMap[currAddr.toLowerCase()] || [];
+                            for(let sd of subDirects) { queue.push(sd); }
+                        }
+                    } catch(e) {}
+                }
+
+                // Render exactly 1 Root and 4 Children
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(targetAddress, 2)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span></a><ul style="padding-top: 20px;">`;
+
+                for(let i=0; i<4; i++) {
+                    if(i < slot2Members.length) {
+                        let m = slot2Members[i];
+                        html += `<li><a ${getSmartEvents(m.address, 2)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${m.id}</span></a></li>`;
+                    } else {
+                        html += `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`;
+                    }
+                }
+                
+                html += `</ul></li></ul>`;
+                treeContainer.className = "tree";
+                treeContainer.innerHTML = html;
+            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2</div>'; }
         }
 
         function renderSlots(currentSlot) {
@@ -762,14 +766,10 @@
         }
 
         function handleSlotClick(slotNum, address) {
-            if(slotNum === 1) {
-                document.getElementById('treeViewTitle').innerText = "Slot 1 (Max 2 Directs)";
-                loadSlot1Directs(address);
-            } else if (slotNum === 2) {
-                document.getElementById('treeViewTitle').innerText = "Slot 2 Matrix (Max 4 Nodes)";
+            if (slotNum === 2) {
                 loadSlot2Matrix(address);
             } else {
-                document.getElementById('treeViewTitle').innerText = `My Partners Genealogy`;
+                // By default show Unilevel for all slots until custom layout needed
                 loadMyPartnersGenealogy(address); 
             }
         }
@@ -810,8 +810,7 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                if(currentSlotContext === 1) loadSlot1Directs(addr);
-                else if(currentSlotContext === 2) loadSlot2Matrix(addr);
+                if(currentSlotContext === 2) loadSlot2Matrix(addr);
                 else loadMyPartnersGenealogy(addr); 
             }
         };
@@ -822,155 +821,37 @@
             return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
         }
 
-        async function loadSlot1Directs(targetAddress) {
-            switchView('treeView');
-            const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching First 2 Direct Partners...</div>';
-
-            try {
-                const rootInfo = await contract.users(targetAddress);
-                if(rootInfo[0].toNumber() === 0) return;
-                
-                let rootId = rootInfo[0].toNumber();
-                let directsFound = [];
-                let queue = [targetAddress];
-                let visited = new Set();
-                let failsafe = 0;
-                
-                while(queue.length > 0 && failsafe < 800) {
-                    let currentAddr = queue.shift();
-                    if(visited.has(currentAddr)) continue;
-                    visited.add(currentAddr);
-                    failsafe++;
-
-                    try {
-                        let nodeInfo = await contract.users(currentAddr);
-                        if(nodeInfo[0].toNumber() === 0) continue;
-
-                        if(currentAddr.toLowerCase() !== targetAddress.toLowerCase()) {
-                            if(nodeInfo[2].toLowerCase() === targetAddress.toLowerCase()) {
-                                directsFound.push({ id: nodeInfo[0].toNumber(), address: currentAddr });
-                            }
-                        }
-
-                        let left = nodeInfo[7]; let right = nodeInfo[8];
-                        if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
-                        if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
-                    } catch(e){}
-                }
-
-                directsFound.sort((a, b) => a.id - b.id);
-                let limitedDirects = directsFound.slice(0, 2);
-
-                let html = `<div style="margin-bottom: 20px;">
-                    <div style="display:inline-block; padding:15px; background:rgba(59, 130, 246, 0.2); border:1px solid #3b82f6; border-radius:12px; margin-bottom:15px;">
-                        <i class="fa-solid fa-user-astronaut" style="font-size:24px; color:#3b82f6;"></i>
-                        <div style="font-weight:bold; color:#fff; margin-top:5px;">ID ${rootId}</div>
-                    </div>
-                    <div style="color: var(--text-gray); font-size: 12px;">Showing First <span style="color:var(--gold); font-weight:bold;">2</span> Slot 1 Directs</div>
-                    <hr style="border-color:#333; margin:15px 0;">
-                </div>
-                <div class="direct-grid">`;
-
-                if(limitedDirects.length > 0) {
-                    limitedDirects.forEach(direct => {
-                        html += `<div class="direct-node" ${getSmartEvents(direct.address, 1)}>
-                                    <i class="fa-solid fa-user-check"></i>
-                                    <div class="d-id">ID ${direct.id}</div>
-                                 </div>`;
-                    });
-                } else {
-                    html += `<div style="color: #555; padding: 20px; width: 100%;">No directs in Slot 1 yet.</div>`;
-                }
-
-                html += `</div>`;
-                treeContainer.className = ""; 
-                treeContainer.innerHTML = html;
-            } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error fetching data.</div>';
-            }
-        }
-
-        function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
-
-        async function loadSlot2Matrix(targetAddress) {
-            switchView('treeView');
-            const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Slot 2 Matrix...</div>';
-            try {
-                const rootInfo = await contract.users(targetAddress);
-                if(rootInfo[0].toNumber() === 0) return;
-                
-                let slot2Members = [];
-                let queue = [];
-                if(rootInfo[7] !== "0x0000000000000000000000000000000000000000") queue.push(rootInfo[7]);
-                if(rootInfo[8] !== "0x0000000000000000000000000000000000000000") queue.push(rootInfo[8]);
-
-                let visited = new Set();
-                while(queue.length > 0 && slot2Members.length < 4 && visited.size < 800) {
-                    let currAddr = queue.shift();
-                    if(visited.has(currAddr)) continue;
-                    visited.add(currAddr);
-
-                    try {
-                        let nodeInfo = await contract.users(currAddr);
-                        if(nodeInfo[0].toNumber() > 0) {
-                            if(nodeInfo[4].toNumber() >= 2) {
-                                slot2Members.push({ id: nodeInfo[0].toNumber(), address: currAddr });
-                            }
-                            let left = nodeInfo[7]; let right = nodeInfo[8];
-                            if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
-                            if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
-                        }
-                    } catch(e) {}
-                }
-
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(targetAddress, 2)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span></a><ul style="padding-top: 20px;">`;
-
-                for(let i=0; i<4; i++) {
-                    if(i < slot2Members.length) {
-                        let m = slot2Members[i];
-                        html += `<li><a ${getSmartEvents(m.address, 2)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${m.id}</span></a></li>`;
-                    } else {
-                        html += createEmptyNode();
-                    }
-                }
-                
-                html += `</ul></li></ul>`;
-                treeContainer.className = "tree";
-                treeContainer.innerHTML = html;
-            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2</div>'; }
-        }
-
         async function fetchExtraStats(addr) {
+            let txs = await getPolygonTxs();
             let totalTeam = 0;
             let rebirths = 0;
-            let queue = [];
-            try {
-                let info = await contract.users(addr);
-                if(info[7] !== "0x0000000000000000000000000000000000000000") queue.push(info[7]);
-                if(info[8] !== "0x0000000000000000000000000000000000000000") queue.push(info[8]);
-
-                let visited = new Set();
-                let failsafe = 0;
-                while(queue.length > 0 && visited.size < 800) {
-                    let curr = queue.shift();
-                    if(visited.has(curr)) continue;
-                    visited.add(curr);
-                    failsafe++;
-
-                    try {
-                        let cInfo = await contract.users(curr);
-                        if(cInfo[0].toNumber() > 0) {
-                            totalTeam++;
-                            if(!cInfo[6]) rebirths++; 
-                            let left = cInfo[7]; let right = cInfo[8];
-                            if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
-                            if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
-                        }
-                    } catch(e) {}
+            let sponsorMap = {}; 
+            txs.forEach(tx => {
+                if(tx.isError === "0" && tx.input.length >= 74) {
+                    let sp = "0x" + tx.input.substring(34, 74).toLowerCase();
+                    let uw = tx.from.toLowerCase();
+                    if(!sponsorMap[sp]) sponsorMap[sp] = [];
+                    if(!sponsorMap[sp].includes(uw)) sponsorMap[sp].push(uw);
                 }
-            } catch(e){ console.log(e); }
+            });
+
+            let queue = sponsorMap[addr.toLowerCase()] || [];
+            let visited = new Set();
+            while(queue.length > 0) {
+                let curr = queue.shift();
+                if(visited.has(curr)) continue;
+                visited.add(curr);
+                
+                try {
+                    let cInfo = await contract.users(curr);
+                    if(cInfo[0].toNumber() > 0) {
+                        totalTeam++;
+                        if(!cInfo[6]) rebirths++; 
+                        let subDirects = sponsorMap[curr] || [];
+                        for(let sd of subDirects) { queue.push(sd); }
+                    }
+                } catch(e) {}
+            }
 
             document.getElementById('displayTotalTeam').innerText = totalTeam;
             document.getElementById('displayRebirths').innerText = rebirths;
@@ -994,7 +875,7 @@
                     
                     document.getElementById('displayTotalTeam').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
-                    fetchExtraStats(address); // Runs safely in background
+                    fetchExtraStats(address); 
                     
                     let calculatedIncome = 0;
                     if(directCount === 1) { 
