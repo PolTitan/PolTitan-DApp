@@ -226,18 +226,15 @@
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
             
-            <!-- Video Logo -->
             <video class="video-logo" autoplay loop muted playsinline style="margin-bottom: 15px; width: 140px; height: 45px; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 0 15px rgba(245, 197, 24, 0.4);">
                 <source src="poltitan-logo.mp4" type="video/mp4">
             </video>
             
             <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
             
-            <!-- Message & Terms -->
             <p style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
             <p style="color: var(--text-gray); font-size: 10px; margin-bottom: 15px;">* Terms & Conditions apply.</p>
             
-            <!-- Bada ACTIVE Text -->
             <h1 style="color: #10b981; font-size: 34px; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ACTIVE</h1>
             
             <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
@@ -344,7 +341,8 @@
             </div>
             
             <div class="action-box">
-                <h4>Hold Amount (Refundable) <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
+                <!-- UPDATED: Removed (Refundable) word from here -->
+                <h4>Hold Amount <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                     <div style="font-size: 24px; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 8px;">
                         <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo" style="width: 20px; height: 20px;">
@@ -571,7 +569,8 @@
                 document.getElementById('treeViewTitle').innerText = "Slot 2 Matrix (Max 4 Nodes)";
                 loadSlot2Matrix(address);
             } else {
-                document.getElementById('treeViewTitle').innerText = `Slot ${slotNum} Matrix`;
+                // Keep it consistent for viewing any slot
+                document.getElementById('treeViewTitle').innerText = `My Partners Genealogy`;
                 loadGenealogyFull(address); 
             }
         }
@@ -633,13 +632,15 @@
             } catch (e) { return null; }
         }
 
+        // UPDATED: TRUE LEVEL-WISE GENEALOGY FETCHING FOR "MY PARTNERS"
         async function loadGenealogyFull(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating Full Genealogy...</div>';
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Matrix Hierarchy...</div>';
 
             try {
+                // Fetch sponsor mapping from transactions (Direct mapping)
                 let sponsorMap = {};
                 try {
                     let res = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&sort=asc`);
@@ -655,11 +656,13 @@
                 } catch(e) {}
 
                 let allNodes = {};
-                let childrenMap = {};
+                let childrenMap = {}; // mapping: sponsor_address -> [array of direct children addresses]
+                
+                // Breadth-First Search (BFS) to find the entire network
                 let queue = [targetAddress];
                 let visited = new Set();
 
-                while(queue.length > 0 && visited.size < 500) {
+                while(queue.length > 0 && visited.size < 2000) {
                     let currentAddr = queue.shift();
                     if(visited.has(currentAddr)) continue;
                     visited.add(currentAddr);
@@ -669,20 +672,26 @@
 
                     allNodes[currentAddr.toLowerCase()] = {
                         id: info[0].toNumber(),
-                        address: currentAddr
+                        address: currentAddr,
+                        isReal: info[6]
                     };
 
                     let trueUpline = sponsorMap[currentAddr.toLowerCase()] || info[2].toLowerCase();
-
+                    
+                    // Add this node to its upline's children list
                     if(!childrenMap[trueUpline]) childrenMap[trueUpline] = [];
                     if(currentAddr.toLowerCase() !== targetAddress.toLowerCase() && !childrenMap[trueUpline].includes(currentAddr.toLowerCase())) {
                         childrenMap[trueUpline].push(currentAddr.toLowerCase());
+                        
+                        // ONLY traverse children recursively if they are part of THIS root's downline
+                        queue.push(currentAddr);
                     }
-
+                    
+                    // Ensure we catch rebirths or internal left/rights just in case they aren't mapped in txns
                     let left = info[7];
                     let right = info[8];
-                    if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
-                    if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
+                    if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
+                    if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
                 }
 
                 if(!allNodes[targetAddress.toLowerCase()]) {
@@ -694,15 +703,21 @@
                     let node = allNodes[nodeAddrLower];
                     if(!node) return '';
 
-                    let iconColor = level === 0 ? '#3b82f6' : (level === 1 ? '#f5c518' : '#a0a0a0');
-                    let iconClass = level === 0 ? 'fa-user-astronaut' : 'fa-user-check';
+                    // Styling based on level and ID type (Real vs Rebirth)
+                    let iconColor = level === 0 ? '#3b82f6' : (node.isReal ? '#f5c518' : '#10b981');
+                    let iconClass = level === 0 ? 'fa-user-astronaut' : (node.isReal ? 'fa-user-check' : 'fa-recycle');
 
                     let html = `<li><a style="${level===0?'background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;':''}" ${getSmartEvents(node.address, 0)}>
                         <i class="fa-solid ${iconClass}" style="color:${iconColor};"></i>
                         <span class="id-label" style="color:#fff;">ID ${node.id}</span>
                     </a>`;
 
+                    // Fetch all directs for this particular node
                     let children = childrenMap[nodeAddrLower] || [];
+                    
+                    // Sort children by ID number so they display logically left to right
+                    children.sort((a, b) => (allNodes[a]?.id || 0) - (allNodes[b]?.id || 0));
+
                     if(children.length > 0) {
                         html += `<ul>`;
                         for(let childAddrLower of children) {
@@ -720,7 +735,7 @@
 
             } catch (error) {
                 console.error(error);
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating true genealogy</div>';
             }
         }
 
@@ -945,7 +960,6 @@
                 showCustomAlertModal("Success", "Refund Claimed Successfully!");
                 await loadDashboardData(userAddress, false);
             } catch (error) {
-                // EXACT MESSAGE AS REQUESTED
                 showCustomAlertModal("Notice", "System is active, refund not allowed!");
             } finally {
                 btn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund';
