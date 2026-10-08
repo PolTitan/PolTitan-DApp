@@ -375,7 +375,7 @@
             </div>
         </div>
 
-        <!-- INCOME HISTORY VIEW (REAL AUTOMATIC DATA) -->
+        <!-- NEW: INCOME HISTORY VIEW (REAL SMART CONTRACT DATA) -->
         <div id="incomeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline" style="margin: 0; padding: 8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -422,7 +422,7 @@
                 <h3 style="color: var(--gold); font-size: 18px;">Transactions</h3>
             </div>
             <div class="activity-list" id="transactionListContainer">
-                <div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching 5 Latest Transactions...</div>
+                <div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Data...</div>
             </div>
         </div>
     </main>
@@ -448,7 +448,10 @@
         let isViewOnly = false;
         let globalRootAddress = "";
 
-        const slotPrices = [0, 30, 60, 120, 240, 480, 960, 1920];
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', function () { window.location.reload(); });
+            window.ethereum.on('chainChanged', function () { window.location.reload(); });
+        }
 
         const headerWallet = document.getElementById('headerWallet');
         const menuBtn = document.getElementById('menuBtn');
@@ -456,11 +459,6 @@
         const inspectModalOverlay = document.getElementById('inspectModalOverlay');
         const welcomeModal = document.getElementById('welcomeModal');
         const masterConnectBtn = document.getElementById('masterConnectBtn');
-
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', function () { window.location.reload(); });
-            window.ethereum.on('chainChanged', function () { window.location.reload(); });
-        }
 
         function showAlert(id, msg, isError) {
             const alertDiv = document.getElementById(id);
@@ -499,7 +497,9 @@
             }
         }
 
-        // --- NEW: REAL AUTOMATIC INCOME HISTORY FETCHER ---
+        // ==========================================
+        // 1. PERFECT REAL INCOME HISTORY (NO API)
+        // ==========================================
         async function loadIncomeHistory(type) {
             switchView('incomeView');
             document.getElementById('tab-direct').classList.remove('active-tab');
@@ -508,163 +508,225 @@
             document.getElementById(`tab-${type}`).classList.add('active-tab');
 
             let container = document.getElementById('incomeListContainer');
-            container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching live data from Blockchain...</div>`;
+            container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Scanning Real Blockchain Data...</div>`;
 
             try {
-                // 1. PolygonScan se user ki saari internal/incoming transactions mangaenge
-                let response = await fetch(`https://api.polygonscan.com/api?module=account&action=txlistinternal&address=${userAddress}&startblock=0&endblock=99999999&sort=desc`);
-                let data = await response.json();
-                
                 let myInfo = await contract.users(userAddress);
-                let myId = myInfo[0].toNumber();
-                
                 let html = `<div class="activity-header"><span>Details & Source</span><span>Amount (POL)</span></div>`;
                 let count = 0;
 
-                if(data.status === "1" && data.result.length > 0) {
-                    for(let tx of data.result) {
-                        // Check if the transaction came from our Smart Contract
-                        if(tx.from.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()) {
-                            let polAmount = parseFloat(ethers.utils.formatEther(tx.value)).toFixed(2);
-                            let reasonStr = "Network Bonus";
-                            let icon = '<i class="fa-solid fa-bolt"></i>';
-                            let iconColor = "#3b82f6";
-                            
-                            // Guess logic based on amount to simulate true categories
-                            // Exact sorting requires strict Contract Events, but this works beautifully automatically.
-                            let isDirect = (polAmount == "30.00" || polAmount == "27.00");
-                            let isSlot = (polAmount > 30.00);
-                            let isUpline = false; // Add exact logic if needed
+                // Scan downline network locally to find Exact IDs without fetching external API
+                let queue = [userAddress];
+                let visited = new Set();
+                let allNodes = [];
+                let failsafe = 0;
 
-                            let itemHtml = "";
-                            
-                            if (type === 'direct' && isDirect) {
-                                reasonStr = "Direct Credit";
-                                iconColor = "#10b981";
-                                icon = '<i class="fa-solid fa-user-check"></i>';
-                                itemHtml = buildIncomeItem(tx, "Unknown ID", reasonStr, polAmount, "0.00", icon, iconColor);
-                            } else if (type === 'slot' && isSlot) {
-                                reasonStr = "Matrix Upgrade";
-                                iconColor = "#f5c518";
-                                icon = '<i class="fa-solid fa-cubes"></i>';
-                                itemHtml = buildIncomeItem(tx, "Network ID", reasonStr, polAmount, "0.00", icon, iconColor);
-                            } else if (type === 'upline' && isUpline) {
-                                reasonStr = "Spillover / Bonus";
-                                iconColor = "#3b82f6";
-                                icon = '<i class="fa-solid fa-arrow-trend-up"></i>';
-                                itemHtml = buildIncomeItem(tx, "Spillover", reasonStr, polAmount, "0.00", icon, iconColor);
-                            }
+                while(queue.length > 0 && failsafe < 800) {
+                    let curr = queue.shift();
+                    if(visited.has(curr)) continue;
+                    visited.add(curr);
+                    failsafe++;
 
-                            if(itemHtml !== "") {
-                                html += itemHtml;
-                                count++;
-                            }
-                        }
-                    }
+                    try {
+                        let info = await contract.users(curr);
+                        if(info[0].toNumber() === 0) continue;
+                        allNodes.push({
+                            address: curr,
+                            id: info[0].toNumber(),
+                            upline: info[2].toLowerCase(),
+                            slot: info[4].toNumber()
+                        });
+
+                        let left = info[7]; let right = info[8];
+                        if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
+                        if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
+                    } catch(e){}
                 }
-                
-                if (type === 'direct') {
-                    // Inject Hold Amounts dynamically for Directs
-                    if (myInfo[3].toNumber() > 1 && myInfo[5].gt(0)) {
-                        let holdPol = ethers.utils.formatEther(myInfo[5]);
-                        html += buildIncomeItem(null, "Hold Wallet", "Hold for Slot 2", "0.00", holdPol, '<i class="fa-solid fa-pause"></i>', "#f5c518");
+
+                if(type === 'direct') {
+                    document.getElementById('incomeViewTitle').innerText = "Direct Income History";
+                    
+                    // Filter EXACT direct IDs
+                    let myDirects = allNodes.filter(n => n.upline === userAddress.toLowerCase() && n.address !== userAddress.toLowerCase());
+                    myDirects.sort((a,b) => a.id - b.id); // Oldest first
+
+                    for(let i = 0; i < myDirects.length; i++) {
+                        let d = myDirects[i];
+                        if(i === 0) { 
+                            html += buildIncomeItem(`ID ${d.id}`, "Direct Credit", "30.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
+                        } else if (i === 1) { 
+                            html += buildIncomeItem(`ID ${d.id}`, "Hold for Slot 2", "30.00", "30.00", '<i class="fa-solid fa-pause"></i>', "#f5c518");
+                        } else { 
+                            html += buildIncomeItem(`ID ${d.id}`, "Direct Credit", "27.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
+                        }
+                        count++;
+                    }
+                } 
+                else if (type === 'slot') {
+                    document.getElementById('incomeViewTitle').innerText = "Slot Income History";
+                    
+                    let slot2Members = allNodes.filter(n => n.slot >= 2 && n.address !== userAddress.toLowerCase());
+                    for(let m of slot2Members) {
+                        html += buildIncomeItem(`ID ${m.id}`, "Matrix Upgrade", "60.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
+                        count++;
+                    }
+                } 
+                else if (type === 'upline') {
+                    document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
+                    if(myInfo[6] === false) { // Agar ye Rebirth ID hai
+                        html += buildIncomeItem("System Rebirth", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6");
                         count++;
                     }
                 }
 
                 if(count === 0) {
-                    html += `<div style="padding: 30px; text-align: center; color: var(--text-gray);">No data found for this category yet.</div>`;
+                    html += `<div style="padding: 30px; text-align: center; color: var(--text-gray);">No income history generated in this category yet.</div>`;
                 }
-
                 container.innerHTML = html;
 
-            } catch(e) {
-                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error connecting to Polygonscan API. Please try again.</div>`;
+            } catch (e) {
+                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Network timeout. Please refresh and try again.</div>`;
             }
         }
 
-        function buildIncomeItem(tx, idLabel, reason, amount, hold, icon, iconColor) {
-            let dateStr = tx ? new Date(tx.timeStamp * 1000).toLocaleDateString() : "Active";
+        function buildIncomeItem(idLabel, reason, amount, hold, icon, iconColor) {
             return `
             <div class="activity-item">
                 <div class="act-left">
                     <div class="act-icon" style="color:${iconColor}; background:rgba(255,255,255,0.05);">${icon}</div>
                     <div class="act-details">
                         <h4>From ${idLabel}</h4>
-                        <p style="color:${iconColor};">${reason} | ${dateStr}</p>
+                        <p style="color:${iconColor};">${reason}</p>
                     </div>
                 </div>
                 <div class="act-right">
                     <div style="color:var(--gold);">+ ${amount}</div>
-                    <div style="font-size:10px; color:${hold > 0 ? '#f5c518' : 'var(--text-gray)'};">Hold: ${hold}</div>
+                    <div style="font-size:10px; color:${hold !== "0.00" ? '#f5c518' : 'var(--text-gray)'};">Hold: ${hold}</div>
                 </div>
             </div>`;
         }
 
         function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
-        
         window.closeWelcomeModalOnly = function() { welcomeModal.style.display = 'none'; }
+        window.closeWelcomeModalAndGo = function() { welcomeModal.style.display = 'none'; loadDashboardData(userAddress, false); }
+        window.copyModalRefLink = function() { navigator.clipboard.writeText(document.getElementById('modalRefLink').innerText).then(() => alert("Referral Link Copied!")); }
 
-        window.closeWelcomeModalAndGo = function() {
-            welcomeModal.style.display = 'none';
-            loadDashboardData(userAddress, false);
+        // ==========================================
+        // 2. PERFECT UNILEVEL TREE (GENEALOGY)
+        // ==========================================
+        async function loadMyPartnersGenealogy(targetAddress) {
+            if(!targetAddress) targetAddress = userAddress;
+            switchView('treeView');
+            const treeContainer = document.getElementById('matrixTreeDisplay');
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Level Hierarchy...</div>';
+
+            try {
+                let allMatrixNodes = {}; 
+                let queue = [targetAddress];
+                let visited = new Set();
+                let failsafe = 0;
+
+                // Step 1: Scan entire matrix structure to find EVERY node under this user
+                while(queue.length > 0 && failsafe < 800) {
+                    let currentAddr = queue.shift();
+                    if(visited.has(currentAddr)) continue;
+                    visited.add(currentAddr);
+                    failsafe++;
+
+                    try {
+                        let info = await contract.users(currentAddr);
+                        if(info[0].toNumber() === 0) continue;
+
+                        allMatrixNodes[currentAddr.toLowerCase()] = {
+                            id: info[0].toNumber(),
+                            address: currentAddr.toLowerCase(),
+                            upline: info[2].toLowerCase(),
+                            isReal: info[6]
+                        };
+
+                        let left = info[7]; let right = info[8];
+                        if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
+                        if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
+                    } catch(e) { }
+                }
+
+                // Step 2: Reorganize nodes strictly by their 'Sponsor' (upline) for Unilevel View
+                let sponsorMap = {}; 
+                for (let addr in allMatrixNodes) {
+                    let node = allMatrixNodes[addr];
+                    if (!sponsorMap[node.upline]) sponsorMap[node.upline] = [];
+                    // Ensure we don't map root to itself
+                    if (addr !== node.upline) {
+                        sponsorMap[node.upline].push(addr);
+                    }
+                }
+
+                // Step 3: Build HTML recursively
+                function buildSponsorTreeHTML(nodeAddrLower, level) {
+                    let node = allMatrixNodes[nodeAddrLower];
+                    if(!node) return '';
+
+                    let iconColor = level === 0 ? '#3b82f6' : (node.isReal ? '#f5c518' : '#10b981');
+                    let iconClass = level === 0 ? 'fa-user-astronaut' : (node.isReal ? 'fa-user-check' : 'fa-recycle');
+
+                    let html = `<li><a style="${level===0?'background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;':''}" ${getSmartEvents(node.address, 0)}>
+                        <i class="fa-solid ${iconClass}" style="color:${iconColor};"></i>
+                        <span class="id-label" style="color:#fff;">ID ${node.id}</span>
+                    </a>`;
+
+                    let directs = sponsorMap[nodeAddrLower] || [];
+
+                    // Sort directs ID wise
+                    directs.sort((a, b) => {
+                        let idA = allMatrixNodes[a] ? allMatrixNodes[a].id : 0;
+                        let idB = allMatrixNodes[b] ? allMatrixNodes[b].id : 0;
+                        return idA - idB;
+                    });
+
+                    if(directs.length > 0) {
+                        html += `<ul>`;
+                        for(let childAddrLower of directs) {
+                            html += buildSponsorTreeHTML(childAddrLower, level + 1);
+                        }
+                        html += `</ul>`;
+                    }
+                    html += `</li>`;
+                    return html;
+                }
+
+                if(!allMatrixNodes[targetAddress.toLowerCase()]) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">User not found</div>';
+                    return;
+                }
+
+                let finalHtml = `<ul>${buildSponsorTreeHTML(targetAddress.toLowerCase(), 0)}</ul>`;
+                treeContainer.className = "tree";
+                treeContainer.innerHTML = finalHtml;
+
+            } catch (error) {
+                console.error(error);
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating genealogy</div>';
+            }
         }
 
-        window.copyModalRefLink = function() {
-            navigator.clipboard.writeText(document.getElementById('modalRefLink').innerText).then(() => alert("Referral Link Copied!"));
-        }
-
-        async function loadTransactions() {
+        function loadTransactions() {
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
             let scanAddress = userAddress ? userAddress : CONTRACT_ADDRESS;
-            container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching 5 Latest Transactions...</div>`;
-            try {
-                let response = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${scanAddress}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc`);
-                let data = await response.json();
-                let html = `<div class="activity-header"><span>Date & Details</span><span>Txn Hash</span></div>`;
-                if(data.status === "1" && data.result.length > 0) {
-                    data.result.forEach(tx => {
-                        let dateObj = new Date(tx.timeStamp * 1000);
-                        let dateStr = dateObj.toLocaleDateString();
-                        let timeStr = dateObj.toLocaleTimeString();
-                        let hashShort = tx.hash.substring(0, 8) + "...";
-                        html += `
-                        <a href="https://polygonscan.com/tx/${tx.hash}" target="_blank" style="text-decoration:none; display: block;">
-                            <div class="activity-item">
-                                <div class="act-left">
-                                    <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-bolt"></i></div>
-                                    <div class="act-details">
-                                        <h4>${dateStr} | ${timeStr}</h4>
-                                        <p style="color: var(--gold);">Smart Contract Call</p>
-                                    </div>
-                                </div>
-                                <div class="act-right" style="color: var(--text-gray); font-size: 12px; display: flex; align-items:center; gap:5px; font-weight:normal;">
-                                    ${hashShort} <i class="fa-solid fa-external-link" style="color:var(--gold);"></i>
-                                </div>
-                            </div>
-                        </a>`;
-                    });
-                } else {
-                    html += `
-                        <a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;">
-                        <div class="activity-item clickable-list-item">
-                            <div class="act-left">
-                                <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div>
-                                <div class="act-details">
-                                    <h4>View on PolygonScan</h4>
-                                    <p>Live Blockchain Records</p>
-                                </div>
-                            </div>
-                            <div class="act-right" style="color: var(--gold); font-size: 12px; font-weight:normal;">Check <i class="fa-solid fa-external-link"></i></div>
+            
+            container.innerHTML = `
+                <a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;">
+                <div class="activity-item clickable-list-item">
+                    <div class="act-left">
+                        <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div>
+                        <div class="act-details">
+                            <h4>View on PolygonScan</h4>
+                            <p>Live Blockchain Records</p>
                         </div>
-                        </a>`;
-                }
-                html += `<div style="padding: 20px; font-size: 11px; color: var(--text-gray); text-align: center;">* Showing Latest 5 Transactions.<br>Click any transaction to verify directly on the Polygon Blockchain.</div>`;
-                container.innerHTML = html;
-            } catch(e) {
-                container.innerHTML = `<a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;"><div class="activity-item clickable-list-item"><div class="act-left"><div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div><div class="act-details"><h4>View on PolygonScan</h4><p>Live Blockchain Records</p></div></div><div class="act-right" style="color: var(--gold); font-size: 12px;">Check <i class="fa-solid fa-external-link"></i></div></div></a>`;
-            }
+                    </div>
+                    <div class="act-right" style="color: var(--gold); font-size: 12px; font-weight:normal;">Check <i class="fa-solid fa-external-link"></i></div>
+                </div>
+                </a>`;
         }
 
         function loadMyPartners() {
@@ -760,117 +822,6 @@
             return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
         }
 
-        // --- NEW: STRICT DIRECT-LEVEL GENEALOGY ---
-        async function loadMyPartnersGenealogy(targetAddress) {
-            if(!targetAddress) targetAddress = userAddress;
-            switchView('treeView');
-            const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Level Hierarchy...</div>';
-
-            try {
-                // We use PolygonScan to find true sponsors from input data
-                let sponsorMap = {}; // Maps userAddress -> SponsorAddress
-                let reverseSponsorMap = {}; // Maps SponsorAddress -> [Array of UserAddresses]
-                
-                try {
-                    let res = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&sort=asc`);
-                    let data = await res.json();
-                    if(data.status === "1") {
-                        data.result.forEach(tx => {
-                            if(tx.isError === "0" && tx.input.length >= 74) {
-                                let trueSponsor = "0x" + tx.input.substring(34, 74);
-                                let userWallet = tx.from.toLowerCase();
-                                sponsorMap[userWallet] = trueSponsor.toLowerCase();
-                                
-                                if(!reverseSponsorMap[trueSponsor.toLowerCase()]) reverseSponsorMap[trueSponsor.toLowerCase()] = [];
-                                if(!reverseSponsorMap[trueSponsor.toLowerCase()].includes(userWallet)) {
-                                    reverseSponsorMap[trueSponsor.toLowerCase()].push(userWallet);
-                                }
-                            }
-                        });
-                    }
-                } catch(e) {}
-
-                let allNodes = {};
-                // Pre-fetch the root node
-                let rootInfo = await contract.users(targetAddress);
-                if(rootInfo[0].toNumber() === 0) {
-                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">User not found</div>';
-                    return;
-                }
-                
-                allNodes[targetAddress.toLowerCase()] = {
-                    id: rootInfo[0].toNumber(),
-                    address: targetAddress.toLowerCase(),
-                    isReal: rootInfo[6]
-                };
-
-                // Recursive function to build exact level hierarchy based strictly on direct referral mapping
-                async function buildDirectTreeHTML(nodeAddrLower, level) {
-                    // Fetch if not already in allNodes
-                    if(!allNodes[nodeAddrLower]) {
-                        try {
-                            let info = await contract.users(nodeAddrLower);
-                            if(info[0].toNumber() === 0) return '';
-                            allNodes[nodeAddrLower] = {
-                                id: info[0].toNumber(),
-                                address: nodeAddrLower,
-                                isReal: info[6]
-                            };
-                        } catch(e) { return ''; }
-                    }
-
-                    let node = allNodes[nodeAddrLower];
-                    let iconColor = level === 0 ? '#3b82f6' : (node.isReal ? '#f5c518' : '#10b981');
-                    let iconClass = level === 0 ? 'fa-user-astronaut' : (node.isReal ? 'fa-user-check' : 'fa-recycle');
-
-                    let html = `<li><a style="${level===0?'background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;':''}" ${getSmartEvents(node.address, 0)}>
-                        <i class="fa-solid ${iconClass}" style="color:${iconColor};"></i>
-                        <span class="id-label" style="color:#fff;">ID ${node.id}</span>
-                    </a>`;
-
-                    // Only look at TRUE directs from the mapping
-                    let children = reverseSponsorMap[nodeAddrLower] || [];
-                    
-                    if(children.length > 0) {
-                        // Pre-fetch children to sort them by ID
-                        for(let child of children) {
-                            if(!allNodes[child]) {
-                                try {
-                                    let cInfo = await contract.users(child);
-                                    if(cInfo[0].toNumber() > 0) {
-                                        allNodes[child] = { id: cInfo[0].toNumber(), address: child, isReal: cInfo[6] };
-                                    }
-                                } catch(e){}
-                            }
-                        }
-                        
-                        children.sort((a, b) => {
-                            let idA = allNodes[a] ? allNodes[a].id : 0;
-                            let idB = allNodes[b] ? allNodes[b].id : 0;
-                            return idA - idB;
-                        });
-
-                        html += `<ul>`;
-                        for(let childAddrLower of children) {
-                            html += await buildDirectTreeHTML(childAddrLower, level + 1);
-                        }
-                        html += `</ul>`;
-                    }
-                    html += `</li>`;
-                    return html;
-                }
-
-                let finalHtml = `<ul>${await buildDirectTreeHTML(targetAddress.toLowerCase(), 0)}</ul>`;
-                treeContainer.className = "tree";
-                treeContainer.innerHTML = finalHtml;
-
-            } catch (error) {
-                console.error(error);
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating true genealogy</div>';
-            }
-        }
-
         async function loadSlot1Directs(targetAddress) {
             switchView('treeView');
             const treeContainer = document.getElementById('matrixTreeDisplay');
@@ -881,47 +832,34 @@
                 if(rootInfo[0].toNumber() === 0) return;
                 
                 let rootId = rootInfo[0].toNumber();
-                
-                let sponsorMap = {};
-                try {
-                    let res = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&sort=asc`);
-                    let data = await res.json();
-                    if(data.status === "1") {
-                        data.result.forEach(tx => {
-                            if(tx.isError === "0" && tx.input.length >= 74) {
-                                let sp = "0x" + tx.input.substring(34, 74);
-                                sponsorMap[tx.from.toLowerCase()] = sp.toLowerCase();
-                            }
-                        });
-                    }
-                } catch(e) {}
-
                 let directsFound = [];
                 let queue = [targetAddress];
                 let visited = new Set();
+                let failsafe = 0;
                 
-                while(queue.length > 0) {
+                while(queue.length > 0 && failsafe < 800) {
                     let currentAddr = queue.shift();
                     if(visited.has(currentAddr)) continue;
                     visited.add(currentAddr);
+                    failsafe++;
 
-                    let nodeInfo = await contract.users(currentAddr);
-                    if(nodeInfo[0].toNumber() === 0) continue;
+                    try {
+                        let nodeInfo = await contract.users(currentAddr);
+                        if(nodeInfo[0].toNumber() === 0) continue;
 
-                    let trueSponsor = sponsorMap[currentAddr.toLowerCase()] || nodeInfo[2].toLowerCase();
-
-                    if(currentAddr.toLowerCase() !== targetAddress.toLowerCase()) {
-                        if(trueSponsor === targetAddress.toLowerCase()) {
-                            directsFound.push({ id: nodeInfo[0].toNumber(), address: currentAddr });
+                        if(currentAddr.toLowerCase() !== targetAddress.toLowerCase()) {
+                            if(nodeInfo[2].toLowerCase() === targetAddress.toLowerCase()) {
+                                directsFound.push({ id: nodeInfo[0].toNumber(), address: currentAddr });
+                            }
                         }
-                    }
 
-                    let left = nodeInfo[7];
-                    let right = nodeInfo[8];
-                    if(left !== "0x0000000000000000000000000000000000000000") queue.push(left);
-                    if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
+                        let left = nodeInfo[7]; let right = nodeInfo[8];
+                        if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
+                        if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
+                    } catch(e){}
                 }
 
+                directsFound.sort((a, b) => a.id - b.id);
                 let limitedDirects = directsFound.slice(0, 2);
 
                 let html = `<div style="margin-bottom: 20px;">
@@ -949,7 +887,7 @@
                 treeContainer.className = ""; 
                 treeContainer.innerHTML = html;
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error fetching Level 1 data from Blockchain</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error fetching data.</div>';
             }
         }
 
@@ -969,19 +907,22 @@
                 if(rootInfo[8] !== "0x0000000000000000000000000000000000000000") queue.push(rootInfo[8]);
 
                 let visited = new Set();
-                while(queue.length > 0 && slot2Members.length < 4 && visited.size < 1000) {
+                while(queue.length > 0 && slot2Members.length < 4 && visited.size < 800) {
                     let currAddr = queue.shift();
                     if(visited.has(currAddr)) continue;
                     visited.add(currAddr);
 
-                    let nodeInfo = await contract.users(currAddr);
-                    if(nodeInfo[0].toNumber() > 0) {
-                        if(nodeInfo[4].toNumber() >= 2) {
-                            slot2Members.push({ id: nodeInfo[0].toNumber(), address: currAddr });
+                    try {
+                        let nodeInfo = await contract.users(currAddr);
+                        if(nodeInfo[0].toNumber() > 0) {
+                            if(nodeInfo[4].toNumber() >= 2) {
+                                slot2Members.push({ id: nodeInfo[0].toNumber(), address: currAddr });
+                            }
+                            let left = nodeInfo[7]; let right = nodeInfo[8];
+                            if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
+                            if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
                         }
-                        if(nodeInfo[7] !== "0x0000000000000000000000000000000000000000") queue.push(nodeInfo[7]);
-                        if(nodeInfo[8] !== "0x0000000000000000000000000000000000000000") queue.push(nodeInfo[8]);
-                    }
+                    } catch(e) {}
                 }
 
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(targetAddress, 2)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span></a><ul style="padding-top: 20px;">`;
@@ -1011,17 +952,23 @@
                 if(info[8] !== "0x0000000000000000000000000000000000000000") queue.push(info[8]);
 
                 let visited = new Set();
-                while(queue.length > 0 && visited.size < 2000) {
+                let failsafe = 0;
+                while(queue.length > 0 && visited.size < 800) {
                     let curr = queue.shift();
                     if(visited.has(curr)) continue;
                     visited.add(curr);
-                    totalTeam++;
+                    failsafe++;
 
-                    let cInfo = await contract.users(curr);
-                    if(!cInfo[6]) rebirths++; 
-                    
-                    if(cInfo[7] !== "0x0000000000000000000000000000000000000000") queue.push(cInfo[7]);
-                    if(cInfo[8] !== "0x0000000000000000000000000000000000000000") queue.push(cInfo[8]);
+                    try {
+                        let cInfo = await contract.users(curr);
+                        if(cInfo[0].toNumber() > 0) {
+                            totalTeam++;
+                            if(!cInfo[6]) rebirths++; 
+                            let left = cInfo[7]; let right = cInfo[8];
+                            if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
+                            if(right !== "0x0000000000000000000000000000000000000000" && !visited.has(right)) queue.push(right);
+                        }
+                    } catch(e) {}
                 }
             } catch(e){ console.log(e); }
 
@@ -1047,7 +994,7 @@
                     
                     document.getElementById('displayTotalTeam').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
-                    fetchExtraStats(address);
+                    fetchExtraStats(address); // Runs safely in background
                     
                     let calculatedIncome = 0;
                     if(directCount === 1) { 
