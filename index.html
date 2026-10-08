@@ -63,7 +63,7 @@
         .p-val { color: #fff; font-weight: 600; display: flex; align-items: center; gap: 5px;}
         .p-val-blue { color: #3b82f6; cursor: pointer; }
         
-        /* TEAM SUMMARY (UPDATED) */
+        /* TEAM SUMMARY */
         .team-summary { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
         .team-box { flex: 1 1 45%; background: #0a0a0a; border: 1px solid var(--border-color); padding: 15px 10px; border-radius: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; }
         .team-box-full { flex: 1 1 100%; cursor: default; }
@@ -221,13 +221,25 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT MODAL (NEW) -->
+    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
-        <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2);">
+        <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
-            <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" style="width: 60px; height: 60px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(130, 71, 229, 0.8));">
+            
+            <!-- Video Logo -->
+            <video class="video-logo" autoplay loop muted playsinline style="margin-bottom: 15px; width: 140px; height: 45px; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 0 15px rgba(245, 197, 24, 0.4);">
+                <source src="poltitan-logo.mp4" type="video/mp4">
+            </video>
+            
             <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
-            <p style="color: #fff; font-size: 13px; margin-bottom: 25px;" id="alertModalBody">Message goes here.</p>
+            
+            <!-- Message & Terms -->
+            <p style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
+            <p style="color: var(--text-gray); font-size: 10px; margin-bottom: 15px;">* Terms & Conditions apply.</p>
+            
+            <!-- Bada ACTIVE Text -->
+            <h1 style="color: #10b981; font-size: 34px; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ACTIVE</h1>
+            
             <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
         </div>
     </div>
@@ -289,7 +301,6 @@
                     </div>
                 </div>
                 
-                <!-- NEW TEAM SUMMARY (Directs, Total Team, Rebirth) -->
                 <div class="team-summary">
                     <div class="team-box" onclick="loadMyPartners()">
                         <div class="icon"><i class="fa-solid fa-user-plus"></i></div>
@@ -764,7 +775,6 @@
                     if(right !== "0x0000000000000000000000000000000000000000") queue.push(right);
                 }
 
-                // EXACTLY LIMIT TO 2 DIRECTS
                 let limitedDirects = directsFound.slice(0, 2);
 
                 let html = `<div style="margin-bottom: 20px;">
@@ -806,7 +816,6 @@
                 const rootInfo = await contract.users(targetAddress);
                 if(rootInfo[0].toNumber() === 0) return;
                 
-                // Scan the network for up to 4 true Slot 2 members
                 let slot2Members = [];
                 let queue = [];
                 if(rootInfo[7] !== "0x0000000000000000000000000000000000000000") queue.push(rootInfo[7]);
@@ -820,7 +829,6 @@
 
                     let nodeInfo = await contract.users(currAddr);
                     if(nodeInfo[0].toNumber() > 0) {
-                        // Agar actual mein Slot 2 (ya upar) pahaunch gaya hai tabhi aayega
                         if(nodeInfo[4].toNumber() >= 2) {
                             slot2Members.push({ id: nodeInfo[0].toNumber(), address: currAddr });
                         }
@@ -829,7 +837,6 @@
                     }
                 }
 
-                // Render Exactly 1 Root aur 4 Boxes
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(targetAddress, 2)}><i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i><span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span></a><ul style="padding-top: 20px;">`;
 
                 for(let i=0; i<4; i++) {
@@ -864,8 +871,6 @@
                     totalTeam++;
 
                     let cInfo = await contract.users(curr);
-                    
-                    // isRealID false means it's a rebirth ID in the network
                     if(!cInfo[6]) rebirths++; 
                     
                     if(cInfo[7] !== "0x0000000000000000000000000000000000000000") queue.push(cInfo[7]);
@@ -893,12 +898,10 @@
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
                     
-                    // CALLING EXTRA STATS FETCHER (RUNS IN BACKGROUND)
                     document.getElementById('displayTotalTeam').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     fetchExtraStats(address);
                     
-                    // UPDATED TOTAL EARNING LOGIC 
                     let calculatedIncome = 0;
                     if(directCount === 1) { 
                         calculatedIncome = 30; 
@@ -942,12 +945,8 @@
                 showCustomAlertModal("Success", "Refund Claimed Successfully!");
                 await loadDashboardData(userAddress, false);
             } catch (error) {
-                let msg = 'Refund Failed or Cancelled.';
-                if(error.message && error.message.includes('System is still active')) {
-                    msg = 'System is active, refund not allowed!';
-                }
-                // CUSTOM POPUP FOR REFUND ALERT
-                showCustomAlertModal("Notice", msg);
+                // EXACT MESSAGE AS REQUESTED
+                showCustomAlertModal("Notice", "System is active, refund not allowed!");
             } finally {
                 btn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund';
                 btn.disabled = false;
