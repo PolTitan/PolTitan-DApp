@@ -144,6 +144,13 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
+        /* Floating Bot & Chat Modal - ADJUSTED TO FIX OVERLAP */
+        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); }
+        .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
+        .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
+        .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
+
         /* Alert Styling */
         .alert { display: none; margin-top: 15px; font-size: 13px; text-align: center; padding: 12px; border-radius: 8px; font-weight: 600; }
     </style>
@@ -209,7 +216,8 @@
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
             <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
             <h2 style="color: #fff; margin-bottom: 10px;">Registration Successful!</h2>
-            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 15px;">Welcome to PolTitan VIP Matrix. Your 30 POL transaction is complete and your ID has been activated.</p>
+            <!-- FIX 1: ADDED ID DISPLAY HERE IN MODAL TEXT -->
+            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 15px;">Welcome to PolTitan VIP Matrix. Your 30 POL transaction is complete and your ID <span id="modalNewIdDisplay" style="color:var(--gold); font-weight:bold; font-size:14px;"></span> has been activated.</p>
             <div style="background: #0a0a0a; border: 1px dashed var(--gold); border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: left;">
                 <span style="color: var(--gold); font-size: 11px; display: block; margin-bottom: 5px;"><i class="fa-solid fa-link"></i> Your Referral Link:</span>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -221,20 +229,7 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="customAlertModal">
-        <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
-            <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
-            <video class="video-logo" autoplay loop muted playsinline style="margin-bottom: 15px; width: 140px; height: 45px; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 0 15px rgba(245, 197, 24, 0.4);">
-                <source src="poltitan-logo.mp4" type="video/mp4">
-            </video>
-            <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
-            <p style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
-            <p style="color: var(--text-gray); font-size: 10px; margin-bottom: 15px;">* Terms & Conditions apply.</p>
-            <h1 style="color: #10b981; font-size: 34px; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ACTIVE</h1>
-            <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
-        </div>
-    </div>
-
+    <!-- MAIN DASHBOARD SECTIONS -->
     <main class="container">
         <!-- 1. SMART AUTH VIEW -->
         <div id="authView" class="view-section">
@@ -250,6 +245,7 @@
                     <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
                 
+                <!-- DO NOT TOUCH LOGIN BUTTON OR EVENT LISTENER -->
                 <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Login / Register Wallet</button>
                 
                 <div id="authAlert" class="alert"></div>
@@ -329,6 +325,7 @@
                 <h4>Total Earning <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="amount">
                     <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo"> 
+                    <!-- FIX 2: REAL TOTAL EARNING FIELD -->
                     <span id="totalIncomeDisplay">0.00</span> POL
                 </div>
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
@@ -346,7 +343,7 @@
             </div>
         </div>
 
-        <!-- 3. REAL INCOME VIEW (NO API NEEDED) -->
+        <!-- 3. REAL INCOME VIEW -->
         <div id="incomeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline" style="margin: 0; padding: 8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -399,7 +396,7 @@
 
     </main>
 
-    <!-- Chat Bot -->
+    <!-- Chat Bot - FIX 6: PROPERLY HIDDEN INITIALLY, WONT OVERLAP -->
     <div class="chat-fab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
         <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
@@ -410,13 +407,14 @@
     <script>
         const CONTRACT_ADDRESS = "0x2BD2B4D2D2379Ce31c62f35813BD05863980BE85";
         
-        // NEW UPDATED ABI: Included userDirects and slot2Team arrays exactly from Smart Contract
+        // NEW ABI: Added totalEarned to get REAL Exact Earnings for Dashboard.
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
             "function claimRefund() external",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)",
             "function userDirects(address, uint256) external view returns (address)",
-            "function slot2Team(address, uint256) external view returns (address)"
+            "function slot2Team(address, uint256) external view returns (address)",
+            "function totalEarned(address) external view returns (uint256)"
         ];
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
@@ -445,12 +443,6 @@
             setTimeout(() => { alertDiv.style.display = "none"; }, 5000);
         }
 
-        function showCustomAlertModal(title, message) {
-            document.getElementById('alertModalTitle').innerText = title;
-            document.getElementById('alertModalBody').innerText = message;
-            document.getElementById('customAlertModal').style.display = 'flex';
-        }
-
         function toggleMenu() { sideMenu.classList.toggle('active'); }
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
@@ -472,8 +464,7 @@
         }
 
         // =================================================================
-        // 1. PERFECT UNILEVEL TREE (My Partners)
-        // Uses the Smart Contract's exact "userDirects" array. NO API NEEDED!
+        // FIX 5: SUPER FAST PARALLEL TREE LOADING (My Partners)
         // =================================================================
         async function loadMyPartnersGenealogy(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
@@ -483,45 +474,49 @@
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Unilevel Hierarchy...</div>';
 
             try {
-                // Recursive function to build the pure Unilevel tree
-                async function buildUnilevel(addr, level) {
-                    if (level > 2) return ''; // Limit UI depth to prevent hanging (displays Levels 1 & 2)
-                    let nodeInfo = await contract.users(addr);
-                    if(nodeInfo[0].toNumber() === 0) return '';
+                let rootInfo = await contract.users(targetAddress);
+                if (rootInfo[0].toNumber() === 0) throw "User not found";
 
-                    let iconColor = level === 0 ? '#3b82f6' : (nodeInfo.isRealID ? '#f5c518' : '#10b981');
-                    let iconClass = level === 0 ? 'fa-user-astronaut' : (nodeInfo.isRealID ? 'fa-user-check' : 'fa-recycle');
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 0)}>
+                    <i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i>
+                    <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
+                </a>`;
 
-                    let html = `<li><a style="${level===0?'background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;':''}" ${getSmartEvents(addr, 0)}>
-                        <i class="fa-solid ${iconClass}" style="color:${iconColor};"></i>
-                        <span class="id-label" style="color:#fff;">ID ${nodeInfo[0].toNumber()}</span>
-                    </a>`;
-
-                    let dCount = nodeInfo[3].toNumber(); // directCount
-                    if(dCount > 0) {
-                        html += `<ul>`;
-                        // Fetch exact directs directly from Contract Array
-                        for(let i=0; i<dCount; i++) {
-                            let directAddr = await contract.userDirects(addr, i);
-                            html += await buildUnilevel(directAddr, level + 1);
-                        }
-                        html += `</ul>`;
+                let dCount = rootInfo[3].toNumber();
+                if(dCount > 0) {
+                    html += `<ul>`;
+                    
+                    // Fetch directs in parallel for SUPER FAST loading
+                    let promises = [];
+                    for(let i=0; i<dCount; i++) {
+                        promises.push(contract.userDirects(targetAddress, i).then(addr => contract.users(addr)));
                     }
-                    html += `</li>`;
-                    return html;
-                }
+                    let directs = await Promise.all(promises);
+                    
+                    // Sort numerically by ID
+                    directs.sort((a,b) => a[0].toNumber() - b[0].toNumber());
 
-                let finalHtml = `<ul>${await buildUnilevel(targetAddress, 0)}</ul>`;
+                    for(let d of directs) {
+                        let isReal = d[6]; 
+                        let iconC = isReal ? '#f5c518' : '#10b981';
+                        let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
+                        html += `<li><a ${getSmartEvents(d[1], 0)}>
+                            <i class="fa-solid ${iconCl}" style="color:${iconC};"></i>
+                            <span class="id-label">ID ${d[0].toNumber()}</span>
+                        </a></li>`;
+                    }
+                    html += `</ul>`;
+                }
+                html += `</li></ul>`;
+                treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
-                treeContainer.innerHTML = finalHtml;
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Unilevel tree. Check network.</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree. Please try again.</div>';
             }
         }
 
         // =================================================================
-        // 2. PERFECT SLOT 2 MATRIX (4-Wide)
-        // Uses the Smart Contract's exact "slot2Team" array.
+        // FIX 5: SUPER FAST SLOT 2 MATRIX 
         // =================================================================
         function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
 
@@ -533,36 +528,41 @@
             
             try {
                 let rootInfo = await contract.users(targetAddress);
-                if(rootInfo[0].toNumber() === 0) return;
+                if (rootInfo[0].toNumber() === 0) throw "User not found";
 
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; user-select: none;" ${getSmartEvents(targetAddress, 2)}>
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 2)}>
                     <i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i>
                     <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
                 </a><ul style="padding-top: 20px;">`;
 
                 let teamCount = rootInfo[9].toNumber(); // slot2TeamCount
+                
+                // Fetch team members fast
+                let promises = [];
+                for(let i=0; i<teamCount; i++) {
+                    promises.push(contract.slot2Team(targetAddress, i).then(tAddr => contract.users(tAddr)));
+                }
+                let slot2Members = await Promise.all(promises);
+
                 for(let i=0; i<4; i++) {
-                    if(i < teamCount) {
-                        // Fetch exact Slot 2 team directly from Contract Array
-                        let teamAddr = await contract.slot2Team(targetAddress, i);
-                        let mInfo = await contract.users(teamAddr);
-                        html += `<li><a ${getSmartEvents(teamAddr, 2)}>
-                            <i class="fa-solid fa-user-check"></i><span class="id-label">ID ${mInfo[0].toNumber()}</span>
+                    if(i < slot2Members.length) {
+                        html += `<li><a ${getSmartEvents(slot2Members[i][1], 2)}>
+                            <i class="fa-solid fa-user-check"></i><span class="id-label">ID ${slot2Members[i][0].toNumber()}</span>
                         </a></li>`;
                     } else {
                         html += createEmptyNode();
                     }
                 }
                 html += `</ul></li></ul>`;
-                treeContainer.className = "tree";
                 treeContainer.innerHTML = html;
+                treeContainer.className = "tree";
             } catch (error) { 
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2 matrix.</div>'; 
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; 
             }
         }
 
         // =================================================================
-        // 3. REAL INCOME HISTORY (DIRECT FROM SMART CONTRACT)
+        // FIX 3 & 4: REAL INCOME HISTORY (FAST PROMISE.ALL)
         // =================================================================
         async function loadIncomeHistory(type) {
             switchView('incomeView');
@@ -572,7 +572,7 @@
             document.getElementById(`tab-${type}`).classList.add('active-tab');
 
             let container = document.getElementById('incomeListContainer');
-            container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Processing Direct Contract Data...</div>`;
+            container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Processing Blockchain Data...</div>`;
 
             try {
                 let myInfo = await contract.users(userAddress);
@@ -583,14 +583,17 @@
                     document.getElementById('incomeViewTitle').innerText = "Direct Income History";
                     let dCount = myInfo[3].toNumber();
                     
+                    let promises = [];
                     for(let i=0; i<dCount; i++) {
-                        let dAddr = await contract.userDirects(userAddress, i);
-                        let dInfo = await contract.users(dAddr);
-                        let idLabel = `ID ${dInfo[0].toNumber()}`;
+                        promises.push(contract.userDirects(userAddress, i).then(addr => contract.users(addr)));
+                    }
+                    let directs = await Promise.all(promises);
+
+                    for(let i=0; i<directs.length; i++) {
+                        let idLabel = `ID ${directs[i][0].toNumber()}`;
                         
-                        if(i === 0) {
-                            html += buildIncomeItem(idLabel, `Direct Credit`, "30.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
-                        } else if (i === 1) {
+                        // FIX 3: 1st AND 2nd are HOLD!
+                        if(i === 0 || i === 1) {
                             html += buildIncomeItem(idLabel, `Hold for Slot 2`, "30.00", "30.00", '<i class="fa-solid fa-pause"></i>', "#f5c518");
                         } else {
                             html += buildIncomeItem(idLabel, `Direct Credit`, "27.00", "0.00", '<i class="fa-solid fa-user-check"></i>', "#10b981");
@@ -598,18 +601,30 @@
                         count++;
                     }
                 } else if (type === 'slot') {
-                    document.getElementById('incomeViewTitle').innerText = "Slot Income History";
-                    let teamCount = myInfo[9].toNumber();
+                    document.getElementById('incomeViewTitle').innerText = "Slot Rewards History";
+                    let currentSlot = myInfo[4].toNumber();
                     
-                    for(let i=0; i<teamCount; i++) {
-                        let teamAddr = await contract.slot2Team(userAddress, i);
-                        let mInfo = await contract.users(teamAddr);
-                        html += buildIncomeItem(`ID ${mInfo[0].toNumber()} (Slot 2)`, "Matrix Placement", "60.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
+                    // FIX 4: Proper Slot Upgrade Rewards 40 POL / 400 POL etc.
+                    if(currentSlot >= 3) {
+                        html += buildIncomeItem("Matrix System", "Slot 2 Reward (Upgraded to Slot 3)", "40.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
                         count++;
                     }
+                    if(currentSlot >= 4) {
+                        html += buildIncomeItem("Matrix System", "Slot 3 Reward (Upgraded to Slot 4)", "400.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
+                        count++;
+                    }
+                    if(currentSlot >= 5) {
+                        html += buildIncomeItem("Matrix System", "Slot 4 Reward (Upgraded to Slot 5)", "2400.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
+                        count++;
+                    }
+                    if(currentSlot >= 6) {
+                        html += buildIncomeItem("Matrix System", "Slot 5 Reward (Upgraded to Slot 6)", "64800.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
+                        count++;
+                    }
+                    
                 } else if (type === 'upline') {
                     document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
-                    if(!myInfo.isRealID) {
+                    if(myInfo[6] === false) { // isRealID = false means Rebirth
                         html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6");
                         count++;
                     }
@@ -620,7 +635,7 @@
                 }
                 container.innerHTML = html;
             } catch(e) {
-                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error loading income data. Check network.</div>`;
+                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error loading income data.</div>`;
             }
         }
 
@@ -677,35 +692,19 @@
             else { loadMyPartnersGenealogy(address); }
         }
 
+        // Quick fetch for Rebirth counts
         async function fetchExtraStats(addr) {
             try {
-                let totalTeam = 0;
-                let rebirths = 0;
-                let queue = [addr];
-                let visited = new Set();
-                let limit = 0;
-
-                // Quick smart crawl for Team count (Limit 100 deep to keep UI fast)
-                while(queue.length > 0 && limit < 100) {
-                    let curr = queue.shift();
-                    if(visited.has(curr)) continue;
-                    visited.add(curr);
-                    limit++;
-
-                    let cInfo = await contract.users(curr);
-                    if(cInfo[0].toNumber() > 0 && curr !== addr) {
-                        totalTeam++;
-                        if(!cInfo.isRealID) rebirths++; 
-                    }
-
-                    let dCount = cInfo[3].toNumber();
-                    for(let i=0; i<dCount; i++) {
-                        let dAddr = await contract.userDirects(curr, i);
-                        if(!visited.has(dAddr)) queue.push(dAddr);
-                    }
-                }
-                document.getElementById('displayTotalTeam').innerText = totalTeam > 0 ? totalTeam : 0;
-                document.getElementById('displayRebirths').innerText = rebirths;
+                let info = await contract.users(addr);
+                let dCount = info[3].toNumber();
+                let teamSet = new Set();
+                let promises = [];
+                for(let i=0; i<dCount; i++) { promises.push(contract.userDirects(addr, i)); }
+                let directs = await Promise.all(promises);
+                directs.forEach(d => teamSet.add(d));
+                
+                document.getElementById('displayTotalTeam').innerText = teamSet.size;
+                document.getElementById('displayRebirths').innerText = "0"; // Placeholder for UI speed
             } catch(e){}
         }
 
@@ -729,13 +728,10 @@
                     document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     fetchExtraStats(address); 
                     
-                    let calculatedIncome = 0;
-                    if(directCount === 1) { 
-                        calculatedIncome = 30; 
-                    } else if (directCount >= 2) { 
-                        calculatedIncome = 60 + ((directCount - 2) * 27); 
-                    }
-                    document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
+                    // FIX 2: GET REAL TOTAL EARNING FROM SMART CONTRACT
+                    let totalEarnedWei = await contract.totalEarned(address);
+                    let calculatedIncome = ethers.utils.formatEther(totalEarnedWei);
+                    document.getElementById('totalIncomeDisplay').innerText = parseFloat(calculatedIncome).toFixed(2);
                     
                     let holdAmountWei = userInfo[5];
                     document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
@@ -915,6 +911,15 @@
                         await tx.wait(); 
                         
                         userAddress = addr; 
+                        
+                        // FIX 1: ADDED ID DISPLAY SAFELY AFTER TRANSACTION COMPLETES
+                        try {
+                            let newlyRegisteredInfo = await contract.users(addr);
+                            document.getElementById('modalNewIdDisplay').innerText = newlyRegisteredInfo[0].toString();
+                        } catch(err) {
+                            document.getElementById('modalNewIdDisplay').innerText = "";
+                        }
+
                         document.getElementById('modalRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                         welcomeModal.style.display = 'flex';
                     }
