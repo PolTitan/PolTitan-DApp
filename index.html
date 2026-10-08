@@ -32,7 +32,7 @@
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
         /* SIDE MENU */
-        .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #0f0f0f; border-right: 1px solid var(--border-color); transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9); }
+        .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #0f0f0f; border-right: 1px solid var(--border-color); transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9); overflow-y: auto; }
         .side-menu.active { left: 0; }
         .close-menu { text-align: right; font-size: 24px; color: var(--gold); cursor: pointer; margin-bottom: 10px; }
         .menu-header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
@@ -41,6 +41,7 @@
         .menu-item { padding: 15px 10px; color: #fff; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 15px; border-radius: 8px; margin-bottom: 5px;}
         .menu-item i { color: var(--gold); font-size: 18px; width: 20px; text-align: center; }
         .menu-item:hover { background: var(--box-bg); color: var(--gold); }
+        .submenu { display: none; background: #0a0a0a; border-radius: 8px; margin-bottom: 5px; border-left: 2px solid var(--gold); }
 
         /* CONTAINER & CARDS */
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
@@ -91,8 +92,10 @@
         .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .btn-gold:hover { background: var(--gold-dark); }
         .btn-gold:disabled { background: #555; cursor: not-allowed; }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: #fff; padding: 15px; width: 100%; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: #fff; padding: 10px 15px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;}
         .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+        .btn-outline.active-tab { background: var(--gold); color: #000; border-color: var(--gold); }
+        
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
         
@@ -106,7 +109,7 @@
         .act-icon { width: 35px; height: 35px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
         .act-details h4 { color: #fff; font-size: 13px; margin-bottom: 2px; }
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
-        .act-right { color: var(--gold); font-weight: bold; font-size: 14px; }
+        .act-right { color: var(--gold); font-weight: bold; font-size: 14px; text-align: right;}
 
         /* TREE Matrix Styling */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 20px 0 40px 0; text-align: center; }
@@ -179,6 +182,18 @@
             <h2><i class="fa-solid fa-crown"></i> PolTitan</h2>
         </div>
         <div class="menu-item" onclick="switchView('dashboardView'); toggleMenu();"><i class="fa-solid fa-house"></i> Dashboard</div>
+        
+        <!-- NEW: INCOME HISTORY DROPDOWN MENU -->
+        <div class="menu-item" onclick="toggleIncomeDropdown()">
+            <i class="fa-solid fa-hand-holding-dollar"></i> Income History 
+            <i class="fa-solid fa-chevron-down" id="incomeArrow" style="margin-left:auto; font-size:12px; transition:0.3s;"></i>
+        </div>
+        <div class="submenu" id="incomeDropdown">
+            <div class="menu-item" onclick="loadIncomeHistory('direct'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Direct Income</div>
+            <div class="menu-item" onclick="loadIncomeHistory('slot'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Slot Income</div>
+            <div class="menu-item" onclick="loadIncomeHistory('upline'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Upline & Downline</div>
+        </div>
+
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="loadMyPartners(); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
@@ -265,7 +280,7 @@
                 <div class="input-box">
                     <input type="text" id="inspectAddressInput" placeholder="Enter Wallet Address to View">
                 </div>
-                <button class="btn-outline" onclick="inspectFromLogin()" style="padding: 10px; font-size: 13px;">View Dashboard</button>
+                <button class="btn-outline" onclick="inspectFromLogin()" style="padding: 10px; font-size: 13px; width: 100%;">View Dashboard</button>
             </div>
         </div>
 
@@ -341,7 +356,6 @@
             </div>
             
             <div class="action-box">
-                <!-- UPDATED: Removed (Refundable) word from here -->
                 <h4>Hold Amount <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                     <div style="font-size: 24px; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 8px;">
@@ -362,8 +376,28 @@
                             <p>Check history on Blockchain</p>
                         </div>
                     </div>
-                    <div class="act-right"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="act-right"><i class="fa-solid fa-arrow-right" style="color:var(--text-gray);"></i></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- NEW: INCOME HISTORY VIEW (DEMO UI) -->
+        <div id="incomeView" class="view-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn-outline" style="margin: 0; padding: 8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h3 style="color: var(--gold); font-size: 18px;" id="incomeViewTitle">Income History</h3>
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
+                <button class="btn-outline active-tab" id="tab-direct" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('direct')">Direct</button>
+                <button class="btn-outline" id="tab-slot" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('slot')">Slot Income</button>
+                <button class="btn-outline" id="tab-upline" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('upline')">Up/Downline</button>
+            </div>
+            
+            <!-- Data Container -->
+            <div class="activity-list" id="incomeListContainer">
+                <!-- Javascript will inject table here -->
             </div>
         </div>
 
@@ -379,7 +413,7 @@
         <!-- 4. TREE VIEW & PARTNERS VIEW-->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
             <div class="vip-card" style="padding: 10px; overflow-x: hidden;">
@@ -394,7 +428,7 @@
         <!-- 5. TRANSACTION VIEW -->
         <div id="transactionView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">Transactions</h3>
             </div>
             <div class="activity-list" id="transactionListContainer">
@@ -463,6 +497,88 @@
         }
         function goToDashboard() { if (userAddress) switchView('dashboardView'); }
 
+        // NEW: Toggle Income Dropdown in Menu
+        function toggleIncomeDropdown() {
+            const dropdown = document.getElementById('incomeDropdown');
+            const arrow = document.getElementById('incomeArrow');
+            if(dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                dropdown.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // NEW: Load Income History Page (DEMO DATA UI)
+        function loadIncomeHistory(type) {
+            switchView('incomeView');
+            // Update tab styles
+            document.getElementById('tab-direct').classList.remove('active-tab');
+            document.getElementById('tab-slot').classList.remove('active-tab');
+            document.getElementById('tab-upline').classList.remove('active-tab');
+            document.getElementById(`tab-${type}`).classList.add('active-tab');
+
+            let container = document.getElementById('incomeListContainer');
+            let html = `<div class="activity-header"><span>Details & Source</span><span>Amount (POL)</span></div>`;
+
+            if(type === 'direct') {
+                document.getElementById('incomeViewTitle').innerText = "Direct Income History";
+                html += `
+                <div class="activity-item">
+                    <div class="act-left">
+                        <div class="act-icon"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="act-details"><h4>From ID 4</h4><p style="color:#10b981;">Direct Credit</p></div>
+                    </div>
+                    <div class="act-right">
+                        <div style="color:var(--gold);">+ 30.00</div>
+                        <div style="font-size:10px; color:var(--text-gray);">Hold: 0.00</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="act-left">
+                        <div class="act-icon"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="act-details"><h4>From ID 3</h4><p style="color:#f5c518;">Hold for Slot 2</p></div>
+                    </div>
+                    <div class="act-right">
+                        <div style="color:var(--gold);">+ 30.00</div>
+                        <div style="font-size:10px; color:#f5c518;">Hold: 30.00</div>
+                    </div>
+                </div>`;
+            } else if (type === 'slot') {
+                document.getElementById('incomeViewTitle').innerText = "Slot Income History";
+                html += `
+                <div class="activity-item">
+                    <div class="act-left">
+                        <div class="act-icon" style="color:#f5c518;"><i class="fa-solid fa-cubes"></i></div>
+                        <div class="act-details"><h4>From ID 7 (Slot 2)</h4><p style="color:#10b981;">Matrix Upgrade</p></div>
+                    </div>
+                    <div class="act-right">
+                        <div style="color:var(--gold);">+ 60.00</div>
+                        <div style="font-size:10px; color:var(--text-gray);">Hold: 0.00</div>
+                    </div>
+                </div>`;
+            } else if (type === 'upline') {
+                document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
+                html += `
+                <div class="activity-item">
+                    <div class="act-left">
+                        <div class="act-icon" style="color:#3b82f6;"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                        <div class="act-details"><h4>Spillover (ID 12)</h4><p style="color:#10b981;">Network Bonus</p></div>
+                    </div>
+                    <div class="act-right">
+                        <div style="color:var(--gold);">+ 30.00</div>
+                        <div style="font-size:10px; color:var(--text-gray);">Hold: 0.00</div>
+                    </div>
+                </div>`;
+            }
+
+            html += `<div style="padding: 20px; font-size: 11px; color: var(--text-gray); text-align: center;">
+                <i class="fa-solid fa-eye"></i> This is a preview layout (Demo Data).<br>Real automated sync requires Smart Contract Events update.
+            </div>`;
+            container.innerHTML = html;
+        }
+
         function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
         
         window.closeWelcomeModalOnly = function() { welcomeModal.style.display = 'none'; }
@@ -501,7 +617,7 @@
                                         <p style="color: var(--gold);">Smart Contract Call</p>
                                     </div>
                                 </div>
-                                <div class="act-right" style="color: var(--text-gray); font-size: 12px; display: flex; align-items:center; gap:5px;">
+                                <div class="act-right" style="color: var(--text-gray); font-size: 12px; display: flex; align-items:center; gap:5px; font-weight:normal;">
                                     ${hashShort} <i class="fa-solid fa-external-link" style="color:var(--gold);"></i>
                                 </div>
                             </div>
@@ -518,7 +634,7 @@
                                     <p>Live Blockchain Records</p>
                                 </div>
                             </div>
-                            <div class="act-right" style="color: var(--gold); font-size: 12px;">Check <i class="fa-solid fa-external-link"></i></div>
+                            <div class="act-right" style="color: var(--gold); font-size: 12px; font-weight:normal;">Check <i class="fa-solid fa-external-link"></i></div>
                         </div>
                         </a>`;
                 }
@@ -569,7 +685,6 @@
                 document.getElementById('treeViewTitle').innerText = "Slot 2 Matrix (Max 4 Nodes)";
                 loadSlot2Matrix(address);
             } else {
-                // Keep it consistent for viewing any slot
                 document.getElementById('treeViewTitle').innerText = `My Partners Genealogy`;
                 loadGenealogyFull(address); 
             }
@@ -632,7 +747,6 @@
             } catch (e) { return null; }
         }
 
-        // UPDATED: TRUE LEVEL-WISE GENEALOGY FETCHING FOR "MY PARTNERS"
         async function loadGenealogyFull(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
@@ -640,7 +754,6 @@
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Matrix Hierarchy...</div>';
 
             try {
-                // Fetch sponsor mapping from transactions (Direct mapping)
                 let sponsorMap = {};
                 try {
                     let res = await fetch(`https://api.polygonscan.com/api?module=account&action=txlist&address=${CONTRACT_ADDRESS}&startblock=0&endblock=99999999&sort=asc`);
@@ -656,9 +769,8 @@
                 } catch(e) {}
 
                 let allNodes = {};
-                let childrenMap = {}; // mapping: sponsor_address -> [array of direct children addresses]
+                let childrenMap = {}; 
                 
-                // Breadth-First Search (BFS) to find the entire network
                 let queue = [targetAddress];
                 let visited = new Set();
 
@@ -678,16 +790,12 @@
 
                     let trueUpline = sponsorMap[currentAddr.toLowerCase()] || info[2].toLowerCase();
                     
-                    // Add this node to its upline's children list
                     if(!childrenMap[trueUpline]) childrenMap[trueUpline] = [];
                     if(currentAddr.toLowerCase() !== targetAddress.toLowerCase() && !childrenMap[trueUpline].includes(currentAddr.toLowerCase())) {
                         childrenMap[trueUpline].push(currentAddr.toLowerCase());
-                        
-                        // ONLY traverse children recursively if they are part of THIS root's downline
                         queue.push(currentAddr);
                     }
                     
-                    // Ensure we catch rebirths or internal left/rights just in case they aren't mapped in txns
                     let left = info[7];
                     let right = info[8];
                     if(left !== "0x0000000000000000000000000000000000000000" && !visited.has(left)) queue.push(left);
@@ -703,7 +811,6 @@
                     let node = allNodes[nodeAddrLower];
                     if(!node) return '';
 
-                    // Styling based on level and ID type (Real vs Rebirth)
                     let iconColor = level === 0 ? '#3b82f6' : (node.isReal ? '#f5c518' : '#10b981');
                     let iconClass = level === 0 ? 'fa-user-astronaut' : (node.isReal ? 'fa-user-check' : 'fa-recycle');
 
@@ -712,10 +819,7 @@
                         <span class="id-label" style="color:#fff;">ID ${node.id}</span>
                     </a>`;
 
-                    // Fetch all directs for this particular node
                     let children = childrenMap[nodeAddrLower] || [];
-                    
-                    // Sort children by ID number so they display logically left to right
                     children.sort((a, b) => (allNodes[a]?.id || 0) - (allNodes[b]?.id || 0));
 
                     if(children.length > 0) {
