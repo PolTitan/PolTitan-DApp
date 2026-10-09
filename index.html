@@ -188,7 +188,7 @@
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         
-        <!-- FIXED 2: Correct function name applied here (loadMyPartnersGenealogy) -->
+        <!-- CORRECT LOAD PARTNERS FUNCTION -->
         <div class="menu-item" onclick="loadMyPartnersGenealogy(userAddress); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
         
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
@@ -228,6 +228,16 @@
                 </div>
             </div>
             <button class="btn-gold" onclick="closeWelcomeModalAndGo()" style="padding: 10px; font-size: 14px;">Go To Dashboard</button>
+        </div>
+    </div>
+
+    <!-- CUSTOM ALERT MODAL -->
+    <div class="modal-overlay" id="customAlertModal">
+        <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
+            <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
+            <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
+            <p style="color: #fff; font-size: 14px; margin-bottom: 20px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
+            <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
         </div>
     </div>
 
@@ -290,7 +300,6 @@
                 </div>
                 
                 <div class="team-summary">
-                    <!-- FIXED 2: Correct function applied here -->
                     <div class="team-box" onclick="loadMyPartnersGenealogy(userAddress)">
                         <div class="icon"><i class="fa-solid fa-user-plus"></i></div>
                         <div class="data">
@@ -298,7 +307,6 @@
                             <p>Direct ID</p>
                         </div>
                     </div>
-                    <!-- FIXED 2: Correct function applied here -->
                     <div class="team-box" onclick="loadMyPartnersGenealogy(userAddress)">
                         <div class="icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);"><i class="fa-solid fa-users"></i></div>
                         <div class="data">
@@ -398,7 +406,7 @@
 
     </main>
 
-    <!-- Chat Bot - FIXED 1: MOVED OUTSIDE MAIN, NOW DRAGGABLE -->
+    <!-- Chat Bot - OUTSIDE MAIN, FLOATING AND DRAGGABLE -->
     <div class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
         <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
@@ -446,6 +454,12 @@
             alertDiv.style.display = "block";
             setTimeout(() => { alertDiv.style.display = "none"; }, 5000);
         }
+        
+        function showCustomAlertModal(title, message) {
+            document.getElementById('alertModalTitle').innerText = title;
+            document.getElementById('alertModalBody').innerText = message;
+            document.getElementById('customAlertModal').style.display = 'flex';
+        }
 
         function toggleMenu() { sideMenu.classList.toggle('active'); }
         function switchView(viewId) {
@@ -468,7 +482,7 @@
         }
 
         // ==========================================
-        // FIXED 1: CHAT BOT DRAG & DROP LOGIC
+        // CHAT BOT DRAG & DROP LOGIC
         // ==========================================
         const chatFab = document.getElementById('chatFab');
         let isDraggingChat = false, chatStartX, chatStartY, chatInitLeft, chatInitTop;
@@ -515,11 +529,10 @@
         });
 
         function toggleChat() { 
-            if(isDraggingChat) return; // Agar drag kiya tha to click nahi manega
+            if(isDraggingChat) return; 
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
             
-            // Bot jahan hai, Chat Modal wahi khulega!
             if (modal.style.display === 'flex') {
                 let fabRect = chatFab.getBoundingClientRect();
                 modal.style.bottom = "auto";
@@ -870,6 +883,7 @@
             return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
         }
 
+        // EXACT ERROR FETCHING FOR REFUND BUTTON
         async function claimMyRefund() {
             if (isViewOnly) { alert("Action not allowed in view mode!"); return; }
             const btn = document.getElementById('claimRefundBtn');
@@ -881,7 +895,23 @@
                 showCustomAlertModal("Success", "Refund Claimed Successfully!");
                 await loadDashboardData(userAddress, false);
             } catch (error) {
-                showCustomAlertModal("Notice", "System is active, refund not allowed!");
+                let errorMsg = "Transaction failed!";
+                if (error.reason) {
+                    errorMsg = error.reason;
+                } else if (error.data && error.data.message) {
+                    errorMsg = error.data.message;
+                } else if (error.message) {
+                    if (error.message.includes("execution reverted:")) {
+                        errorMsg = error.message.split("execution reverted:")[1].split('"')[0].trim();
+                    } else if (error.message.includes("System is still active")) {
+                         errorMsg = "System is still active (180 Days rule).";
+                    } else if (error.message.includes("Income received")) {
+                         errorMsg = "Not eligible: Income received.";
+                    } else {
+                        errorMsg = "Contract rejected the refund.";
+                    }
+                }
+                showCustomAlertModal("Notice", errorMsg);
             } finally {
                 btn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund';
                 btn.disabled = false;
