@@ -180,7 +180,7 @@
             <i class="fa-solid fa-hand-holding-dollar"></i> Income History 
             <i class="fa-solid fa-chevron-down" id="incomeArrow" style="margin-left:auto; font-size:12px; transition:0.3s;"></i>
         </div>
-        <div class="submenu" id="incomeDropdown">
+        <div class="submenu" id="incomeDropdown" style="display: none;">
             <div class="menu-item" onclick="loadIncomeHistory('direct'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Direct Income</div>
             <div class="menu-item" onclick="loadIncomeHistory('slot'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Slot Income</div>
             <div class="menu-item" onclick="loadIncomeHistory('upline'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Up/Downline</div>
@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <!-- FIX 3: RESTORED EXACT OLD CUSTOM ALERT MODAL DESIGN -->
+    <!-- CUSTOM ALERT MODAL (REFUND & NOTICES) -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -330,7 +330,6 @@
                 <h4>Personal Link <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="link-container">
                     <span id="displayRefLink">https://...</span>
-                    <!-- FIX 1: ADDED ONCLICK COPY ACTION -->
                     <i class="fa-regular fa-copy" id="copyRefBtn" onclick="copyDashboardRefLink()"></i>
                 </div>
             </div>
@@ -407,7 +406,7 @@
 
     </main>
 
-    <!-- Chat Bot - OUTSIDE MAIN, FLOATING AND DRAGGABLE -->
+    <!-- Chat Bot -->
     <div class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
         <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
@@ -423,7 +422,8 @@
             "function claimRefund() external",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)",
             "function userDirects(address, uint256) external view returns (address)",
-            "function slot2Team(address, uint256) external view returns (address)"
+            "function slot2Team(address, uint256) external view returns (address)",
+            "function slotQueues(uint256, uint256) external view returns (address)"
         ];
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
@@ -481,9 +481,6 @@
             }
         }
 
-        // ==========================================
-        // FIX 1: COPY REFERRAL LINK FROM DASHBOARD
-        // ==========================================
         window.copyDashboardRefLink = function() {
             const link = document.getElementById('displayRefLink').innerText;
             navigator.clipboard.writeText(link).then(() => {
@@ -497,9 +494,6 @@
             });
         }
 
-        // ==========================================
-        // CHAT BOT DRAG & DROP LOGIC
-        // ==========================================
         const chatFab = document.getElementById('chatFab');
         let isDraggingChat = false, chatStartX, chatStartY, chatInitLeft, chatInitTop;
 
@@ -563,12 +557,38 @@
             }
         }
 
+        // DEEP UNILEVEL RECURSION
+        async function buildUnilevelTree(addr, level) {
+            if(level > 3) return ''; 
+            let uInfo = await contract.users(addr);
+            let dCount = uInfo[3].toNumber();
+            if(dCount === 0) return '';
+
+            let html = '<ul>';
+            let promises = [];
+            for(let i=0; i<dCount; i++) { promises.push(contract.userDirects(addr, i)); }
+            let directAddrs = await Promise.all(promises);
+
+            for(let i=0; i<directAddrs.length; i++) {
+                let dAddr = directAddrs[i];
+                let dInfo = await contract.users(dAddr);
+                let isReal = dInfo[6]; 
+                let iconC = isReal ? '#f5c518' : '#10b981';
+                let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
+                html += `<li><a ${getSmartEvents(dAddr, 0)}><i class="fa-solid ${iconCl}" style="color:${iconC};"></i><span class="id-label">ID ${dInfo[0].toNumber()}</span></a>`;
+                html += await buildUnilevelTree(dAddr, level + 1);
+                html += `</li>`;
+            }
+            html += '</ul>';
+            return html;
+        }
+
         async function loadMyPartnersGenealogy(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "My Partners Genealogy";
             const treeContainer = document.getElementById('matrixTreeDisplay');
-            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading True Unilevel Hierarchy...</div>';
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Deep Genealogy...</div>';
 
             try {
                 let rootInfo = await contract.users(targetAddress);
@@ -579,30 +599,9 @@
                     <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
                 </a>`;
 
-                let dCount = rootInfo[3].toNumber();
-                if(dCount > 0) {
-                    html += `<ul>`;
-                    
-                    let promises = [];
-                    for(let i=0; i<dCount; i++) {
-                        promises.push(contract.userDirects(targetAddress, i).then(addr => contract.users(addr)));
-                    }
-                    let directs = await Promise.all(promises);
-                    
-                    directs.sort((a,b) => a[0].toNumber() - b[0].toNumber());
-
-                    for(let d of directs) {
-                        let isReal = d[6]; 
-                        let iconC = isReal ? '#f5c518' : '#10b981';
-                        let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
-                        html += `<li><a ${getSmartEvents(d[1], 0)}>
-                            <i class="fa-solid ${iconCl}" style="color:${iconC};"></i>
-                            <span class="id-label">ID ${d[0].toNumber()}</span>
-                        </a></li>`;
-                    }
-                    html += `</ul>`;
-                }
+                html += await buildUnilevelTree(targetAddress, 1);
                 html += `</li></ul>`;
+                
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) {
@@ -628,11 +627,8 @@
                 </a><ul style="padding-top: 20px;">`;
 
                 let teamCount = rootInfo[9].toNumber(); 
-                
                 let promises = [];
-                for(let i=0; i<teamCount; i++) {
-                    promises.push(contract.slot2Team(targetAddress, i).then(tAddr => contract.users(tAddr)));
-                }
+                for(let i=0; i<teamCount; i++) { promises.push(contract.slot2Team(targetAddress, i).then(tAddr => contract.users(tAddr))); }
                 let slot2Members = await Promise.all(promises);
 
                 for(let i=0; i<4; i++) {
@@ -647,8 +643,66 @@
                 html += `</ul></li></ul>`;
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
-            } catch (error) { 
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; 
+            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; }
+        }
+
+        // 8-ID SLOT 3 GLOBAL POOL LOGIC
+        async function loadSlot3Matrix(targetAddress) {
+            switchView('treeView');
+            document.getElementById('treeViewTitle').innerText = "3rd Slot (Global Pool)";
+            const treeContainer = document.getElementById('matrixTreeDisplay');
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Pool Data...</div>';
+
+            try {
+                let rootInfo = await contract.users(targetAddress);
+                if (rootInfo[0].toNumber() === 0) throw "User not found";
+
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 3)}>
+                    <i class="fa-solid fa-globe" style="color:#3b82f6;"></i>
+                    <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
+                </a><ul style="padding-top: 20px;">`;
+
+                let userIndex = -1;
+                let indexFound = false;
+                for(let i=0; i<500; i++) {
+                    try {
+                        let qAddr = await contract.slotQueues(3, i);
+                        if(qAddr.toLowerCase() === targetAddress.toLowerCase()) {
+                            userIndex = i; indexFound = true; break;
+                        }
+                    } catch(e) { break; }
+                }
+
+                let downlines = [];
+                if(indexFound) {
+                    for(let i=1; i<=8; i++) {
+                        try {
+                            let childAddr = await contract.slotQueues(3, (userIndex * 8) + i);
+                            if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") {
+                                downlines.push(childAddr);
+                            } else { break; }
+                        } catch(e) { break; }
+                    }
+                }
+
+                let promises = downlines.map(addr => contract.users(addr));
+                let resolvedUsers = await Promise.all(promises);
+
+                for(let i=0; i<8; i++) {
+                    if(i < resolvedUsers.length) {
+                        let childInfo = resolvedUsers[i];
+                        html += `<li><a ${getSmartEvents(childInfo[1], 3)}>
+                            <i class="fa-solid fa-user-check" style="color:var(--gold);"></i><span class="id-label">ID ${childInfo[0].toNumber()}</span>
+                        </a></li>`;
+                    } else {
+                        html += createEmptyNode();
+                    }
+                }
+                html += `</ul></li></ul>`;
+                treeContainer.innerHTML = html;
+                treeContainer.className = "tree";
+            } catch (error) {
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 3 Matrix.</div>';
             }
         }
 
@@ -776,6 +830,7 @@
 
         function handleSlotClick(slotNum, address) {
             if(slotNum === 2) { loadSlot2Matrix(address); } 
+            else if(slotNum === 3) { loadSlot3Matrix(address); } 
             else { loadMyPartnersGenealogy(address); }
         }
 
@@ -819,7 +874,6 @@
                     document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     fetchExtraStats(address); 
                     
-                    // FIX 2: RESTORED REAL-MATH EARNING DISPLAY (Since Contract totalEarned hides upgrade funds)
                     let calculatedIncome = 0;
                     if(directCount === 1) { 
                         calculatedIncome = 30; 
@@ -844,9 +898,7 @@
                     let slot2TeamCount = userInfo[9].toNumber();
                     let displaySlotLimit = userCurrentSlotNum;
 
-                    if(slot2TeamCount >= 4 && displaySlotLimit < 3) {
-                        displaySlotLimit = 3;
-                    }
+                    if(slot2TeamCount >= 4 && displaySlotLimit < 3) { displaySlotLimit = 3; }
 
                     renderSlots(displaySlotLimit);
                     
@@ -903,6 +955,7 @@
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
                 if(currentSlotContext === 2) loadSlot2Matrix(addr);
+                else if(currentSlotContext === 3) loadSlot3Matrix(addr);
                 else loadMyPartnersGenealogy(addr); 
             }
         };
@@ -930,10 +983,8 @@
                 } else if (error.message) {
                     if (error.message.includes("execution reverted:")) {
                         errorMsg = error.message.split("execution reverted:")[1].split('"')[0].trim();
-                    } else if (error.message.includes("System is still active")) {
-                         errorMsg = "System is still active (180 Days rule).";
-                    } else if (error.message.includes("Income received")) {
-                         errorMsg = "Not eligible: Income received.";
+                    } else if (error.message.includes("System is still active") || error.message.includes("Income received")) {
+                         errorMsg = "0 pol user claim your 30 pol if inactive system";
                     } else {
                         errorMsg = "Contract rejected the refund.";
                     }
@@ -970,20 +1021,22 @@
 
         window.addEventListener('load', async () => {
             let savedSession = localStorage.getItem('poltitan_saved_session');
-            
             if (window.ethereum) {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                // Background me initialize hoga, UI ko rokega nahi
+                setTimeout(async () => {
+                    try {
+                        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
-                    if (savedSession && savedSession.length === 42) {
-                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--gold);"></i> Checking...`;
-                        await loadDashboardData(savedSession, false);
-                    } else {
-                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`;
-                        document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Register';
-                    }
-                } catch (error) { console.log("Init Error"); }
+                        if (savedSession && savedSession.length === 42) {
+                            document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--gold);"></i> Checking...`;
+                            await loadDashboardData(savedSession, false);
+                        } else {
+                            document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`;
+                            document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Register';
+                        }
+                    } catch (error) { console.log("Init Error"); }
+                }, 100);
             }
         });
 
