@@ -80,7 +80,7 @@
         .action-box h4 { color: var(--text-gray); font-size: 12px; font-weight: 400; margin-bottom: 10px; }
         .link-container { background: #000; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .link-container span { color: #fff; font-size: 12px; word-break: break-all; margin-right: 10px; }
-        .link-container i { color: var(--gold); font-size: 18px; cursor: pointer; }
+        .link-container i { color: var(--gold); font-size: 18px; cursor: pointer; transition: 0.3s; }
         
         .earning-box { background: linear-gradient(90deg, #1a1a1a, #0a0a0a); position: relative; overflow: hidden;}
         .earning-box .amount { font-size: 32px; color: var(--gold); font-weight: 800; display: flex; align-items: center; gap: 10px; }
@@ -111,7 +111,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; text-align: right;}
 
-        /* TREE Matrix Styling - UNILEVEL HORIZONTAL */
+        /* TREE Matrix Styling */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 20px 0 40px 0; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 20px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
@@ -144,7 +144,7 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
-        /* Floating Bot & Chat Modal - NOW DRAGGABLE & FLOATING */
+        /* Floating Bot & Chat Modal */
         .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: move; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); touch-action: none; }
         .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
         .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
@@ -187,10 +187,7 @@
         </div>
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        
-        <!-- CORRECT LOAD PARTNERS FUNCTION -->
         <div class="menu-item" onclick="loadMyPartnersGenealogy(userAddress); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
-        
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
@@ -231,12 +228,17 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT MODAL -->
+    <!-- FIX 3: RESTORED EXACT OLD CUSTOM ALERT MODAL DESIGN -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
+            <video class="video-logo" autoplay loop muted playsinline style="margin-bottom: 15px; width: 140px; height: 45px; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 0 15px rgba(245, 197, 24, 0.4);">
+                <source src="poltitan-logo.mp4" type="video/mp4">
+            </video>
             <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
-            <p style="color: #fff; font-size: 14px; margin-bottom: 20px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
+            <p style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
+            <p style="color: var(--text-gray); font-size: 10px; margin-bottom: 15px;">* Terms & Conditions apply.</p>
+            <h1 style="color: #10b981; font-size: 34px; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ACTIVE</h1>
             <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
         </div>
     </div>
@@ -328,7 +330,8 @@
                 <h4>Personal Link <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="link-container">
                     <span id="displayRefLink">https://...</span>
-                    <i class="fa-regular fa-copy" id="copyRefBtn"></i>
+                    <!-- FIX 1: ADDED ONCLICK COPY ACTION -->
+                    <i class="fa-regular fa-copy" id="copyRefBtn" onclick="copyDashboardRefLink()"></i>
                 </div>
             </div>
 
@@ -399,9 +402,7 @@
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">Transactions</h3>
             </div>
-            <div class="activity-list" id="transactionListContainer">
-                <!-- UI injected by JS -->
-            </div>
+            <div class="activity-list" id="transactionListContainer"></div>
         </div>
 
     </main>
@@ -422,8 +423,7 @@
             "function claimRefund() external",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)",
             "function userDirects(address, uint256) external view returns (address)",
-            "function slot2Team(address, uint256) external view returns (address)",
-            "function totalEarned(address) external view returns (uint256)"
+            "function slot2Team(address, uint256) external view returns (address)"
         ];
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
@@ -479,6 +479,22 @@
                 dropdown.style.display = 'block';
                 arrow.style.transform = 'rotate(180deg)';
             }
+        }
+
+        // ==========================================
+        // FIX 1: COPY REFERRAL LINK FROM DASHBOARD
+        // ==========================================
+        window.copyDashboardRefLink = function() {
+            const link = document.getElementById('displayRefLink').innerText;
+            navigator.clipboard.writeText(link).then(() => {
+                const copyBtn = document.getElementById('copyRefBtn');
+                copyBtn.className = "fa-solid fa-check";
+                copyBtn.style.color = "#10b981";
+                setTimeout(() => {
+                    copyBtn.className = "fa-regular fa-copy";
+                    copyBtn.style.color = "var(--gold)";
+                }, 2000);
+            });
         }
 
         // ==========================================
@@ -803,14 +819,26 @@
                     document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     fetchExtraStats(address); 
                     
-                    let totalEarnedWei = await contract.totalEarned(address);
-                    let calculatedIncome = ethers.utils.formatEther(totalEarnedWei);
-                    document.getElementById('totalIncomeDisplay').innerText = parseFloat(calculatedIncome).toFixed(2);
+                    // FIX 2: RESTORED REAL-MATH EARNING DISPLAY (Since Contract totalEarned hides upgrade funds)
+                    let calculatedIncome = 0;
+                    if(directCount === 1) { 
+                        calculatedIncome = 30; 
+                    } else if (directCount >= 2) { 
+                        calculatedIncome = 60 + ((directCount - 2) * 27); 
+                    }
+                    let currentSlot = userInfo[4].toNumber();
+                    if(currentSlot >= 3) calculatedIncome += 40;
+                    if(currentSlot >= 4) calculatedIncome += 400;
+                    if(currentSlot >= 5) calculatedIncome += 2400;
+                    if(currentSlot >= 6) calculatedIncome += 64800;
+                    if(currentSlot >= 7) calculatedIncome += 2648000;
+
+                    document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
                     
                     let holdAmountWei = userInfo[5];
                     document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
                     
-                    userCurrentSlotNum = userInfo[4].toNumber();
+                    userCurrentSlotNum = currentSlot;
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
 
                     let slot2TeamCount = userInfo[9].toNumber();
@@ -883,7 +911,6 @@
             return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
         }
 
-        // EXACT ERROR FETCHING FOR REFUND BUTTON
         async function claimMyRefund() {
             if (isViewOnly) { alert("Action not allowed in view mode!"); return; }
             const btn = document.getElementById('claimRefundBtn');
@@ -1030,7 +1057,6 @@
         function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
         window.closeWelcomeModalOnly = function() { welcomeModal.style.display = 'none'; }
         window.closeWelcomeModalAndGo = function() { welcomeModal.style.display = 'none'; loadDashboardData(userAddress, false); }
-        window.copyModalRefLink = function() { navigator.clipboard.writeText(document.getElementById('modalRefLink').innerText).then(() => alert("Referral Link Copied!")); }
         
         function logoutWallet() { 
             localStorage.removeItem('poltitan_saved_session');
