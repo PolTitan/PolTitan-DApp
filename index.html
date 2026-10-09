@@ -410,7 +410,10 @@
         let isViewOnly = false;
 
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', function () { window.location.reload(); });
+            window.ethereum.on('accountsChanged', function (accounts) { 
+                if (accounts.length === 0) { logoutWallet(); } 
+                else { window.location.reload(); }
+            });
             window.ethereum.on('chainChanged', function () { window.location.reload(); });
         }
 
@@ -686,6 +689,12 @@
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
+                
+                // SAVE SESSION IN BROWSER
+                if(!isViewOnly) {
+                    localStorage.setItem('poltitan_saved_session', address);
+                }
+
                 if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
                 let userId = 0; let userInfo = null;
                 try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
@@ -711,8 +720,6 @@
                     document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
                     
                     userCurrentSlotNum = userInfo[4].toNumber();
-                    
-                    // FIX: REAL CURRENT SLOT DISPLAY
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
 
                     let slot2TeamCount = userInfo[9].toNumber();
@@ -737,7 +744,10 @@
                         document.getElementById('displayRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     }
                     menuBtn.style.display = "block"; switchView('dashboardView');
-                } else { showAlert('authAlert', 'Address not found in Matrix!', true); }
+                } else { 
+                    showAlert('authAlert', 'Address not found in Matrix!', true); 
+                    localStorage.removeItem('poltitan_saved_session');
+                }
             } catch (error) { showAlert('authAlert', 'Network Error!', true); }
         }
 
@@ -823,25 +833,25 @@
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
 
+        // AUTO LOGIN CHECK ON PAGE LOAD
         window.addEventListener('load', async () => {
+            let savedSession = localStorage.getItem('poltitan_saved_session');
+            
             if (window.ethereum) {
                 try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                    let activeAddress = await provider.getSigner().getAddress();
-                    
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                    
-                    let userInfo;
-                    try { userInfo = await contract.users(activeAddress); } catch(e) { userInfo = null; }
-                    
-                    if(userInfo && userInfo[0].toNumber() > 0) { 
-                        await loadDashboardData(activeAddress, false); 
+
+                    // If user was logged in previously, bypass start page
+                    if (savedSession && savedSession.length === 42) {
+                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--gold);"></i> Checking...`;
+                        await loadDashboardData(savedSession, false);
                     } else {
-                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-link" style="color:#10b981;"></i> Connected`;
+                        // Just wait on home page
+                        document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`;
                         document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Register';
                     }
-                } catch (error) { console.log("Auto-connect ignored by user or wallet"); }
+                } catch (error) { console.log("Init Error"); }
             }
         });
 
@@ -921,6 +931,8 @@
         window.copyModalRefLink = function() { navigator.clipboard.writeText(document.getElementById('modalRefLink').innerText).then(() => alert("Referral Link Copied!")); }
         
         function logoutWallet() { 
+            // CLEAR SESSION ON LOGOUT
+            localStorage.removeItem('poltitan_saved_session');
             userAddress = null; 
             isViewOnly = false; 
             toggleMenu(); 
