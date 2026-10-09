@@ -144,13 +144,6 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
-        /* Floating Bot & Chat Modal - ADJUSTED TO FIX OVERLAP */
-        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); }
-        .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
-        .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
-        .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
-
         /* Alert Styling */
         .alert { display: none; margin-top: 15px; font-size: 13px; text-align: center; padding: 12px; border-radius: 8px; font-weight: 600; }
     </style>
@@ -216,7 +209,6 @@
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
             <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #10b981; margin-bottom: 15px;"></i>
             <h2 style="color: #fff; margin-bottom: 10px;">Registration Successful!</h2>
-            <!-- FIX 1: ADDED ID DISPLAY HERE IN MODAL TEXT -->
             <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 15px;">Welcome to PolTitan VIP Matrix. Your 30 POL transaction is complete and your ID <span id="modalNewIdDisplay" style="color:var(--gold); font-weight:bold; font-size:14px;"></span> has been activated.</p>
             <div style="background: #0a0a0a; border: 1px dashed var(--gold); border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: left;">
                 <span style="color: var(--gold); font-size: 11px; display: block; margin-bottom: 5px;"><i class="fa-solid fa-link"></i> Your Referral Link:</span>
@@ -245,7 +237,6 @@
                     <input type="text" id="uplineInput" placeholder="Sponsor Address (Optional if Login)">
                 </div>
                 
-                <!-- DO NOT TOUCH LOGIN BUTTON OR EVENT LISTENER -->
                 <button class="btn-gold" id="masterConnectBtn"><i class="fa-solid fa-wallet"></i> Login / Register Wallet</button>
                 
                 <div id="authAlert" class="alert"></div>
@@ -325,7 +316,6 @@
                 <h4>Total Earning <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div class="amount">
                     <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo"> 
-                    <!-- FIX 2: REAL TOTAL EARNING FIELD -->
                     <span id="totalIncomeDisplay">0.00</span> POL
                 </div>
                 <i class="fa-solid fa-sack-dollar earning-icon"></i>
@@ -396,7 +386,7 @@
 
     </main>
 
-    <!-- Chat Bot - FIX 6: PROPERLY HIDDEN INITIALLY, WONT OVERLAP -->
+    <!-- Chat Bot -->
     <div class="chat-fab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
         <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
@@ -407,7 +397,6 @@
     <script>
         const CONTRACT_ADDRESS = "0x2BD2B4D2D2379Ce31c62f35813BD05863980BE85";
         
-        // NEW ABI: Added totalEarned to get REAL Exact Earnings for Dashboard.
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
             "function claimRefund() external",
@@ -463,9 +452,6 @@
             }
         }
 
-        // =================================================================
-        // FIX 5: SUPER FAST PARALLEL TREE LOADING (My Partners)
-        // =================================================================
         async function loadMyPartnersGenealogy(targetAddress) {
             if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
@@ -486,14 +472,12 @@
                 if(dCount > 0) {
                     html += `<ul>`;
                     
-                    // Fetch directs in parallel for SUPER FAST loading
                     let promises = [];
                     for(let i=0; i<dCount; i++) {
                         promises.push(contract.userDirects(targetAddress, i).then(addr => contract.users(addr)));
                     }
                     let directs = await Promise.all(promises);
                     
-                    // Sort numerically by ID
                     directs.sort((a,b) => a[0].toNumber() - b[0].toNumber());
 
                     for(let d of directs) {
@@ -515,9 +499,6 @@
             }
         }
 
-        // =================================================================
-        // FIX 5: SUPER FAST SLOT 2 MATRIX 
-        // =================================================================
         function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
 
         async function loadSlot2Matrix(targetAddress) {
@@ -535,9 +516,8 @@
                     <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
                 </a><ul style="padding-top: 20px;">`;
 
-                let teamCount = rootInfo[9].toNumber(); // slot2TeamCount
+                let teamCount = rootInfo[9].toNumber(); 
                 
-                // Fetch team members fast
                 let promises = [];
                 for(let i=0; i<teamCount; i++) {
                     promises.push(contract.slot2Team(targetAddress, i).then(tAddr => contract.users(tAddr)));
@@ -561,9 +541,6 @@
             }
         }
 
-        // =================================================================
-        // FIX 3 & 4: REAL INCOME HISTORY (FAST PROMISE.ALL)
-        // =================================================================
         async function loadIncomeHistory(type) {
             switchView('incomeView');
             document.getElementById('tab-direct').classList.remove('active-tab');
@@ -592,7 +569,6 @@
                     for(let i=0; i<directs.length; i++) {
                         let idLabel = `ID ${directs[i][0].toNumber()}`;
                         
-                        // FIX 3: 1st AND 2nd are HOLD!
                         if(i === 0 || i === 1) {
                             html += buildIncomeItem(idLabel, `Hold for Slot 2`, "30.00", "30.00", '<i class="fa-solid fa-pause"></i>', "#f5c518");
                         } else {
@@ -604,7 +580,6 @@
                     document.getElementById('incomeViewTitle').innerText = "Slot Rewards History";
                     let currentSlot = myInfo[4].toNumber();
                     
-                    // FIX 4: Proper Slot Upgrade Rewards 40 POL / 400 POL etc.
                     if(currentSlot >= 3) {
                         html += buildIncomeItem("Matrix System", "Slot 2 Reward (Upgraded to Slot 3)", "40.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
                         count++;
@@ -621,10 +596,14 @@
                         html += buildIncomeItem("Matrix System", "Slot 5 Reward (Upgraded to Slot 6)", "64800.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
                         count++;
                     }
+                    if(currentSlot >= 7) {
+                        html += buildIncomeItem("Matrix System", "Slot 6 Reward (Upgraded to Slot 7)", "2648000.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518");
+                        count++;
+                    }
                     
                 } else if (type === 'upline') {
                     document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
-                    if(myInfo[6] === false) { // isRealID = false means Rebirth
+                    if(myInfo[6] === false) { 
                         html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6");
                         count++;
                     }
@@ -656,9 +635,6 @@
             </div>`;
         }
 
-        // ==========================================
-        // UI & DASHBOARD LOGIC
-        // ==========================================
         function renderSlots(displaySlotLimit) {
             const container = document.getElementById('slotsContainer');
             if(!container) return;
@@ -692,7 +668,6 @@
             else { loadMyPartnersGenealogy(address); }
         }
 
-        // Quick fetch for Rebirth counts
         async function fetchExtraStats(addr) {
             try {
                 let info = await contract.users(addr);
@@ -704,7 +679,7 @@
                 directs.forEach(d => teamSet.add(d));
                 
                 document.getElementById('displayTotalTeam').innerText = teamSet.size;
-                document.getElementById('displayRebirths').innerText = "0"; // Placeholder for UI speed
+                document.getElementById('displayRebirths').innerText = "0"; 
             } catch(e){}
         }
 
@@ -728,7 +703,6 @@
                     document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     fetchExtraStats(address); 
                     
-                    // FIX 2: GET REAL TOTAL EARNING FROM SMART CONTRACT
                     let totalEarnedWei = await contract.totalEarned(address);
                     let calculatedIncome = ethers.utils.formatEther(totalEarnedWei);
                     document.getElementById('totalIncomeDisplay').innerText = parseFloat(calculatedIncome).toFixed(2);
@@ -737,10 +711,13 @@
                     document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
                     
                     userCurrentSlotNum = userInfo[4].toNumber();
+                    
+                    // FIX: REAL CURRENT SLOT DISPLAY
+                    document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
+
                     let slot2TeamCount = userInfo[9].toNumber();
                     let displaySlotLimit = userCurrentSlotNum;
 
-                    // AUTO-UNLOCK SLOT 3 VISUALLY IF SLOT 2 HAS 4 MEMBERS
                     if(slot2TeamCount >= 4 && displaySlotLimit < 3) {
                         displaySlotLimit = 3;
                     }
@@ -869,7 +846,7 @@
         });
 
         // -----------------------------------------------------------
-        // 100% UNTOUCHED LOGIN / REGISTRATION LOGIC
+        // UNTOUCHED LOGIN / REGISTRATION LOGIC
         // -----------------------------------------------------------
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
@@ -912,7 +889,6 @@
                         
                         userAddress = addr; 
                         
-                        // FIX 1: ADDED ID DISPLAY SAFELY AFTER TRANSACTION COMPLETES
                         try {
                             let newlyRegisteredInfo = await contract.users(addr);
                             document.getElementById('modalNewIdDisplay').innerText = newlyRegisteredInfo[0].toString();
