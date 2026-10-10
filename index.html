@@ -22,7 +22,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; padding-bottom: 100px; }
+        body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; padding-bottom: 60px; }
 
         /* HEADER */
         header { background: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
@@ -44,7 +44,7 @@
         .submenu { display: none; background: #0a0a0a; border-radius: 8px; margin-bottom: 5px; border-left: 2px solid var(--gold); }
 
         /* CONTAINER & CARDS */
-        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; min-height: 80vh; }
         .vip-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: center; }
         
         /* PROFILE CARD */
@@ -99,6 +99,9 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
         
+        /* NEW: INQUIRY TEXTAREA */
+        .inquiry-textarea { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; resize: none; height: 80px; font-family: 'Poppins', sans-serif; }
+
         /* ACTIVITY LIST */
         .activity-list { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); }
         .activity-header { display: flex; justify-content: space-between; padding: 15px; background: #0a0a0a; border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-gray); font-weight: bold; }
@@ -132,6 +135,12 @@
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
 
+        /* NEW: FOOTER DESIGN */
+        .site-footer { background: var(--card-bg); border-top: 1px solid var(--border-color); text-align: center; padding: 25px 15px; font-size: 12px; color: var(--text-gray); width: 100%; position: absolute; bottom: 0; left: 0; }
+        .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 20px; }
+        .footer-links a { color: var(--gold); text-decoration: none; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .footer-links a:hover { color: #fff; }
+
         /* View Sections */
         .view-section { display: none; }
         #authView { display: block; margin-top: 5vh; }
@@ -145,8 +154,8 @@
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
         /* Floating Bot & Chat Modal */
-        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: move; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); touch-action: none; }
-        .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 100px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
+        .chat-fab { position: fixed; bottom: 90px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: move; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); touch-action: none; }
+        .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 160px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
         .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
         .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
         .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
@@ -155,7 +164,7 @@
         .alert { display: none; margin-top: 15px; font-size: 13px; text-align: center; padding: 12px; border-radius: 8px; font-weight: 600; }
     </style>
 </head>
-<body>
+<body style="position: relative; min-height: 100vh;">
 
     <!-- HEADER -->
     <header onclick="goToDashboard()">
@@ -187,14 +196,17 @@
         </div>
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        
         <div class="menu-item" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
-        
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
+        
+        <!-- NEW: INQUIRY MENU ITEM -->
+        <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
+
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
 
     <!-- MODALS -->
+    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -213,6 +225,7 @@
         </div>
     </div>
 
+    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -245,8 +258,31 @@
         </div>
     </div>
 
+    <!-- NEW: INQUIRY MODAL FORM -->
+    <div class="modal-overlay" id="inquiryModal">
+        <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
+            <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeInquiryModal()"></i>
+            <h2 style="color: var(--gold); margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-envelope"></i> Inquiry Form</h2>
+            <form id="inquiryForm" onsubmit="submitInquiry(event)">
+                <div class="input-box" style="margin-bottom: 15px;">
+                    <i class="fa-solid fa-user" style="color: var(--gold); margin-right: 10px;"></i>
+                    <input type="text" placeholder="Your Name" required>
+                </div>
+                <div class="input-box" style="margin-bottom: 15px;">
+                    <i class="fa-solid fa-phone" style="color: var(--gold); margin-right: 10px;"></i>
+                    <input type="text" placeholder="Phone or Email" required>
+                </div>
+                <div class="input-box" style="margin-bottom: 20px; align-items: flex-start;">
+                    <i class="fa-solid fa-comment-dots" style="color: var(--gold); margin-right: 10px; margin-top: 10px;"></i>
+                    <textarea class="inquiry-textarea" placeholder="Your Inquiry or Message..." required></textarea>
+                </div>
+                <button type="submit" class="btn-gold" style="padding: 10px; font-size: 14px;">Submit Inquiry</button>
+            </form>
+        </div>
+    </div>
+
     <!-- MAIN DASHBOARD SECTIONS -->
-    <main class="container">
+    <main class="container" style="padding-bottom: 80px;">
         <!-- 1. SMART AUTH VIEW -->
         <div id="authView" class="view-section">
             <div style="text-align: center; margin-bottom: 30px;">
@@ -385,7 +421,6 @@
         <!-- 5. TREE VIEW & PARTNERS VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <!-- BACK BUTTON FIXED -->
                 <button class="btn-outline btn-small" id="treeBackBtn" style="margin: 0; padding:8px 15px; width:auto;" onclick="goBackFromTree()"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
@@ -416,6 +451,14 @@
         <div class="chat-body" id="chatBody"><div class="chat-msg">🙏 Namaste VIP! Main aapki kaise madad kar sakta hu?</div></div>
     </div>
 
+    <!-- NEW: GLOBAL FOOTER -->
+    <footer class="site-footer">
+        <p>&copy; 2026 PolTitan VIP Matrix. All rights reserved.</p>
+        <div class="footer-links">
+            <a onclick="openInquiryModal()"><i class="fa-solid fa-envelope"></i> Inquiry / Contact Support</a>
+        </div>
+    </footer>
+
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0x2BD2B4D2D2379Ce31c62f35813BD05863980BE85";
@@ -432,8 +475,6 @@
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
-        
-        // BACK BUTTON LOGIC VARIABLE
         let previousViewForTree = 'dashboardView';
 
         if (window.ethereum) {
@@ -468,6 +509,22 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
+        // NEW: INQUIRY LOGIC
+        function openInquiryModal() {
+            document.getElementById('inquiryModal').style.display = 'flex';
+        }
+
+        function closeInquiryModal() {
+            document.getElementById('inquiryModal').style.display = 'none';
+        }
+
+        function submitInquiry(e) {
+            e.preventDefault();
+            closeInquiryModal();
+            showCustomAlertModal("Success", "Your inquiry has been submitted successfully. We will contact you soon.");
+            document.getElementById('inquiryForm').reset();
+        }
+
         function toggleMenu() { sideMenu.classList.toggle('active'); }
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
@@ -476,7 +533,6 @@
         }
         function goToDashboard() { if (userAddress) switchView('dashboardView'); }
 
-        // TREE BACK BUTTON FUNCTION
         function goBackFromTree() {
             switchView(previousViewForTree);
         }
@@ -569,9 +625,6 @@
             }
         }
 
-        // =====================================
-        // FIX: SLOT 1 MATRIX (LEFT/RIGHT)
-        // =====================================
         async function loadSlot1Matrix(targetAddress) {
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "Slot 1 (Left/Right Placement)";
@@ -612,9 +665,6 @@
             }
         }
 
-        // =====================================
-        // FIX: MY PARTNERS DEEP GENEALOGY 
-        // =====================================
         async function buildUnilevelTree(addr, level) {
             if(level > 3) return ''; 
             let uInfo = await contract.users(addr);
@@ -703,9 +753,6 @@
             } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; }
         }
 
-        // =====================================
-        // FIX: SLOT 3 GLOBAL POOL (8 Nodes)
-        // =====================================
         async function loadSlot3Matrix(targetAddress) {
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "3rd Slot (Global Pool)";
@@ -887,20 +934,14 @@
             container.innerHTML = html;
         }
 
-        // =====================================
-        // FIX: SLOT CLICK HANDLER ROUTING
-        // =====================================
         function handleSlotClick(slotNum, address) {
-            previousViewForTree = 'slotsView'; // Record back navigation
+            previousViewForTree = 'slotsView'; 
             if(slotNum === 1) { loadSlot1Matrix(address); }
             else if(slotNum === 2) { loadSlot2Matrix(address); } 
             else if(slotNum === 3) { loadSlot3Matrix(address); } 
             else { loadMyPartnersGenealogy(address); }
         }
 
-        // =====================================
-        // FIX: TOTAL TEAM DEEP COUNT (BFS)
-        // =====================================
         async function fetchExtraStats(addr) {
             try {
                 let teamSet = new Set();
@@ -1040,7 +1081,6 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                // FIX: DEEP NAVIGATION PRESERVES CONTEXT
                 if(currentSlotContext === 1) loadSlot1Matrix(addr);
                 else if(currentSlotContext === 2) loadSlot2Matrix(addr);
                 else if(currentSlotContext === 3) loadSlot3Matrix(addr);
