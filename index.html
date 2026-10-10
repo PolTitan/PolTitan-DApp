@@ -99,7 +99,7 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
         
-        /* NEW: INQUIRY TEXTAREA */
+        /* INQUIRY TEXTAREA */
         .inquiry-textarea { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; resize: none; height: 80px; font-family: 'Poppins', sans-serif; }
 
         /* ACTIVITY LIST */
@@ -135,7 +135,7 @@
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
 
-        /* NEW: FOOTER DESIGN */
+        /* FOOTER DESIGN */
         .site-footer { background: var(--card-bg); border-top: 1px solid var(--border-color); text-align: center; padding: 25px 15px; font-size: 12px; color: var(--text-gray); width: 100%; position: absolute; bottom: 0; left: 0; }
         .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 20px; }
         .footer-links a { color: var(--gold); text-decoration: none; cursor: pointer; transition: 0.3s; font-weight: 600; }
@@ -199,8 +199,8 @@
         <div class="menu-item" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
-        <!-- NEW: INQUIRY MENU ITEM -->
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
+        <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
 
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
@@ -258,7 +258,7 @@
         </div>
     </div>
 
-    <!-- NEW: INQUIRY MODAL FORM -->
+    <!-- INQUIRY MODAL FORM -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeInquiryModal()"></i>
@@ -442,6 +442,48 @@
             <div class="activity-list" id="transactionListContainer"></div>
         </div>
 
+        <!-- 7. ABOUT US VIEW -->
+        <div id="aboutView" class="view-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h3 style="color: var(--gold); font-size: 18px;">About PolTitan</h3>
+            </div>
+            
+            <div class="vip-card" style="text-align: left;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="color: #fff; font-size: 24px; font-weight: 800; letter-spacing: 1px;">Pol<span style="color: var(--gold);">Titan</span></h1>
+                    <p style="color: var(--text-gray); font-size: 12px;">THE ULTIMATE DECENTRALIZED MATRIX</p>
+                </div>
+                
+                <p style="font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 15px;">
+                    PolTitan VIP Matrix ek 100% Decentralized aur Transparent smart contract based system hai jo Polygon Blockchain par run karta hai. Humara vision ek fair aur secure platform provide karna hai jahan har user bina kisi risk ke grow kar sake.
+                </p>
+
+                <div class="action-box" style="margin-bottom: 15px; background: #0a0a0a;">
+                    <h4 style="color: var(--gold); font-size: 14px; margin-bottom: 10px;"><i class="fa-solid fa-shield-halved"></i> 100% Safe & No Admin Control</h4>
+                    <ul style="list-style-type: none; padding: 0; font-size: 12px; color: #ccc; line-height: 1.8;">
+                        <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 8px;"></i> <b>No Creator Control:</b> Contract deploy hone ke baad creator ya admin ka system pe koi control nahi hota.</li>
+                        <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 8px;"></i> <b>Cannot Withdraw Funds:</b> Creator ya admin kisi bhi user ka fund contract address se nahi nikal sakta.</li>
+                        <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 8px;"></i> <b>No ID Blocking:</b> Kisi ki bhi ID block, ban, ya delete nahi ki ja sakti.</li>
+                        <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 8px;"></i> <b>No Payment Hold:</b> 100% Payout turant wallet me distribute hota hai. Kisi ka payment roka nahi ja sakta.</li>
+                    </ul>
+                </div>
+
+                <div class="action-box" style="margin-bottom: 15px; background: #0a0a0a;">
+                    <h4 style="color: var(--gold); font-size: 14px; margin-bottom: 10px;"><i class="fa-solid fa-hand-holding-dollar"></i> 180 Days Refund Policy</h4>
+                    <p style="font-size: 12px; color: #ccc; line-height: 1.6;">
+                        Users whose initial registration funds were held in the system can claim a full refund of their 30 POL under the following strict conditions:
+                        <br><br>
+                        <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>System Inactivity:</b> The system must be officially 'Inactive', meaning no new IDs have been registered globally for a continuous period of 180 days.
+                        <br>
+                        <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>Zero Earnings:</b> The claiming user must have exactly 0 POL income from the system.
+                        <br>
+                        <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>Claim Validity:</b> Eligible users have a strict 90-day window to claim their funds once the system becomes inactive.
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Chat Bot -->
@@ -451,7 +493,7 @@
         <div class="chat-body" id="chatBody"><div class="chat-msg">🙏 Namaste VIP! Main aapki kaise madad kar sakta hu?</div></div>
     </div>
 
-    <!-- NEW: GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER -->
     <footer class="site-footer">
         <p>&copy; 2026 PolTitan VIP Matrix. All rights reserved.</p>
         <div class="footer-links">
@@ -509,7 +551,6 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        // NEW: INQUIRY LOGIC
         function openInquiryModal() {
             document.getElementById('inquiryModal').style.display = 'flex';
         }
