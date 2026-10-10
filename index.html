@@ -187,7 +187,9 @@
         </div>
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        <div class="menu-item" onclick="loadMyPartnersGenealogy(userAddress); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
+        
+        <div class="menu-item" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
+        
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
@@ -228,7 +230,7 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT MODAL (REFUND & NOTICES) -->
+    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -302,14 +304,14 @@
                 </div>
                 
                 <div class="team-summary">
-                    <div class="team-box" onclick="loadMyPartnersGenealogy(userAddress)">
+                    <div class="team-box" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress)">
                         <div class="icon"><i class="fa-solid fa-user-plus"></i></div>
                         <div class="data">
                             <h4 id="displayDirects">--</h4>
                             <p>Direct ID</p>
                         </div>
                     </div>
-                    <div class="team-box" onclick="loadMyPartnersGenealogy(userAddress)">
+                    <div class="team-box" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress)">
                         <div class="icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);"><i class="fa-solid fa-users"></i></div>
                         <div class="data">
                             <h4 id="displayTotalTeam"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
@@ -383,7 +385,8 @@
         <!-- 5. TREE VIEW & PARTNERS VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('slotsView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <!-- BACK BUTTON FIXED -->
+                <button class="btn-outline btn-small" id="treeBackBtn" style="margin: 0; padding:8px 15px; width:auto;" onclick="goBackFromTree()"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
             <div class="vip-card" style="padding: 10px; overflow-x: hidden;">
@@ -423,11 +426,15 @@
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)",
             "function userDirects(address, uint256) external view returns (address)",
             "function slot2Team(address, uint256) external view returns (address)",
-            "function slotQueues(uint256, uint256) external view returns (address)"
+            "function slotQueues(uint256, uint256) external view returns (address)",
+            "function totalEarned(address) external view returns (uint256)"
         ];
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
+        
+        // BACK BUTTON LOGIC VARIABLE
+        let previousViewForTree = 'dashboardView';
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) { 
@@ -468,6 +475,11 @@
             window.scrollTo(0, 0); 
         }
         function goToDashboard() { if (userAddress) switchView('dashboardView'); }
+
+        // TREE BACK BUTTON FUNCTION
+        function goBackFromTree() {
+            switchView(previousViewForTree);
+        }
 
         function toggleIncomeDropdown() {
             const dropdown = document.getElementById('incomeDropdown');
@@ -557,7 +569,52 @@
             }
         }
 
-        // DEEP UNILEVEL RECURSION
+        // =====================================
+        // FIX: SLOT 1 MATRIX (LEFT/RIGHT)
+        // =====================================
+        async function loadSlot1Matrix(targetAddress) {
+            switchView('treeView');
+            document.getElementById('treeViewTitle').innerText = "Slot 1 (Left/Right Placement)";
+            const treeContainer = document.getElementById('matrixTreeDisplay');
+            treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Slot 1 Data...</div>';
+
+            try {
+                let rootInfo = await contract.users(targetAddress);
+                if (rootInfo[0].toNumber() === 0) throw "User not found";
+
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 1)}>
+                    <i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i>
+                    <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
+                </a><ul style="padding-top: 20px;">`;
+
+                let left = rootInfo[7]; 
+                let right = rootInfo[8]; 
+
+                if(left && left !== "0x0000000000000000000000000000000000000000") {
+                    let lInfo = await contract.users(left);
+                    html += `<li><a ${getSmartEvents(left, 1)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${lInfo[0].toNumber()}</span></a></li>`;
+                } else {
+                    html += createEmptyNode();
+                }
+
+                if(right && right !== "0x0000000000000000000000000000000000000000") {
+                    let rInfo = await contract.users(right);
+                    html += `<li><a ${getSmartEvents(right, 1)}><i class="fa-solid fa-user-check"></i><span class="id-label">ID ${rInfo[0].toNumber()}</span></a></li>`;
+                } else {
+                    html += createEmptyNode();
+                }
+
+                html += `</ul></li></ul>`;
+                treeContainer.innerHTML = html;
+                treeContainer.className = "tree";
+            } catch (error) { 
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 1.</div>'; 
+            }
+        }
+
+        // =====================================
+        // FIX: MY PARTNERS DEEP GENEALOGY 
+        // =====================================
         async function buildUnilevelTree(addr, level) {
             if(level > 3) return ''; 
             let uInfo = await contract.users(addr);
@@ -646,7 +703,9 @@
             } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; }
         }
 
-        // 8-ID SLOT 3 GLOBAL POOL LOGIC
+        // =====================================
+        // FIX: SLOT 3 GLOBAL POOL (8 Nodes)
+        // =====================================
         async function loadSlot3Matrix(targetAddress) {
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "3rd Slot (Global Pool)";
@@ -828,23 +887,50 @@
             container.innerHTML = html;
         }
 
+        // =====================================
+        // FIX: SLOT CLICK HANDLER ROUTING
+        // =====================================
         function handleSlotClick(slotNum, address) {
-            if(slotNum === 2) { loadSlot2Matrix(address); } 
+            previousViewForTree = 'slotsView'; // Record back navigation
+            if(slotNum === 1) { loadSlot1Matrix(address); }
+            else if(slotNum === 2) { loadSlot2Matrix(address); } 
             else if(slotNum === 3) { loadSlot3Matrix(address); } 
             else { loadMyPartnersGenealogy(address); }
         }
 
+        // =====================================
+        // FIX: TOTAL TEAM DEEP COUNT (BFS)
+        // =====================================
         async function fetchExtraStats(addr) {
             try {
-                let info = await contract.users(addr);
-                let dCount = info[3].toNumber();
                 let teamSet = new Set();
-                let promises = [];
-                for(let i=0; i<dCount; i++) { promises.push(contract.userDirects(addr, i)); }
-                let directs = await Promise.all(promises);
-                directs.forEach(d => teamSet.add(d));
-                
-                document.getElementById('displayTotalTeam').innerText = teamSet.size;
+                let queue = [addr];
+                let visited = new Set();
+                visited.add(addr.toLowerCase());
+
+                let count = 0;
+                while(queue.length > 0 && count < 300) { 
+                    let current = queue.shift();
+                    try {
+                        let info = await contract.users(current);
+                        let dCount = info[3].toNumber();
+                        
+                        let promises = [];
+                        for(let i=0; i<dCount; i++) { promises.push(contract.userDirects(current, i)); }
+                        let directs = await Promise.all(promises);
+                        
+                        for(let d of directs) {
+                            let lowerD = d.toLowerCase();
+                            if(!visited.has(lowerD)) {
+                                visited.add(lowerD);
+                                teamSet.add(lowerD);
+                                queue.push(lowerD);
+                            }
+                        }
+                    } catch(e){}
+                    count++;
+                    document.getElementById('displayTotalTeam').innerText = teamSet.size;
+                }
                 document.getElementById('displayRebirths').innerText = "0"; 
             } catch(e){}
         }
@@ -954,7 +1040,9 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                if(currentSlotContext === 2) loadSlot2Matrix(addr);
+                // FIX: DEEP NAVIGATION PRESERVES CONTEXT
+                if(currentSlotContext === 1) loadSlot1Matrix(addr);
+                else if(currentSlotContext === 2) loadSlot2Matrix(addr);
                 else if(currentSlotContext === 3) loadSlot3Matrix(addr);
                 else loadMyPartnersGenealogy(addr); 
             }
@@ -1022,7 +1110,6 @@
         window.addEventListener('load', async () => {
             let savedSession = localStorage.getItem('poltitan_saved_session');
             if (window.ethereum) {
-                // Background me initialize hoga, UI ko rokega nahi
                 setTimeout(async () => {
                     try {
                         provider = new ethers.providers.Web3Provider(window.ethereum, "any");
