@@ -99,7 +99,6 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
         
-        /* INQUIRY TEXTAREA */
         .inquiry-textarea { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; resize: none; height: 80px; font-family: 'Poppins', sans-serif; }
 
         /* ACTIVITY LIST */
@@ -114,7 +113,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; text-align: right;}
 
-        /* TREE Matrix Styling - COMPACT SIZE FOR 4 LEVELS */
+        /* TREE Matrix Styling */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 0 30px 0; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 15px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
@@ -359,6 +358,7 @@
                     <div class="team-box team-box-full">
                         <div class="icon" style="color: #10b981; background: rgba(16, 185, 129, 0.1);"><i class="fa-solid fa-recycle"></i></div>
                         <div class="data">
+                            <!-- FIX: Rebirth IDs auto-calculate hoga abhi JS me -->
                             <h4 id="displayRebirths"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
                             <p>Rebirth IDs</p>
                         </div>
@@ -384,7 +384,8 @@
             </div>
             
             <div class="action-box">
-                <h4>Hold Amount <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
+                <!-- FIX: Hold Amount text changed to Hold POL -->
+                <h4>Hold POL <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                     <div style="font-size: 24px; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 8px;">
                         <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo" style="width: 20px; height: 20px;">
@@ -708,8 +709,9 @@
             }
         }
 
+        // FIX: REBIRTH LOGIC ADDED IN UNILEVEL TREE WITH R/B TAG
         async function buildUnilevelTree(addr, level) {
-            if(level > 3) return ''; 
+            if(level > 4) return ''; 
             let uInfo = await contract.users(addr);
             let dCount = uInfo[3].toNumber();
             if(dCount === 0) return '';
@@ -723,9 +725,14 @@
                 let dAddr = directAddrs[i];
                 let dInfo = await contract.users(dAddr);
                 let isReal = dInfo[6]; 
+                
+                // Set Icon and Colors based on Rebirth
                 let iconC = isReal ? '#f5c518' : '#10b981';
                 let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
-                html += `<li><a ${getSmartEvents(dAddr, 0)}><i class="fa-solid ${iconCl}" style="color:${iconC};"></i><span class="id-label">ID ${dInfo[0].toNumber()}</span></a>`;
+                // Add R/B tag if it's a rebirth ID
+                let displayLabel = isReal ? `ID ${dInfo[0].toNumber()}` : `ID ${dInfo[0].toNumber()} (R/B)`;
+
+                html += `<li><a ${getSmartEvents(dAddr, 0)}><i class="fa-solid ${iconCl}" style="color:${iconC};"></i><span class="id-label">${displayLabel}</span></a>`;
                 html += await buildUnilevelTree(dAddr, level + 1);
                 html += `</li>`;
             }
@@ -743,10 +750,13 @@
             try {
                 let rootInfo = await contract.users(targetAddress);
                 if (rootInfo[0].toNumber() === 0) throw "User not found";
+                
+                let isReal = rootInfo[6]; 
+                let displayLabel = isReal ? `ID ${rootInfo[0].toNumber()}` : `ID ${rootInfo[0].toNumber()} (R/B)`;
 
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 0)}>
                     <i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i>
-                    <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
+                    <span class="id-label" style="color:#fff;">${displayLabel}</span>
                 </a>`;
 
                 html += await buildUnilevelTree(targetAddress, 1);
@@ -1015,7 +1025,6 @@
                     count++;
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
                 }
-                document.getElementById('displayRebirths').innerText = "0"; 
             } catch(e){}
         }
 
@@ -1041,8 +1050,17 @@
                     document.getElementById('displayDirects').innerText = directCount;
                     
                     document.getElementById('displayTotalTeam').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
-                    document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     fetchExtraStats(address); 
+                    
+                    let currentSlot = userInfo[4].toNumber();
+                    
+                    // FIX: REBIRTH AUTO-CALCULATION BASED ON SLOT
+                    let rebirthCount = 0;
+                    if(currentSlot >= 4) rebirthCount = 10;
+                    if(currentSlot >= 5) rebirthCount = 50;  // 10 + 40
+                    if(currentSlot >= 6) rebirthCount = 210; // 50 + 160
+                    if(currentSlot >= 7) rebirthCount = 850; // 210 + 640
+                    document.getElementById('displayRebirths').innerText = rebirthCount;
                     
                     let calculatedIncome = 0;
                     if(directCount === 1) { 
@@ -1050,7 +1068,6 @@
                     } else if (directCount >= 2) { 
                         calculatedIncome = 60 + ((directCount - 2) * 27); 
                     }
-                    let currentSlot = userInfo[4].toNumber();
                     if(currentSlot >= 3) calculatedIncome += 40;
                     if(currentSlot >= 4) calculatedIncome += 400;
                     if(currentSlot >= 5) calculatedIncome += 2400;
@@ -1059,8 +1076,19 @@
 
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
                     
-                    let holdAmountWei = userInfo[5];
-                    document.getElementById('holdAmountDisplay').innerText = ethers.utils.formatEther(holdAmountWei);
+                    // FIX: HOLD AMOUNT AUTO-CALCULATION BASED ON MISSING DIRECTS FOR NEXT SLOT
+                    let autoHoldAmount = 0;
+                    if(currentSlot === 4 && directCount < 5) autoHoldAmount = 400;
+                    if(currentSlot === 5 && directCount < 5) autoHoldAmount = 2400;
+                    if(currentSlot === 6 && directCount < 5) autoHoldAmount = 64800;
+                    if(currentSlot === 7 && directCount < 5) autoHoldAmount = 2648000;
+                    
+                    // If formula gives 0, check the smart contract variable just in case
+                    if(autoHoldAmount === 0 && userInfo[5] > 0) {
+                        autoHoldAmount = parseFloat(ethers.utils.formatEther(userInfo[5]));
+                    }
+
+                    document.getElementById('holdAmountDisplay').innerText = autoHoldAmount.toFixed(1);
                     
                     userCurrentSlotNum = currentSlot;
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
