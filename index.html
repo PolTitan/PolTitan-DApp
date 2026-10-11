@@ -113,7 +113,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; text-align: right;}
 
-        /* TREE Matrix Styling */
+        /* TREE Matrix Styling - COMPACT SIZE FIX */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 0 30px 0; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 15px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
@@ -127,11 +127,12 @@
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold); width: 0; height: 15px; }
         
-        .tree li a { border: 1px solid var(--border-color); padding: 8px 10px; text-decoration: none; color: #fff; display: inline-block; border-radius: 8px; background: #111; min-width: 55px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; margin: 0 2px;}
-        .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 11px; margin-bottom: 3px;}
-        .tree li a i { font-size: 16px; color: var(--text-gray); margin-bottom: 3px; }
+        .tree li a { border: 1px solid var(--border-color); padding: 5px 8px; text-decoration: none; color: #fff; display: inline-block; border-radius: 6px; background: #111; min-width: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; margin: 0 2px;}
+        .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 10px; margin-bottom: 2px;}
+        .tree li a i { font-size: 14px; color: var(--text-gray); margin-bottom: 2px; }
+        .tree li a .rb-tag { display: block; font-size: 8px; color: #ff4d4d; font-weight: bold; margin-top: 2px; letter-spacing: 0.5px;}
         
-        .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-3px); }
+        .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-2px); }
         .tree li a.empty-node { border: 1px dashed #555; background: transparent; color: #555; cursor: default;}
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
@@ -197,7 +198,7 @@
         </div>
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        <div class="menu-item" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
+        <div class="menu-item" onclick="resetHistoryAndLoadTree(userAddress, 0); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
         <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
@@ -207,7 +208,6 @@
     </div>
 
     <!-- MODALS -->
-    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -226,7 +226,6 @@
         </div>
     </div>
 
-    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -341,14 +340,14 @@
                 </div>
                 
                 <div class="team-summary">
-                    <div class="team-box" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress)">
+                    <div class="team-box" onclick="resetHistoryAndLoadTree(userAddress, 0)">
                         <div class="icon"><i class="fa-solid fa-user-plus"></i></div>
                         <div class="data">
                             <h4 id="displayDirects">--</h4>
                             <p>Direct ID</p>
                         </div>
                     </div>
-                    <div class="team-box" onclick="previousViewForTree='dashboardView'; loadMyPartnersGenealogy(userAddress)">
+                    <div class="team-box" onclick="resetHistoryAndLoadTree(userAddress, 0)">
                         <div class="icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);"><i class="fa-solid fa-users"></i></div>
                         <div class="data">
                             <h4 id="displayTotalTeam"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
@@ -358,7 +357,6 @@
                     <div class="team-box team-box-full">
                         <div class="icon" style="color: #10b981; background: rgba(16, 185, 129, 0.1);"><i class="fa-solid fa-recycle"></i></div>
                         <div class="data">
-                            <!-- FIX: Rebirth IDs auto-calculate hoga abhi JS me -->
                             <h4 id="displayRebirths"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
                             <p>Rebirth IDs</p>
                         </div>
@@ -384,12 +382,11 @@
             </div>
             
             <div class="action-box">
-                <!-- FIX: Hold Amount text changed to Hold POL -->
                 <h4>Hold POL <i class="fa-solid fa-circle-info" style="font-size: 10px;"></i></h4>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                     <div style="font-size: 24px; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 8px;">
                         <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" class="pol-logo" style="width: 20px; height: 20px;">
-                        <span id="holdAmountDisplay">0.00</span>
+                        <span id="holdAmountDisplay">0.0</span>
                     </div>
                     <button class="btn-gold" id="claimRefundBtn" style="width: auto; padding: 10px 15px; font-size: 12px; margin: 0;" onclick="claimMyRefund()"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund</button>
                 </div>
@@ -424,7 +421,8 @@
         <!-- 5. TREE VIEW & PARTNERS VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" id="treeBackBtn" style="margin: 0; padding:8px 15px; width:auto;" onclick="goBackFromTree()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <!-- BACK BUTTON CALLS NEW STEP-BACK FUNCTION -->
+                <button class="btn-outline btn-small" id="treeBackBtn" style="margin: 0; padding:8px 15px; width:auto;" onclick="goBackInTreeHistory()"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
             <div class="vip-card" style="padding: 10px; overflow-x: hidden;">
@@ -520,7 +518,10 @@
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
-        let previousViewForTree = 'dashboardView';
+        
+        // FIX 1: NAVIGATION HISTORY LOGIC
+        let treeNavigationHistory = []; 
+        let currentTreeContext = 0; // 0: Partners, 1: Slot1, 2: Slot2, 3: Slot3
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) { 
@@ -554,14 +555,8 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        function openInquiryModal() {
-            document.getElementById('inquiryModal').style.display = 'flex';
-        }
-
-        function closeInquiryModal() {
-            document.getElementById('inquiryModal').style.display = 'none';
-        }
-
+        function openInquiryModal() { document.getElementById('inquiryModal').style.display = 'flex'; }
+        function closeInquiryModal() { document.getElementById('inquiryModal').style.display = 'none'; }
         function submitInquiry(e) {
             e.preventDefault();
             closeInquiryModal();
@@ -576,10 +571,6 @@
             window.scrollTo(0, 0); 
         }
         function goToDashboard() { if (userAddress) switchView('dashboardView'); }
-
-        function goBackFromTree() {
-            switchView(previousViewForTree);
-        }
 
         function toggleIncomeDropdown() {
             const dropdown = document.getElementById('incomeDropdown');
@@ -608,67 +599,86 @@
 
         const chatFab = document.getElementById('chatFab');
         let isDraggingChat = false, chatStartX, chatStartY, chatInitLeft, chatInitTop;
-
         chatFab.addEventListener('touchstart', (e) => {
-            isDraggingChat = false;
-            chatStartX = e.touches[0].clientX;
-            chatStartY = e.touches[0].clientY;
-            chatInitLeft = chatFab.offsetLeft;
-            chatInitTop = chatFab.offsetTop;
+            isDraggingChat = false; chatStartX = e.touches[0].clientX; chatStartY = e.touches[0].clientY;
+            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
         }, {passive: false});
-
         chatFab.addEventListener('touchmove', (e) => {
-            let dx = e.touches[0].clientX - chatStartX;
-            let dy = e.touches[0].clientY - chatStartY;
+            let dx = e.touches[0].clientX - chatStartX; let dy = e.touches[0].clientY - chatStartY;
             if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                isDraggingChat = true;
-                e.preventDefault();
-                chatFab.style.left = (chatInitLeft + dx) + 'px';
-                chatFab.style.top = (chatInitTop + dy) + 'px';
-                chatFab.style.right = 'auto';
-                chatFab.style.bottom = 'auto';
+                isDraggingChat = true; e.preventDefault();
+                chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
+                chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
             }
         }, {passive: false});
-
         chatFab.addEventListener('mousedown', (e) => {
-            isDraggingChat = false;
-            chatStartX = e.clientX;
-            chatStartY = e.clientY;
-            chatInitLeft = chatFab.offsetLeft;
-            chatInitTop = chatFab.offsetTop;
+            isDraggingChat = false; chatStartX = e.clientX; chatStartY = e.clientY;
+            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
             document.onmousemove = (me) => {
-                let dx = me.clientX - chatStartX;
-                let dy = me.clientY - chatStartY;
+                let dx = me.clientX - chatStartX; let dy = me.clientY - chatStartY;
                 if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
                     isDraggingChat = true;
-                    chatFab.style.left = (chatInitLeft + dx) + 'px';
-                    chatFab.style.top = (chatInitTop + dy) + 'px';
-                    chatFab.style.right = 'auto';
-                    chatFab.style.bottom = 'auto';
+                    chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
+                    chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
                 }
             };
             document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
         });
-
         function toggleChat() { 
             if(isDraggingChat) return; 
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-            
             if (modal.style.display === 'flex') {
                 let fabRect = chatFab.getBoundingClientRect();
-                modal.style.bottom = "auto";
-                modal.style.right = "auto";
-                let topPos = fabRect.top - 280;
-                let leftPos = fabRect.left - 220;
+                modal.style.bottom = "auto"; modal.style.right = "auto";
+                let topPos = fabRect.top - 280; let leftPos = fabRect.left - 220;
                 if (topPos < 0) topPos = fabRect.bottom + 10;
                 if (leftPos < 0) leftPos = 10;
                 if (leftPos + 280 > window.innerWidth) leftPos = window.innerWidth - 290;
-                modal.style.top = topPos + 'px';
-                modal.style.left = leftPos + 'px';
+                modal.style.top = topPos + 'px'; modal.style.left = leftPos + 'px';
             }
         }
 
+        // ==========================================
+        // FIX 1: TREE NAVIGATION AND HISTORY BACK
+        // ==========================================
+        function resetHistoryAndLoadTree(addr, context) {
+            treeNavigationHistory = []; 
+            currentTreeContext = context;
+            executeTreeLoad(addr, context, true);
+        }
+
+        function addHistoryAndLoadTree(addr, context) {
+            currentTreeContext = context;
+            executeTreeLoad(addr, context, true);
+        }
+
+        function goBackInTreeHistory() {
+            if(treeNavigationHistory.length > 1) {
+                treeNavigationHistory.pop(); // Remove current
+                let previousState = treeNavigationHistory[treeNavigationHistory.length - 1]; // Get previous
+                currentTreeContext = previousState.context;
+                executeTreeLoad(previousState.addr, previousState.context, false);
+            } else {
+                // If history is empty, go to main dashboard or slots
+                if(currentTreeContext === 0) switchView('dashboardView');
+                else switchView('slotsView');
+            }
+        }
+
+        function executeTreeLoad(addr, context, pushToHistory) {
+            if(pushToHistory) {
+                treeNavigationHistory.push({addr: addr, context: context});
+            }
+            if(context === 1) loadSlot1Matrix(addr);
+            else if(context === 2) loadSlot2Matrix(addr);
+            else if(context === 3) loadSlot3Matrix(addr);
+            else loadMyPartnersGenealogy(addr);
+        }
+
+        // ==========================================
+        // MATRIX GENERATORS
+        // ==========================================
         async function loadSlot1Matrix(targetAddress) {
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "Slot 1 (Left/Right Placement)";
@@ -709,7 +719,7 @@
             }
         }
 
-        // FIX: REBIRTH LOGIC ADDED IN UNILEVEL TREE WITH R/B TAG
+        // FIX 2: REBIRTH ID TAGGING IN UNILEVEL TREE (R/B)
         async function buildUnilevelTree(addr, level) {
             if(level > 4) return ''; 
             let uInfo = await contract.users(addr);
@@ -724,15 +734,21 @@
             for(let i=0; i<directAddrs.length; i++) {
                 let dAddr = directAddrs[i];
                 let dInfo = await contract.users(dAddr);
-                let isReal = dInfo[6]; 
                 
-                // Set Icon and Colors based on Rebirth
+                let isReal = dInfo[6]; 
                 let iconC = isReal ? '#f5c518' : '#10b981';
                 let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
-                // Add R/B tag if it's a rebirth ID
-                let displayLabel = isReal ? `ID ${dInfo[0].toNumber()}` : `ID ${dInfo[0].toNumber()} (R/B)`;
+                
+                // Show normal ID or ID with R/B tag
+                let displayHtml = isReal 
+                    ? `<span class="id-label">ID ${dInfo[0].toNumber()}</span>` 
+                    : `<span class="id-label">ID ${dInfo[0].toNumber()}</span><span class="rb-tag">R/B</span>`;
 
-                html += `<li><a ${getSmartEvents(dAddr, 0)}><i class="fa-solid ${iconCl}" style="color:${iconC};"></i><span class="id-label">${displayLabel}</span></a>`;
+                html += `<li><a ${getSmartEvents(dAddr, 0)}>
+                    <i class="fa-solid ${iconCl}" style="color:${iconC};"></i>
+                    ${displayHtml}
+                </a>`;
+                
                 html += await buildUnilevelTree(dAddr, level + 1);
                 html += `</li>`;
             }
@@ -741,7 +757,6 @@
         }
 
         async function loadMyPartnersGenealogy(targetAddress) {
-            if(!targetAddress) targetAddress = userAddress;
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "My Partners Genealogy";
             const treeContainer = document.getElementById('matrixTreeDisplay');
@@ -752,11 +767,13 @@
                 if (rootInfo[0].toNumber() === 0) throw "User not found";
                 
                 let isReal = rootInfo[6]; 
-                let displayLabel = isReal ? `ID ${rootInfo[0].toNumber()}` : `ID ${rootInfo[0].toNumber()} (R/B)`;
+                let displayHtml = isReal 
+                    ? `<span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>` 
+                    : `<span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span><span class="rb-tag">R/B</span>`;
 
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 0)}>
                     <i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i>
-                    <span class="id-label" style="color:#fff;">${displayLabel}</span>
+                    ${displayHtml}
                 </a>`;
 
                 html += await buildUnilevelTree(targetAddress, 1);
@@ -967,7 +984,7 @@
             for(let i=1; i<=7; i++) {
                 if(i <= displaySlotLimit) {
                     html += `
-                    <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: var(--gold);" onclick="handleSlotClick(${i}, '${userAddress}')">
+                    <div class="vip-card clickable-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-color: var(--gold);" onclick="resetHistoryAndLoadTree('${userAddress}', ${i})">
                         <div style="text-align: left;">
                             <h2 style="margin: 0; color: #fff;">Slot ${i}</h2>
                             <p style="font-size: 12px; color: var(--gold);"><i class="fa-solid fa-unlock"></i> Open</p>
@@ -985,14 +1002,6 @@
                 }
             }
             container.innerHTML = html;
-        }
-
-        function handleSlotClick(slotNum, address) {
-            previousViewForTree = 'slotsView'; 
-            if(slotNum === 1) { loadSlot1Matrix(address); }
-            else if(slotNum === 2) { loadSlot2Matrix(address); } 
-            else if(slotNum === 3) { loadSlot3Matrix(address); } 
-            else { loadMyPartnersGenealogy(address); }
         }
 
         async function fetchExtraStats(addr) {
@@ -1050,16 +1059,16 @@
                     document.getElementById('displayDirects').innerText = directCount;
                     
                     document.getElementById('displayTotalTeam').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
+                    document.getElementById('displayRebirths').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                     fetchExtraStats(address); 
                     
                     let currentSlot = userInfo[4].toNumber();
                     
-                    // FIX: REBIRTH AUTO-CALCULATION BASED ON SLOT
                     let rebirthCount = 0;
                     if(currentSlot >= 4) rebirthCount = 10;
-                    if(currentSlot >= 5) rebirthCount = 50;  // 10 + 40
-                    if(currentSlot >= 6) rebirthCount = 210; // 50 + 160
-                    if(currentSlot >= 7) rebirthCount = 850; // 210 + 640
+                    if(currentSlot >= 5) rebirthCount = 50;  
+                    if(currentSlot >= 6) rebirthCount = 210; 
+                    if(currentSlot >= 7) rebirthCount = 850; 
                     document.getElementById('displayRebirths').innerText = rebirthCount;
                     
                     let calculatedIncome = 0;
@@ -1076,14 +1085,13 @@
 
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
                     
-                    // FIX: HOLD AMOUNT AUTO-CALCULATION BASED ON MISSING DIRECTS FOR NEXT SLOT
+                    // FIX: EXACT Hold Logic Check
                     let autoHoldAmount = 0;
                     if(currentSlot === 4 && directCount < 5) autoHoldAmount = 400;
                     if(currentSlot === 5 && directCount < 5) autoHoldAmount = 2400;
                     if(currentSlot === 6 && directCount < 5) autoHoldAmount = 64800;
                     if(currentSlot === 7 && directCount < 5) autoHoldAmount = 2648000;
                     
-                    // If formula gives 0, check the smart contract variable just in case
                     if(autoHoldAmount === 0 && userInfo[5] > 0) {
                         autoHoldAmount = parseFloat(ethers.utils.formatEther(userInfo[5]));
                     }
@@ -1152,10 +1160,8 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                if(currentSlotContext === 1) loadSlot1Matrix(addr);
-                else if(currentSlotContext === 2) loadSlot2Matrix(addr);
-                else if(currentSlotContext === 3) loadSlot3Matrix(addr);
-                else loadMyPartnersGenealogy(addr); 
+                // FIX: DEEP NAVIGATION (Add to History)
+                addHistoryAndLoadTree(addr, currentSlotContext);
             }
         };
         window.cancelNodePress = function() { clearTimeout(pressTimer); pressStartTime = 0; };
