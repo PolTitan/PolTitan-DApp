@@ -113,7 +113,7 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; text-align: right;}
 
-        /* TREE Matrix Styling - COMPACT SIZE FIX */
+        /* TREE Matrix Styling */
         .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 0 30px 0; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 15px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
@@ -155,12 +155,14 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
-        /* Floating Bot & Chat Modal */
+        /* Floating Bot & Chat Modal - UPDATED MENU DESIGN */
         .chat-fab { position: fixed; bottom: 90px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: move; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); touch-action: none; }
         .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 160px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
         .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
         .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
         .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
+        .chat-menu-btn { width: 100%; text-align: left; background: #111; color: var(--gold); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-size: 12px; transition: 0.3s;}
+        .chat-menu-btn:hover { background: var(--gold); color: #000; }
 
         /* Alert Styling */
         .alert { display: none; margin-top: 15px; font-size: 13px; text-align: center; padding: 12px; border-radius: 8px; font-weight: 600; }
@@ -199,7 +201,7 @@
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="resetHistoryAndLoadTree(userAddress, 0); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
-        <div class="menu-item" onclick="loadTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
+        <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
         <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
@@ -243,7 +245,6 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -258,7 +259,6 @@
         </div>
     </div>
 
-    <!-- INQUIRY MODAL FORM -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeInquiryModal()"></i>
@@ -421,7 +421,6 @@
         <!-- 5. TREE VIEW & PARTNERS VIEW -->
         <div id="treeView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <!-- BACK BUTTON CALLS NEW STEP-BACK FUNCTION -->
                 <button class="btn-outline btn-small" id="treeBackBtn" style="margin: 0; padding:8px 15px; width:auto;" onclick="goBackInTreeHistory()"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;" id="treeViewTitle">Matrix Tree</h3>
             </div>
@@ -434,13 +433,15 @@
             </div>
         </div>
         
-        <!-- 6. TRANSACTION VIEW -->
+        <!-- 6. TRANSACTION VIEW (FIXED WITH LIVE API) -->
         <div id="transactionView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">Transactions</h3>
             </div>
-            <div class="activity-list" id="transactionListContainer"></div>
+            <div class="activity-list" id="transactionListContainer">
+                <div style="padding:30px; text-align:center; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Live Blockchain Data...</div>
+            </div>
         </div>
 
         <!-- 7. ABOUT US VIEW -->
@@ -455,11 +456,9 @@
                     <h1 style="color: #fff; font-size: 24px; font-weight: 800; letter-spacing: 1px;">Pol<span style="color: var(--gold);">Titan</span></h1>
                     <p style="color: var(--text-gray); font-size: 12px;">THE ULTIMATE DECENTRALIZED MATRIX</p>
                 </div>
-                
                 <p style="font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 15px;">
                     PolTitan VIP Matrix ek 100% Decentralized aur Transparent smart contract based system hai jo Polygon Blockchain par run karta hai. Humara vision ek fair aur secure platform provide karna hai jahan har user bina kisi risk ke grow kar sake.
                 </p>
-
                 <div class="action-box" style="margin-bottom: 15px; background: #0a0a0a;">
                     <h4 style="color: var(--gold); font-size: 14px; margin-bottom: 10px;"><i class="fa-solid fa-shield-halved"></i> 100% Safe & No Admin Control</h4>
                     <ul style="list-style-type: none; padding: 0; font-size: 12px; color: #ccc; line-height: 1.8;">
@@ -469,16 +468,12 @@
                         <li><i class="fa-solid fa-check" style="color: #10b981; margin-right: 8px;"></i> <b>No Payment Hold:</b> 100% Payout turant wallet me distribute hota hai. Kisi ka payment roka nahi ja sakta.</li>
                     </ul>
                 </div>
-
                 <div class="action-box" style="margin-bottom: 15px; background: #0a0a0a;">
                     <h4 style="color: var(--gold); font-size: 14px; margin-bottom: 10px;"><i class="fa-solid fa-hand-holding-dollar"></i> 180 Days Refund Policy</h4>
                     <p style="font-size: 12px; color: #ccc; line-height: 1.6;">
-                        Users whose initial registration funds were held in the system can claim a full refund of their 30 POL under the following strict conditions:
-                        <br><br>
-                        <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>System Inactivity:</b> The system must be officially 'Inactive', meaning no new IDs have been registered globally for a continuous period of 180 days.
-                        <br>
-                        <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>Zero Earnings:</b> The claiming user must have exactly 0 POL income from the system.
-                        <br>
+                        Users whose initial registration funds were held in the system can claim a full refund of their 30 POL under the following strict conditions:<br><br>
+                        <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>System Inactivity:</b> The system must be officially 'Inactive', meaning no new IDs have been registered globally for a continuous period of 180 days.<br>
+                        <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>Zero Earnings:</b> The claiming user must have exactly 0 POL income from the system.<br>
                         <i class="fa-solid fa-check" style="color: var(--gold); margin-right: 5px;"></i> <b>Claim Validity:</b> Eligible users have a strict 90-day window to claim their funds once the system becomes inactive.
                     </p>
                 </div>
@@ -487,11 +482,17 @@
 
     </main>
 
-    <!-- Chat Bot -->
+    <!-- NEW FIX: ADVANCED CHAT BOT ACTION MENU -->
     <div class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
-        <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI CHAT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
-        <div class="chat-body" id="chatBody"><div class="chat-msg">🙏 Namaste VIP! Main aapki kaise madad kar sakta hu?</div></div>
+        <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI ASSISTANT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg" id="chatBotMsg">🙏 Namaste VIP! How can I help you today? Please select an option:</div>
+            <button class="chat-menu-btn" onclick="chatAction('id_sponsor')"><i class="fa-solid fa-id-badge" style="margin-right:8px;"></i> Get My ID & Sponsor</button>
+            <button class="chat-menu-btn" onclick="chatAction('current_slot')"><i class="fa-solid fa-cubes" style="margin-right:8px;"></i> My Current Slot</button>
+            <button class="chat-menu-btn" onclick="chatAction('rebirth_details')"><i class="fa-solid fa-recycle" style="margin-right:8px;"></i> Check Rebirth Details</button>
+            <button class="chat-menu-btn" onclick="chatAction('total_earnings')"><i class="fa-solid fa-sack-dollar" style="margin-right:8px;"></i> Total Earnings Check</button>
+        </div>
     </div>
 
     <!-- GLOBAL FOOTER -->
@@ -505,6 +506,8 @@
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0x2BD2B4D2D2379Ce31c62f35813BD05863980BE85";
+        // Free Polygon API Key for live tx history
+        const POLYGONSCAN_API_KEY = "YourFreeAPIKeyHereIfYouHaveOne"; 
         
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
@@ -518,10 +521,8 @@
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
-        
-        // FIX 1: NAVIGATION HISTORY LOGIC
         let treeNavigationHistory = []; 
-        let currentTreeContext = 0; // 0: Partners, 1: Slot1, 2: Slot2, 3: Slot3
+        let currentTreeContext = 0; 
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) { 
@@ -597,50 +598,8 @@
             });
         }
 
-        const chatFab = document.getElementById('chatFab');
-        let isDraggingChat = false, chatStartX, chatStartY, chatInitLeft, chatInitTop;
-        chatFab.addEventListener('touchstart', (e) => {
-            isDraggingChat = false; chatStartX = e.touches[0].clientX; chatStartY = e.touches[0].clientY;
-            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
-        }, {passive: false});
-        chatFab.addEventListener('touchmove', (e) => {
-            let dx = e.touches[0].clientX - chatStartX; let dy = e.touches[0].clientY - chatStartY;
-            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                isDraggingChat = true; e.preventDefault();
-                chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
-                chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
-            }
-        }, {passive: false});
-        chatFab.addEventListener('mousedown', (e) => {
-            isDraggingChat = false; chatStartX = e.clientX; chatStartY = e.clientY;
-            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
-            document.onmousemove = (me) => {
-                let dx = me.clientX - chatStartX; let dy = me.clientY - chatStartY;
-                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                    isDraggingChat = true;
-                    chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
-                    chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
-                }
-            };
-            document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
-        });
-        function toggleChat() { 
-            if(isDraggingChat) return; 
-            const modal = document.getElementById('chatModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-            if (modal.style.display === 'flex') {
-                let fabRect = chatFab.getBoundingClientRect();
-                modal.style.bottom = "auto"; modal.style.right = "auto";
-                let topPos = fabRect.top - 280; let leftPos = fabRect.left - 220;
-                if (topPos < 0) topPos = fabRect.bottom + 10;
-                if (leftPos < 0) leftPos = 10;
-                if (leftPos + 280 > window.innerWidth) leftPos = window.innerWidth - 290;
-                modal.style.top = topPos + 'px'; modal.style.left = leftPos + 'px';
-            }
-        }
-
         // ==========================================
-        // FIX 1: TREE NAVIGATION AND HISTORY BACK
+        // TREE NAVIGATION HISTORY LOGIC
         // ==========================================
         function resetHistoryAndLoadTree(addr, context) {
             treeNavigationHistory = []; 
@@ -655,12 +614,11 @@
 
         function goBackInTreeHistory() {
             if(treeNavigationHistory.length > 1) {
-                treeNavigationHistory.pop(); // Remove current
-                let previousState = treeNavigationHistory[treeNavigationHistory.length - 1]; // Get previous
+                treeNavigationHistory.pop(); 
+                let previousState = treeNavigationHistory[treeNavigationHistory.length - 1]; 
                 currentTreeContext = previousState.context;
                 executeTreeLoad(previousState.addr, previousState.context, false);
             } else {
-                // If history is empty, go to main dashboard or slots
                 if(currentTreeContext === 0) switchView('dashboardView');
                 else switchView('slotsView');
             }
@@ -677,8 +635,128 @@
         }
 
         // ==========================================
-        // MATRIX GENERATORS
+        // NEW FIX: CHAT BOT ACTION MENU LOGIC
         // ==========================================
+        async function chatAction(action) {
+            const msgBox = document.getElementById('chatBotMsg');
+            if(!userAddress) {
+                msgBox.innerHTML = "<span style='color:#ff4d4d;'>Please login first to use AI Assistant.</span>";
+                return;
+            }
+            msgBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching details...';
+            try {
+                let info = await contract.users(userAddress);
+                let myId = info[0].toNumber();
+                
+                if(action === 'id_sponsor') {
+                    let spId = "None";
+                    if(info[2] !== "0x0000000000000000000000000000000000000000") {
+                        let spInfo = await contract.users(info[2]);
+                        spId = spInfo[0].toNumber();
+                    }
+                    msgBox.innerHTML = `VIP! Your Matrix ID is <b style="color:var(--gold);">ID ${myId}</b>. You were invited by Sponsor <b style="color:var(--gold);">ID ${spId}</b>.`;
+                }
+                else if(action === 'current_slot') {
+                    let slot = info[4].toNumber();
+                    msgBox.innerHTML = `Your current highest active slot is <b style="color:var(--gold);">Slot ${slot}</b>. Keep upgrading for higher limits!`;
+                }
+                else if(action === 'rebirth_details') {
+                    let slot = info[4].toNumber();
+                    let count = 0;
+                    if(slot >= 4) count = 10;
+                    if(slot >= 5) count = 50;
+                    if(slot >= 6) count = 210;
+                    if(slot >= 7) count = 850;
+                    if(count > 0) {
+                        msgBox.innerHTML = `Great! You have generated <b style="color:var(--gold);">${count} Rebirth IDs</b>. These are automatically placed top-to-bottom, left-to-right under your team's empty (A/B) nodes to push them to Slot 2.`;
+                    } else {
+                        msgBox.innerHTML = `You currently have 0 Rebirth IDs. Rebirth generation starts automatically when you reach Slot 4!`;
+                    }
+                }
+                else if(action === 'total_earnings') {
+                    let directCount = info[3].toNumber();
+                    let currentSlot = info[4].toNumber();
+                    let calc = 0;
+                    if(directCount === 1) calc = 30; 
+                    else if (directCount >= 2) calc = 60 + ((directCount - 2) * 27); 
+                    if(currentSlot >= 3) calc += 40;
+                    if(currentSlot >= 4) calc += 400;
+                    if(currentSlot >= 5) calc += 2400;
+                    if(currentSlot >= 6) calc += 64800;
+                    if(currentSlot >= 7) calc += 2648000;
+                    
+                    msgBox.innerHTML = `You have earned a total of <b style="color:var(--gold);">${calc} POL</b> so far. Note: Some earnings are held to automatically upgrade you to the next slot.`;
+                }
+            } catch(e) {
+                msgBox.innerHTML = "<span style='color:#ff4d4d;'>Error reading contract data. Try again.</span>";
+            }
+        }
+
+        // ==========================================
+        // NEW FIX: LIVE TRANSACTIONS API CALL
+        // ==========================================
+        async function loadLiveTransactions() {
+            switchView('transactionView');
+            const container = document.getElementById('transactionListContainer');
+            if(!userAddress) {
+                container.innerHTML = `<div style="padding:30px; text-align:center;">Please Login to view your transaction history.</div>`;
+                return;
+            }
+            
+            container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Live Blockchain Data...</div>`;
+            
+            // Using public PolygonScan API for normal txns
+            const apiUrl = `https://api.polygonscan.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc`;
+            
+            try {
+                let response = await fetch(apiUrl);
+                let data = await response.json();
+                
+                if(data.status === "1" && data.result.length > 0) {
+                    let html = `<div class="activity-header"><span>Transaction Detail</span><span>Status</span></div>`;
+                    
+                    data.result.forEach(tx => {
+                        // Very basic parser for UI demo purposes
+                        let isToContract = tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
+                        let txType = isToContract ? "Smart Contract Interaction" : (tx.value > 0 ? "Transfer (Sent/Received)" : "Transaction");
+                        let valPol = (tx.value / 1e18).toFixed(2);
+                        if (isToContract && valPol == "30.00") txType = "Registration / Joining";
+                        
+                        let txDate = new Date(tx.timeStamp * 1000).toLocaleDateString();
+                        let hashShort = tx.hash.substring(0, 8) + "...";
+                        let statusColor = tx.isError === "0" ? "#10b981" : "#ff4d4d";
+                        let statusIcon = tx.isError === "0" ? "fa-check-circle" : "fa-times-circle";
+
+                        html += `
+                        <a href="https://polygonscan.com/tx/${tx.hash}" target="_blank" style="text-decoration:none;">
+                        <div class="activity-item">
+                            <div class="act-left">
+                                <div class="act-icon" style="background: rgba(245, 197, 24, 0.1); color: var(--gold);"><i class="fa-solid fa-receipt"></i></div>
+                                <div class="act-details">
+                                    <h4>${txType}</h4>
+                                    <p>${txDate} • Hash: ${hashShort}</p>
+                                </div>
+                            </div>
+                            <div class="act-right">
+                                <div style="color:var(--gold);">${valPol > 0 ? valPol + ' POL' : '-'}</div>
+                                <div style="font-size:12px; color:${statusColor};"><i class="fa-solid ${statusIcon}"></i></div>
+                            </div>
+                        </div>
+                        </a>`;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--text-gray);">No recent transactions found on PolygonScan.</div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `
+                <div style="padding:20px; text-align:center;">
+                    <p style="color:#ff4d4d; font-size:12px; margin-bottom:15px;">API Error or Rate Limit.</p>
+                    <a href="https://polygonscan.com/address/${userAddress}#tokentxns" target="_blank" class="btn-outline" style="text-decoration:none; display:inline-block;">View Manually on PolygonScan</a>
+                </div>`;
+            }
+        }
+
         async function loadSlot1Matrix(targetAddress) {
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "Slot 1 (Left/Right Placement)";
@@ -719,7 +797,6 @@
             }
         }
 
-        // FIX 2: REBIRTH ID TAGGING IN UNILEVEL TREE (R/B)
         async function buildUnilevelTree(addr, level) {
             if(level > 4) return ''; 
             let uInfo = await contract.users(addr);
@@ -739,7 +816,6 @@
                 let iconC = isReal ? '#f5c518' : '#10b981';
                 let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
                 
-                // Show normal ID or ID with R/B tag
                 let displayHtml = isReal 
                     ? `<span class="id-label">ID ${dInfo[0].toNumber()}</span>` 
                     : `<span class="id-label">ID ${dInfo[0].toNumber()}</span><span class="rb-tag">R/B</span>`;
@@ -1085,7 +1161,6 @@
 
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
                     
-                    // FIX: EXACT Hold Logic Check
                     let autoHoldAmount = 0;
                     if(currentSlot === 4 && directCount < 5) autoHoldAmount = 400;
                     if(currentSlot === 5 && directCount < 5) autoHoldAmount = 2400;
@@ -1160,7 +1235,6 @@
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
                 pressStartTime = 0;
-                // FIX: DEEP NAVIGATION (Add to History)
                 addHistoryAndLoadTree(addr, currentSlotContext);
             }
         };
@@ -1199,25 +1273,6 @@
                 btn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund';
                 btn.disabled = false;
             }
-        }
-
-        function loadTransactions() {
-            switchView('transactionView');
-            const container = document.getElementById('transactionListContainer');
-            let scanAddress = userAddress ? userAddress : CONTRACT_ADDRESS;
-            container.innerHTML = `
-                <a href="https://polygonscan.com/address/${scanAddress}#tokentxns" target="_blank" style="text-decoration:none;">
-                <div class="activity-item clickable-list-item">
-                    <div class="act-left">
-                        <div class="act-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-link"></i></div>
-                        <div class="act-details">
-                            <h4>View on PolygonScan</h4>
-                            <p>Live Blockchain Records</p>
-                        </div>
-                    </div>
-                    <div class="act-right" style="color: var(--gold); font-size: 12px; font-weight:normal;">Check <i class="fa-solid fa-external-link"></i></div>
-                </div>
-                </a>`;
         }
 
         const urlParams = new URLSearchParams(window.location.search);
