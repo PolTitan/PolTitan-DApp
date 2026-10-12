@@ -127,14 +127,12 @@
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold); width: 0; height: 15px; }
         
-        /* FIX: NORMAL NODE VS REBIRTH GREEN NODE */
         .tree li a { border: 1px solid var(--border-color); padding: 5px 8px; text-decoration: none; color: #fff; display: inline-block; border-radius: 6px; background: #111; min-width: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; margin: 0 2px;}
         .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-2px); }
         .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 10px; margin-bottom: 2px;}
         .tree li a i { font-size: 14px; color: var(--text-gray); margin-bottom: 2px; }
         .tree li a .rb-tag { display: block; font-size: 8px; color: #ff4d4d; font-weight: bold; margin-top: 2px; letter-spacing: 0.5px;}
         
-        /* NEW: REBIRTH SPECIFIC NODE (GREEN) */
         .tree li a.rb-node { background: #004d00; border-color: #10b981; }
         .tree li a.rb-node:hover { background: #006600; border-color: #34d399; }
         .tree li a.rb-node .id-label { color: #fff; }
@@ -210,7 +208,6 @@
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
         <div class="menu-item" onclick="resetHistoryAndLoadTree(myOriginalAddress || userAddress, 0); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
         
-        <!-- NEW FEATURE: TEAM ID SEARCH -->
         <div class="menu-item" onclick="openTeamSearchModal(); toggleMenu();"><i class="fa-solid fa-magnifying-glass"></i> Team ID Search</div>
         
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
@@ -218,7 +215,6 @@
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
         <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
 
-        <!-- NEW MENU OPTION: CHECK RECEIVED REBIRTHS -->
         <div class="menu-item" onclick="checkReceivedRebirths(); toggleMenu();"><i class="fa-solid fa-recycle" style="color:#10b981;"></i> Received Rebirths</div>
 
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
@@ -400,7 +396,6 @@
                             <p>Generated Rebirths</p>
                         </div>
                     </div>
-                    <!-- NEW BOX: RECEIVED REBIRTHS -->
                     <div class="team-box" style="border-color: #10b981;" onclick="checkReceivedRebirths()">
                         <div class="icon" style="color: #fff; background: #10b981;"><i class="fa-solid fa-hand-holding-heart"></i></div>
                         <div class="data">
@@ -571,16 +566,19 @@
         
         let treeNavigationHistory = []; 
         let currentTreeContext = 0; 
-        
-        // Tracking how many rebirths this user received from downline
         let myReceivedRebirthsCount = 0;
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) { 
-                if (accounts.length === 0) { logoutWallet(); } 
-                else { window.location.reload(); }
+                if (accounts.length === 0) { 
+                    logoutWallet(); 
+                } else { 
+                    window.location.reload(); 
+                }
             });
-            window.ethereum.on('chainChanged', function () { window.location.reload(); });
+            window.ethereum.on('chainChanged', function () { 
+                window.location.reload(); 
+            });
         }
 
         const headerWallet = document.getElementById('headerWallet');
@@ -598,7 +596,9 @@
             alertDiv.style.backgroundColor = isError ? "rgba(255, 77, 77, 0.1)" : "rgba(16, 185, 129, 0.1)";
             alertDiv.style.border = `1px solid ${isError ? "#ff4d4d" : "#10b981"}`;
             alertDiv.style.display = "block";
-            setTimeout(() => { alertDiv.style.display = "none"; }, 5000);
+            setTimeout(() => { 
+                alertDiv.style.display = "none"; 
+            }, 5000);
         }
         
         function showCustomAlertModal(title, message) {
@@ -607,7 +607,6 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        // NEW: Show Rebirth Count popup
         function checkReceivedRebirths() {
             if(myReceivedRebirthsCount > 0) {
                 showCustomAlertModal("Received Rebirths", `Congratulations! You have received ${myReceivedRebirthsCount} Rebirth (Green) IDs in your downline structure.`);
@@ -616,8 +615,14 @@
             }
         }
 
-        function openInquiryModal() { document.getElementById('inquiryModal').style.display = 'flex'; }
-        function closeInquiryModal() { document.getElementById('inquiryModal').style.display = 'none'; }
+        function openInquiryModal() { 
+            document.getElementById('inquiryModal').style.display = 'flex'; 
+        }
+        
+        function closeInquiryModal() { 
+            document.getElementById('inquiryModal').style.display = 'none'; 
+        }
+        
         function submitInquiry(e) {
             e.preventDefault();
             closeInquiryModal();
@@ -625,13 +630,21 @@
             document.getElementById('inquiryForm').reset();
         }
 
-        function toggleMenu() { sideMenu.classList.toggle('active'); }
+        function toggleMenu() { 
+            sideMenu.classList.toggle('active'); 
+        }
+        
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
             window.scrollTo(0, 0); 
         }
-        function goToDashboard() { if (userAddress) switchView('dashboardView'); }
+        
+        function goToDashboard() { 
+            if (userAddress) {
+                switchView('dashboardView'); 
+            }
+        }
 
         function toggleIncomeDropdown() {
             const dropdown = document.getElementById('incomeDropdown');
@@ -685,9 +698,14 @@
                 
                 if(!inputVal.startsWith("0x")) {
                     let idNum = parseInt(inputVal);
-                    if(isNaN(idNum) || idNum <= 0) throw "Invalid ID Number";
-                    try { targetAddr = await contract.idToAddress(idNum); } 
-                    catch(err) { throw "ID not found. Please try searching by Wallet Address."; }
+                    if(isNaN(idNum) || idNum <= 0) {
+                        throw "Invalid ID Number";
+                    }
+                    try { 
+                        targetAddr = await contract.idToAddress(idNum); 
+                    } catch(err) { 
+                        throw "ID not found. Please try searching by Wallet Address."; 
+                    }
                 }
 
                 if(!targetAddr || targetAddr === "0x0000000000000000000000000000000000000000" || targetAddr.length !== 42) {
@@ -704,13 +722,18 @@
                     let info = await contract.users(currentCheck);
                     let up = info[2];
                     if(up.toLowerCase() === myOriginalAddress.toLowerCase()) {
-                        isTeam = true; break;
+                        isTeam = true; 
+                        break;
                     }
-                    if(up === "0x0000000000000000000000000000000000000000") break;
+                    if(up === "0x0000000000000000000000000000000000000000") {
+                        break;
+                    }
                     currentCheck = up;
                 }
 
-                if(!isTeam) throw "Access Denied: This ID is crossline or not in your downline team!";
+                if(!isTeam) {
+                    throw "Access Denied: This ID is crossline or not in your downline team!";
+                }
 
                 closeTeamSearchModal();
                 await loadDashboardData(targetAddr, true);
@@ -750,58 +773,96 @@
                 currentTreeContext = previousState.context;
                 executeTreeLoad(previousState.addr, previousState.context, false);
             } else {
-                if(currentTreeContext === 0) switchView('dashboardView');
-                else switchView('slotsView');
+                if(currentTreeContext === 0) {
+                    switchView('dashboardView');
+                } else {
+                    switchView('slotsView');
+                }
             }
         }
 
         function executeTreeLoad(addr, context, pushToHistory) {
-            if(pushToHistory) { treeNavigationHistory.push({addr: addr, context: context}); }
-            if(context === 1) loadSlot1Matrix(addr);
-            else if(context === 2) loadSlot2Matrix(addr);
-            else if(context === 3) loadSlot3Matrix(addr);
-            else loadMyPartnersGenealogy(addr);
+            if(pushToHistory) { 
+                treeNavigationHistory.push({addr: addr, context: context}); 
+            }
+            if(context === 1) {
+                loadSlot1Matrix(addr);
+            } else if(context === 2) {
+                loadSlot2Matrix(addr);
+            } else if(context === 3) {
+                loadSlot3Matrix(addr);
+            } else {
+                loadMyPartnersGenealogy(addr);
+            }
         }
 
         const chatFab = document.getElementById('chatFab');
         let isDraggingChat = false, chatStartX, chatStartY, chatInitLeft, chatInitTop;
         chatFab.addEventListener('touchstart', (e) => {
-            isDraggingChat = false; chatStartX = e.touches[0].clientX; chatStartY = e.touches[0].clientY;
-            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
+            isDraggingChat = false; 
+            chatStartX = e.touches[0].clientX; 
+            chatStartY = e.touches[0].clientY;
+            chatInitLeft = chatFab.offsetLeft; 
+            chatInitTop = chatFab.offsetTop;
         }, {passive: false});
+        
         chatFab.addEventListener('touchmove', (e) => {
-            let dx = e.touches[0].clientX - chatStartX; let dy = e.touches[0].clientY - chatStartY;
+            let dx = e.touches[0].clientX - chatStartX; 
+            let dy = e.touches[0].clientY - chatStartY;
             if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                isDraggingChat = true; e.preventDefault();
-                chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
-                chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
+                isDraggingChat = true; 
+                e.preventDefault();
+                chatFab.style.left = (chatInitLeft + dx) + 'px'; 
+                chatFab.style.top = (chatInitTop + dy) + 'px';
+                chatFab.style.right = 'auto'; 
+                chatFab.style.bottom = 'auto';
             }
         }, {passive: false});
+        
         chatFab.addEventListener('mousedown', (e) => {
-            isDraggingChat = false; chatStartX = e.clientX; chatStartY = e.clientY;
-            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
+            isDraggingChat = false; 
+            chatStartX = e.clientX; 
+            chatStartY = e.clientY;
+            chatInitLeft = chatFab.offsetLeft; 
+            chatInitTop = chatFab.offsetTop;
             document.onmousemove = (me) => {
-                let dx = me.clientX - chatStartX; let dy = me.clientY - chatStartY;
+                let dx = me.clientX - chatStartX; 
+                let dy = me.clientY - chatStartY;
                 if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
                     isDraggingChat = true;
-                    chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
-                    chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
+                    chatFab.style.left = (chatInitLeft + dx) + 'px'; 
+                    chatFab.style.top = (chatInitTop + dy) + 'px';
+                    chatFab.style.right = 'auto'; 
+                    chatFab.style.bottom = 'auto';
                 }
             };
-            document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
+            document.onmouseup = () => { 
+                document.onmousemove = null; 
+                document.onmouseup = null; 
+            };
         });
+        
         function toggleChat() { 
             if(isDraggingChat) return; 
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
             if (modal.style.display === 'flex') {
                 let fabRect = chatFab.getBoundingClientRect();
-                modal.style.bottom = "auto"; modal.style.right = "auto";
-                let topPos = fabRect.top - 280; let leftPos = fabRect.left - 220;
-                if (topPos < 0) topPos = fabRect.bottom + 10;
-                if (leftPos < 0) leftPos = 10;
-                if (leftPos + 280 > window.innerWidth) leftPos = window.innerWidth - 290;
-                modal.style.top = topPos + 'px'; modal.style.left = leftPos + 'px';
+                modal.style.bottom = "auto"; 
+                modal.style.right = "auto";
+                let topPos = fabRect.top - 280; 
+                let leftPos = fabRect.left - 220;
+                if (topPos < 0) {
+                    topPos = fabRect.bottom + 10;
+                }
+                if (leftPos < 0) {
+                    leftPos = 10;
+                }
+                if (leftPos + 280 > window.innerWidth) {
+                    leftPos = window.innerWidth - 290;
+                }
+                modal.style.top = topPos + 'px'; 
+                modal.style.left = leftPos + 'px';
                 document.getElementById('chatBotMsg').innerHTML = "🙏 Namaste VIP! How can I help you today? Please select an option:";
             }
         }
@@ -809,7 +870,8 @@
         async function chatAction(action) {
             const msgBox = document.getElementById('chatBotMsg');
             if(!userAddress) {
-                msgBox.innerHTML = "<span style='color:#ff4d4d;'>Please login first to use AI Assistant.</span>"; return;
+                msgBox.innerHTML = "<span style='color:#ff4d4d;'>Please login first to use AI Assistant.</span>"; 
+                return;
             }
             msgBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching details...';
             try {
@@ -819,7 +881,8 @@
                 if(action === 'id_sponsor') {
                     let spId = "None";
                     if(info[2] !== "0x0000000000000000000000000000000000000000") {
-                        let spInfo = await contract.users(info[2]); spId = spInfo[0].toNumber();
+                        let spInfo = await contract.users(info[2]); 
+                        spId = spInfo[0].toNumber();
                     }
                     msgBox.innerHTML = `VIP! Your Matrix ID is <b style="color:var(--gold);">ID ${myId}</b>. You were invited by Sponsor <b style="color:var(--gold);">ID ${spId}</b>.`;
                 }
@@ -830,8 +893,11 @@
                 else if(action === 'rebirth_details') {
                     let slot = info[4].toNumber();
                     let count = 0;
-                    if(slot >= 4) count = 10; if(slot >= 5) count = 50;
-                    if(slot >= 6) count = 210; if(slot >= 7) count = 850;
+                    if(slot >= 4) { count = 10; }
+                    if(slot >= 5) { count = 50; }
+                    if(slot >= 6) { count = 210; }
+                    if(slot >= 7) { count = 850; }
+                    
                     if(count > 0) {
                         msgBox.innerHTML = `Great! You have generated <b style="color:var(--gold);">${count} Rebirth IDs</b>. These are automatically placed top-to-bottom, left-to-right under your team's empty (A/B) nodes to push them to Slot 2.`;
                     } else {
@@ -842,11 +908,21 @@
                     let directCount = info[3].toNumber();
                     let currentSlot = info[4].toNumber();
                     let calc = 0;
-                    if(directCount === 1) calc = 30; 
-                    else if (directCount >= 2) calc = 60 + ((directCount - 2) * 27); 
-                    if(currentSlot >= 3) calc += 40; if(currentSlot >= 4) calc += 400;
-                    if(currentSlot >= 5) calc += 2400; if(currentSlot >= 6) calc += 64800;
-                    if(currentSlot >= 7) calc += 2648000;
+                    
+                    if(currentSlot >= 2) {
+                        calc += 60;
+                    } else if (currentSlot === 1 && directCount === 1) {
+                        calc += 30;
+                    }
+                    if(directCount > 2) {
+                        calc += ((directCount - 2) * 27);
+                    }
+                    
+                    if(currentSlot >= 3) { calc += 40; }
+                    if(currentSlot >= 4) { calc += 400; }
+                    if(currentSlot >= 5) { calc += 2400; }
+                    if(currentSlot >= 6) { calc += 64800; }
+                    if(currentSlot >= 7) { calc += 2648000; }
                     
                     msgBox.innerHTML = `You have earned a total of <b style="color:var(--gold);">${calc} POL</b> so far. Note: Some earnings are held to automatically upgrade you to the next slot.`;
                 }
@@ -859,13 +935,15 @@
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
             if(!userAddress) {
-                container.innerHTML = `<div style="padding:30px; text-align:center;">Please Login to view your transaction history.</div>`; return;
+                container.innerHTML = `<div style="padding:30px; text-align:center;">Please Login to view your transaction history.</div>`; 
+                return;
             }
             container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Live Blockchain Data...</div>`;
             const apiUrl = `https://api.polygonscan.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc`;
             
             try {
-                let response = await fetch(apiUrl); let data = await response.json();
+                let response = await fetch(apiUrl); 
+                let data = await response.json();
                 
                 if(data.status === "1" && data.result.length > 0) {
                     let html = `<div class="activity-header"><span>Transaction Detail</span><span>Status</span></div>`;
@@ -873,7 +951,9 @@
                         let isToContract = tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
                         let txType = isToContract ? "Smart Contract Interaction" : (tx.value > 0 ? "Transfer (Sent/Received)" : "Transaction");
                         let valPol = (tx.value / 1e18).toFixed(2);
-                        if (isToContract && valPol == "30.00") txType = "Registration / Joining";
+                        if (isToContract && valPol == "30.00") {
+                            txType = "Registration / Joining";
+                        }
                         
                         let txDate = new Date(tx.timeStamp * 1000).toLocaleDateString();
                         let hashShort = tx.hash.substring(0, 8) + "...";
@@ -898,7 +978,9 @@
                         </a>`;
                     });
                     container.innerHTML = html;
-                } else { container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--text-gray);">No recent transactions found on PolygonScan.</div>`; }
+                } else { 
+                    container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--text-gray);">No recent transactions found on PolygonScan.</div>`; 
+                }
             } catch (err) {
                 container.innerHTML = `
                 <div style="padding:20px; text-align:center;">
@@ -916,7 +998,9 @@
 
             try {
                 let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) throw "User not found";
+                if (rootInfo[0].toNumber() === 0) {
+                    throw "User not found";
+                }
 
                 let isReal = rootInfo[6]; 
                 let nodeClass = isReal ? '' : 'rb-node';
@@ -936,7 +1020,9 @@
                     let leftNodeClass = isLeftReal ? '' : 'rb-node';
                     let leftDisplay = isLeftReal ? `ID ${lInfo[0].toNumber()}` : `ID ${lInfo[0].toNumber()}<br><span class="rb-tag">(R/B)</span>`;
                     html += `<li><a class="${leftNodeClass}" ${getSmartEvents(left, 1)}><i class="fa-solid fa-user-check"></i><span class="id-label">${leftDisplay}</span></a></li>`;
-                } else { html += createEmptyNode(); }
+                } else { 
+                    html += createEmptyNode(); 
+                }
 
                 if(right && right !== "0x0000000000000000000000000000000000000000") {
                     let rInfo = await contract.users(right);
@@ -944,7 +1030,9 @@
                     let rightNodeClass = isRightReal ? '' : 'rb-node';
                     let rightDisplay = isRightReal ? `ID ${rInfo[0].toNumber()}` : `ID ${rInfo[0].toNumber()}<br><span class="rb-tag">(R/B)</span>`;
                     html += `<li><a class="${rightNodeClass}" ${getSmartEvents(right, 1)}><i class="fa-solid fa-user-check"></i><span class="id-label">${rightDisplay}</span></a></li>`;
-                } else { html += createEmptyNode(); }
+                } else { 
+                    html += createEmptyNode(); 
+                }
 
                 html += `</ul></li></ul>`;
                 treeContainer.innerHTML = html;
@@ -954,18 +1042,19 @@
             }
         }
 
-        // FIX 3: REBIRTH ID CHECK IN LEFT/RIGHT ALSO (For My Partners Genealogy)
         async function buildUnilevelTree(addr, level) {
-            if(level > 4) return ''; 
+            if(level > 4) {
+                return ''; 
+            }
             let uInfo = await contract.users(addr);
             let dCount = uInfo[3].toNumber();
             
-            // Collect Directs
             let promises = [];
-            for(let i=0; i<dCount; i++) { promises.push(contract.userDirects(addr, i)); }
+            for(let i=0; i<dCount; i++) { 
+                promises.push(contract.userDirects(addr, i)); 
+            }
             let allChildrenAddrs = await Promise.all(promises);
 
-            // Collect Left & Right (In case they are rebirths placed under this user)
             let leftAddr = uInfo[7];
             let rightAddr = uInfo[8];
             if(leftAddr && leftAddr !== "0x0000000000000000000000000000000000000000" && !allChildrenAddrs.includes(leftAddr)) {
@@ -975,7 +1064,9 @@
                 allChildrenAddrs.push(rightAddr);
             }
 
-            if(allChildrenAddrs.length === 0) return '';
+            if(allChildrenAddrs.length === 0) {
+                return '';
+            }
 
             let html = '<ul>';
             for(let i=0; i<allChildrenAddrs.length; i++) {
@@ -986,7 +1077,6 @@
                 let iconC = isReal ? '#f5c518' : '#10b981';
                 let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
                 
-                // CSS class applied here to make whole box green
                 let nodeClass = isReal ? '' : 'rb-node';
                 let displayHtml = isReal 
                     ? `<span class="id-label">ID ${cInfo[0].toNumber()}</span>` 
@@ -1012,7 +1102,9 @@
 
             try {
                 let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) throw "User not found";
+                if (rootInfo[0].toNumber() === 0) {
+                    throw "User not found";
+                }
                 
                 let isReal = rootInfo[6]; 
                 let nodeClass = isReal ? '' : 'rb-node';
@@ -1035,7 +1127,9 @@
             }
         }
 
-        function createEmptyNode() { return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; }
+        function createEmptyNode() { 
+            return `<li><a class="empty-node"><i class="fa-solid fa-plus"></i><span class="id-label">Empty</span></a></li>`; 
+        }
 
         async function loadSlot2Matrix(targetAddress) {
             switchView('treeView');
@@ -1045,7 +1139,9 @@
             
             try {
                 let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) throw "User not found";
+                if (rootInfo[0].toNumber() === 0) {
+                    throw "User not found";
+                }
 
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 2)}>
                     <i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i>
@@ -1054,7 +1150,9 @@
 
                 let teamCount = rootInfo[9].toNumber(); 
                 let promises = [];
-                for(let i=0; i<teamCount; i++) { promises.push(contract.slot2Team(targetAddress, i).then(tAddr => contract.users(tAddr))); }
+                for(let i=0; i<teamCount; i++) { 
+                    promises.push(contract.slot2Team(targetAddress, i).then(tAddr => contract.users(tAddr))); 
+                }
                 let slot2Members = await Promise.all(promises);
 
                 for(let i=0; i<4; i++) {
@@ -1062,12 +1160,16 @@
                         html += `<li><a ${getSmartEvents(slot2Members[i][1], 2)}>
                             <i class="fa-solid fa-user-check"></i><span class="id-label">ID ${slot2Members[i][0].toNumber()}</span>
                         </a></li>`;
-                    } else { html += createEmptyNode(); }
+                    } else { 
+                        html += createEmptyNode(); 
+                    }
                 }
                 html += `</ul></li></ul>`;
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
-            } catch (error) { treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; }
+            } catch (error) { 
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; 
+            }
         }
 
         async function loadSlot3Matrix(targetAddress) {
@@ -1078,7 +1180,9 @@
 
             try {
                 let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) throw "User not found";
+                if (rootInfo[0].toNumber() === 0) {
+                    throw "User not found";
+                }
 
                 let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 3)}>
                     <i class="fa-solid fa-globe" style="color:#3b82f6;"></i>
@@ -1090,8 +1194,14 @@
                 for(let i=0; i<500; i++) {
                     try {
                         let qAddr = await contract.slotQueues(3, i);
-                        if(qAddr.toLowerCase() === targetAddress.toLowerCase()) { userIndex = i; indexFound = true; break; }
-                    } catch(e) { break; }
+                        if(qAddr.toLowerCase() === targetAddress.toLowerCase()) {
+                            userIndex = i; 
+                            indexFound = true; 
+                            break; 
+                        }
+                    } catch(e) { 
+                        break; 
+                    }
                 }
 
                 let downlines = [];
@@ -1099,9 +1209,14 @@
                     for(let i=1; i<=8; i++) {
                         try {
                             let childAddr = await contract.slotQueues(3, (userIndex * 8) + i);
-                            if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") { downlines.push(childAddr); } 
-                            else { break; }
-                        } catch(e) { break; }
+                            if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") { 
+                                downlines.push(childAddr); 
+                            } else { 
+                                break; 
+                            }
+                        } catch(e) { 
+                            break; 
+                        }
                     }
                 }
 
@@ -1114,7 +1229,9 @@
                         html += `<li><a ${getSmartEvents(childInfo[1], 3)}>
                             <i class="fa-solid fa-user-check" style="color:var(--gold);"></i><span class="id-label">ID ${childInfo[0].toNumber()}</span>
                         </a></li>`;
-                    } else { html += createEmptyNode(); }
+                    } else { 
+                        html += createEmptyNode(); 
+                    }
                 }
                 html += `</ul></li></ul>`;
                 treeContainer.innerHTML = html;
@@ -1142,12 +1259,16 @@
                 if(type === 'direct') {
                     document.getElementById('incomeViewTitle').innerText = "Direct Income History";
                     let dCount = myInfo[3].toNumber();
+                    
                     let promises = [];
-                    for(let i=0; i<dCount; i++) { promises.push(contract.userDirects(userAddress, i).then(addr => contract.users(addr))); }
+                    for(let i=0; i<dCount; i++) {
+                        promises.push(contract.userDirects(userAddress, i).then(addr => contract.users(addr)));
+                    }
                     let directs = await Promise.all(promises);
 
                     for(let i=0; i<directs.length; i++) {
                         let idLabel = `ID ${directs[i][0].toNumber()}`;
+                        
                         if(i === 0 || i === 1) {
                             html += buildIncomeItem(idLabel, `Hold for Slot 2`, "30.00", "30.00", '<i class="fa-solid fa-pause"></i>', "#f5c518");
                         } else {
@@ -1158,21 +1279,43 @@
                 } else if (type === 'slot') {
                     document.getElementById('incomeViewTitle').innerText = "Slot Rewards History";
                     let currentSlot = myInfo[4].toNumber();
-                    if(currentSlot >= 3) { html += buildIncomeItem("Matrix System", "Slot 2 Reward (Upgraded to Slot 3)", "40.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); count++; }
-                    if(currentSlot >= 4) { html += buildIncomeItem("Matrix System", "Slot 3 Reward (Upgraded to Slot 4)", "400.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); count++; }
-                    if(currentSlot >= 5) { html += buildIncomeItem("Matrix System", "Slot 4 Reward (Upgraded to Slot 5)", "2400.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); count++; }
-                    if(currentSlot >= 6) { html += buildIncomeItem("Matrix System", "Slot 5 Reward (Upgraded to Slot 6)", "64800.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); count++; }
-                    if(currentSlot >= 7) { html += buildIncomeItem("Matrix System", "Slot 6 Reward (Upgraded to Slot 7)", "2648000.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); count++; }
+                    
+                    if(currentSlot >= 3) { 
+                        html += buildIncomeItem("Matrix System", "Slot 2 Reward (Upgraded to Slot 3)", "40.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); 
+                        count++; 
+                    }
+                    if(currentSlot >= 4) { 
+                        html += buildIncomeItem("Matrix System", "Slot 3 Reward (Upgraded to Slot 4)", "400.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); 
+                        count++; 
+                    }
+                    if(currentSlot >= 5) { 
+                        html += buildIncomeItem("Matrix System", "Slot 4 Reward (Upgraded to Slot 5)", "2400.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); 
+                        count++; 
+                    }
+                    if(currentSlot >= 6) { 
+                        html += buildIncomeItem("Matrix System", "Slot 5 Reward (Upgraded to Slot 6)", "64800.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); 
+                        count++; 
+                    }
+                    if(currentSlot >= 7) { 
+                        html += buildIncomeItem("Matrix System", "Slot 6 Reward (Upgraded to Slot 7)", "2648000.00", "0.00", '<i class="fa-solid fa-cubes"></i>', "#f5c518"); 
+                        count++; 
+                    }
+                    
                 } else if (type === 'upline') {
                     document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
                     if(myInfo[6] === false) { 
-                        html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6"); count++;
+                        html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6"); 
+                        count++;
                     }
                 }
 
-                if(count === 0) { html += `<div style="padding: 30px; text-align: center; color: var(--text-gray);">No data found for this category yet.</div>`; }
+                if(count === 0) {
+                    html += `<div style="padding: 30px; text-align: center; color: var(--text-gray);">No data found for this category yet.</div>`;
+                }
                 container.innerHTML = html;
-            } catch(e) { container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error loading income data.</div>`; }
+            } catch(e) {
+                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error loading income data.</div>`;
+            }
         }
 
         function buildIncomeItem(idLabel, reason, amount, hold, icon, iconColor) {
@@ -1195,6 +1338,7 @@
         function renderSlots(displaySlotLimit) {
             const container = document.getElementById('slotsContainer');
             if(!container) return;
+            
             let html = '';
             for(let i=1; i<=7; i++) {
                 if(i <= displaySlotLimit) {
@@ -1242,8 +1386,12 @@
                             let cAddr = await contract.userDirects(current, i);
                             childrenToCheck.push(cAddr);
                         }
-                        if(left && left !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(left)) childrenToCheck.push(left);
-                        if(right && right !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(right)) childrenToCheck.push(right);
+                        if(left && left !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(left)) {
+                            childrenToCheck.push(left);
+                        }
+                        if(right && right !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(right)) {
+                            childrenToCheck.push(right);
+                        }
                         
                         for(let d of childrenToCheck) {
                             let lowerD = d.toLowerCase();
@@ -1253,7 +1401,9 @@
                                 queue.push(lowerD);
                                 
                                 let cInfo = await contract.users(d);
-                                if(cInfo[6] === false) { myReceivedRebirthsCount++; }
+                                if(cInfo[6] === false) { 
+                                    myReceivedRebirthsCount++; 
+                                }
                             }
                         }
                     } catch(e){}
@@ -1266,22 +1416,40 @@
 
         async function loadDashboardData(address, viewMode) {
             try {
-                userAddress = address; globalRootAddress = address; isViewOnly = viewMode;
+                userAddress = address; 
+                globalRootAddress = address; 
+                isViewOnly = viewMode;
                 
                 if(!isViewOnly) {
                     localStorage.setItem('poltitan_saved_session', address);
                     myOriginalAddress = address; 
                 }
 
-                if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
-                let userId = 0; let userInfo = null;
-                try { userInfo = await contract.users(userAddress); userId = userInfo[0].toNumber(); } catch (dataError) { userId = 0; }
+                if(!provider) { 
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any"); 
+                    signer = provider.getSigner(); 
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
+                }
+                
+                let userId = 0; 
+                let userInfo = null;
+                
+                try { 
+                    userInfo = await contract.users(userAddress); 
+                    userId = userInfo[0].toNumber(); 
+                } catch (dataError) { 
+                    userId = 0; 
+                }
                 
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
+                    
                     let upline = userInfo[2];
-                    if(upline !== "0x0000000000000000000000000000000000000000") { const uInfo = await contract.users(upline); document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); }
+                    if(upline !== "0x0000000000000000000000000000000000000000") { 
+                        const uInfo = await contract.users(upline); 
+                        document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); 
+                    }
                     
                     let directCount = userInfo[3].toNumber();
                     document.getElementById('displayDirects').innerText = directCount;
@@ -1295,31 +1463,37 @@
                     let currentSlot = userInfo[4].toNumber();
                     
                     let rebirthCount = 0;
-                    if(currentSlot >= 4) rebirthCount = 10;
-                    if(currentSlot >= 5) rebirthCount = 50;  
-                    if(currentSlot >= 6) rebirthCount = 210; 
-                    if(currentSlot >= 7) rebirthCount = 850; 
+                    if(currentSlot >= 4) { rebirthCount = 10; }
+                    if(currentSlot >= 5) { rebirthCount = 50; }  
+                    if(currentSlot >= 6) { rebirthCount = 210; } 
+                    if(currentSlot >= 7) { rebirthCount = 850; } 
                     document.getElementById('displayRebirths').innerText = rebirthCount;
                     
+                    // FIX: Earning Formula
                     let calculatedIncome = 0;
-                    if(directCount === 1) { 
-                        calculatedIncome = 30; 
-                    } else if (directCount >= 2) { 
-                        calculatedIncome = 60 + ((directCount - 2) * 27); 
+                    
+                    if(currentSlot >= 2) {
+                        calculatedIncome += 60;
+                    } else if (currentSlot === 1 && directCount === 1) {
+                        calculatedIncome += 30;
                     }
-                    if(currentSlot >= 3) calculatedIncome += 40;
-                    if(currentSlot >= 4) calculatedIncome += 400;
-                    if(currentSlot >= 5) calculatedIncome += 2400;
-                    if(currentSlot >= 6) calculatedIncome += 64800;
-                    if(currentSlot >= 7) calculatedIncome += 2648000;
+                    if(directCount > 2) {
+                        calculatedIncome += ((directCount - 2) * 27);
+                    }
+                    
+                    if(currentSlot >= 3) { calculatedIncome += 40; }
+                    if(currentSlot >= 4) { calculatedIncome += 400; }
+                    if(currentSlot >= 5) { calculatedIncome += 2400; }
+                    if(currentSlot >= 6) { calculatedIncome += 64800; }
+                    if(currentSlot >= 7) { calculatedIncome += 2648000; }
 
                     document.getElementById('totalIncomeDisplay').innerText = calculatedIncome.toFixed(2);
                     
                     let autoHoldAmount = 0;
-                    if(currentSlot === 4 && directCount < 5) autoHoldAmount = 400;
-                    if(currentSlot === 5 && directCount < 5) autoHoldAmount = 2400;
-                    if(currentSlot === 6 && directCount < 5) autoHoldAmount = 64800;
-                    if(currentSlot === 7 && directCount < 5) autoHoldAmount = 2648000;
+                    if(currentSlot === 4 && directCount < 5) { autoHoldAmount = 400; }
+                    if(currentSlot === 5 && directCount < 5) { autoHoldAmount = 2400; }
+                    if(currentSlot === 6 && directCount < 5) { autoHoldAmount = 64800; }
+                    if(currentSlot === 7 && directCount < 5) { autoHoldAmount = 2648000; }
                     
                     if(autoHoldAmount === 0 && userInfo[5] > 0) {
                         autoHoldAmount = parseFloat(ethers.utils.formatEther(userInfo[5]));
@@ -1333,7 +1507,9 @@
                     let slot2TeamCount = userInfo[9].toNumber();
                     let displaySlotLimit = userCurrentSlotNum;
 
-                    if(slot2TeamCount >= 4 && displaySlotLimit < 3) { displaySlotLimit = 3; }
+                    if(slot2TeamCount >= 4 && displaySlotLimit < 3) { 
+                        displaySlotLimit = 3; 
+                    }
 
                     renderSlots(displaySlotLimit);
                     
@@ -1349,16 +1525,22 @@
                         document.getElementById('claimRefundBtn').style.display = "block";
                         document.getElementById('displayRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                     }
-                    menuBtn.style.display = "block"; switchView('dashboardView');
+                    menuBtn.style.display = "block"; 
+                    switchView('dashboardView');
                 } else { 
                     showAlert('authAlert', 'Address not found in Matrix!', true); 
-                    if(!isViewOnly) localStorage.removeItem('poltitan_saved_session');
+                    if(!isViewOnly) {
+                        localStorage.removeItem('poltitan_saved_session');
+                    }
                 }
-            } catch (error) { showAlert('authAlert', 'Network Error!', true); }
+            } catch (error) { 
+                showAlert('authAlert', 'Network Error!', true); 
+            }
         }
 
         let pressStartTime = 0;
         let pressTimer;
+        
         window.startNodePress = function(e, addr) {
             pressStartTime = new Date().getTime();
             pressTimer = setTimeout(async () => {
@@ -1380,11 +1562,16 @@
                     }
                     document.getElementById('inspectLoading').style.display = "none";
                     document.getElementById('inspectData').style.display = "block";
-                } catch(err) { document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Error fetching Upline</span>"; }
+                } catch(err) { 
+                    document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Error fetching Upline</span>"; 
+                }
             }, 500);
         };
+        
         window.endNodePress = function(e, addr, currentSlotContext) {
-            if (e.type === 'touchend') { e.preventDefault(); }
+            if (e.type === 'touchend') { 
+                e.preventDefault(); 
+            }
             clearTimeout(pressTimer);
             const pressDuration = new Date().getTime() - pressStartTime;
             if (pressStartTime !== 0 && pressDuration < 500) {
@@ -1392,13 +1579,21 @@
                 addHistoryAndLoadTree(addr, currentSlotContext);
             }
         };
-        window.cancelNodePress = function() { clearTimeout(pressTimer); pressStartTime = 0; };
+        
+        window.cancelNodePress = function() { 
+            clearTimeout(pressTimer); 
+            pressStartTime = 0; 
+        };
+        
         function getSmartEvents(addr, context) {
             return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
         }
 
         async function claimMyRefund() {
-            if (isViewOnly) { alert("Action not allowed in view mode!"); return; }
+            if (isViewOnly) { 
+                alert("Action not allowed in view mode!"); 
+                return; 
+            }
             const btn = document.getElementById('claimRefundBtn');
             try {
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
@@ -1409,14 +1604,18 @@
                 await loadDashboardData(userAddress, false);
             } catch (error) {
                 let errorMsg = "Transaction failed!";
-                if (error.reason) { errorMsg = error.reason; } 
-                else if (error.data && error.data.message) { errorMsg = error.data.message; } 
-                else if (error.message) {
+                if (error.reason) {
+                    errorMsg = error.reason;
+                } else if (error.data && error.data.message) {
+                    errorMsg = error.data.message;
+                } else if (error.message) {
                     if (error.message.includes("execution reverted:")) {
                         errorMsg = error.message.split("execution reverted:")[1].split('"')[0].trim();
                     } else if (error.message.includes("System is still active") || error.message.includes("Income received")) {
                          errorMsg = "0 pol user claim your 30 pol if inactive system";
-                    } else { errorMsg = "Contract rejected the refund."; }
+                    } else {
+                        errorMsg = "Contract rejected the refund.";
+                    }
                 }
                 showCustomAlertModal("Notice", errorMsg);
             } finally {
@@ -1427,7 +1626,9 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
-        if (refParam && refParam.length === 42) { document.getElementById('uplineInput').value = refParam; }
+        if (refParam && refParam.length === 42) { 
+            document.getElementById('uplineInput').value = refParam; 
+        }
 
         window.addEventListener('load', async () => {
             let savedSession = localStorage.getItem('poltitan_saved_session');
@@ -1444,7 +1645,9 @@
                             document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`;
                             document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Register';
                         }
-                    } catch (error) { console.log("Init Error"); }
+                    } catch (error) { 
+                        console.log("Init Error"); 
+                    }
                 }, 100);
             }
         });
@@ -1456,9 +1659,11 @@
                     
                     let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     let addr = accounts[0];
+                    
                     if(window.ethereum.selectedAddress && addr.toLowerCase() !== window.ethereum.selectedAddress.toLowerCase()) {
                         addr = window.ethereum.selectedAddress;
                     }
+
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     signer = provider.getSigner(); 
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
@@ -1466,7 +1671,11 @@
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
 
                     let userInfo; 
-                    try { userInfo = await contract.users(addr); } catch(e) { userInfo = null; }
+                    try { 
+                        userInfo = await contract.users(addr); 
+                    } catch(e) { 
+                        userInfo = null; 
+                    }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
                         await loadDashboardData(addr, false); 
@@ -1477,17 +1686,23 @@
                             masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
                             return; 
                         }
+                        
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirm 30 POL...';
+                        
                         const txValue = ethers.utils.parseEther("30");
                         const tx = await contract.register(uplineAddr, { value: txValue });
+                        
                         masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
                         await tx.wait(); 
+                        
                         userAddress = addr; 
                         
                         try {
                             let newlyRegisteredInfo = await contract.users(addr);
                             document.getElementById('modalNewIdDisplay').innerText = newlyRegisteredInfo[0].toString();
-                        } catch(err) { document.getElementById('modalNewIdDisplay').innerText = ""; }
+                        } catch(err) {
+                            document.getElementById('modalNewIdDisplay').innerText = "";
+                        }
 
                         document.getElementById('modalRefLink').innerText = window.location.origin + window.location.pathname + "?ref=" + userAddress;
                         welcomeModal.style.display = 'flex';
@@ -1495,20 +1710,39 @@
                 } catch (error) {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
                     let msg = 'Transaction Failed or User Rejected.';
-                    if(error.message && error.message.includes('network')) msg = 'Wrong Network! Switch to Polygon.';
+                    if(error.message && error.message.includes('network')) {
+                        msg = 'Wrong Network! Switch to Polygon.';
+                    }
                     showAlert('authAlert', msg, true);
                 }
-            } else { alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); }
+            } else { 
+                alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
+            }
         });
 
         async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
-            if(inputAddr.length === 42) { provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); await loadDashboardData(inputAddr, true); } else { showAlert('authAlert', 'Invalid Address Format', true); }
+            if(inputAddr.length === 42) { 
+                provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); 
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); 
+                await loadDashboardData(inputAddr, true); 
+            } else { 
+                showAlert('authAlert', 'Invalid Address Format', true); 
+            }
         }
 
-        function closeInspectModal() { inspectModalOverlay.style.display = "none"; }
-        window.closeWelcomeModalOnly = function() { welcomeModal.style.display = 'none'; }
-        window.closeWelcomeModalAndGo = function() { welcomeModal.style.display = 'none'; loadDashboardData(userAddress, false); }
+        function closeInspectModal() { 
+            inspectModalOverlay.style.display = "none"; 
+        }
+        
+        function closeWelcomeModalOnly() { 
+            welcomeModal.style.display = 'none'; 
+        }
+        
+        function closeWelcomeModalAndGo() { 
+            welcomeModal.style.display = 'none'; 
+            loadDashboardData(userAddress, false); 
+        }
         
         function logoutWallet() { 
             localStorage.removeItem('poltitan_saved_session');
