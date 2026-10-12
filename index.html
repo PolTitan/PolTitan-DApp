@@ -343,7 +343,6 @@
 
         <!-- 2. DASHBOARD VIEW -->
         <div id="dashboardView" class="view-section">
-            <!-- WATCHING MODE BANNER -->
             <div id="readOnlyBanner" style="display: none; background: rgba(245, 197, 24, 0.1); border: 1px dashed var(--gold); color: var(--gold); text-align: center; padding: 15px; font-size: 13px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; position: relative;">
                 <i class="fa-solid fa-eye" style="font-size: 20px; margin-bottom: 5px; display: block;"></i> 
                 WATCHING MODE <br>
@@ -399,6 +398,7 @@
                     <div class="team-box" style="border-color: #10b981;" onclick="checkReceivedRebirths()">
                         <div class="icon" style="color: #fff; background: #10b981;"><i class="fa-solid fa-hand-holding-heart"></i></div>
                         <div class="data">
+                            <!-- DOUBLE COUNTING FIX APPLIED HERE -->
                             <h4 id="displayReceivedRebirths" style="color: #10b981;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
                             <p style="color: #10b981;">Received Rebirths</p>
                         </div>
@@ -566,7 +566,9 @@
         
         let treeNavigationHistory = []; 
         let currentTreeContext = 0; 
-        let myReceivedRebirthsCount = 0;
+        
+        // FIX: Remove Global counting logic from here
+        let myReceivedRebirthsCount = 0; 
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) { 
@@ -1363,6 +1365,7 @@
             container.innerHTML = html;
         }
 
+        // FIX: The issue was double-counting due to global variable accumulation on fast consecutive calls
         async function fetchExtraStats(addr) {
             try {
                 let teamSet = new Set();
@@ -1370,7 +1373,8 @@
                 let visited = new Set();
                 visited.add(addr.toLowerCase());
                 
-                myReceivedRebirthsCount = 0; 
+                // Using LOCAL variable to perfectly prevent overlap accumulation
+                let localRebirthsCount = 0; 
                 let count = 0;
 
                 while(queue.length > 0 && count < 300) { 
@@ -1402,14 +1406,17 @@
                                 
                                 let cInfo = await contract.users(d);
                                 if(cInfo[6] === false) { 
-                                    myReceivedRebirthsCount++; 
+                                    localRebirthsCount++; 
                                 }
                             }
                         }
                     } catch(e){}
                     count++;
+                    
+                    // Sync the local safe count to the UI and global state safely
+                    myReceivedRebirthsCount = localRebirthsCount;
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
-                    document.getElementById('displayReceivedRebirths').innerText = myReceivedRebirthsCount;
+                    document.getElementById('displayReceivedRebirths').innerText = localRebirthsCount;
                 }
             } catch(e){}
         }
@@ -1469,7 +1476,6 @@
                     if(currentSlot >= 7) { rebirthCount = 850; } 
                     document.getElementById('displayRebirths').innerText = rebirthCount;
                     
-                    // FIX: Earning Formula
                     let calculatedIncome = 0;
                     
                     if(currentSlot >= 2) {
