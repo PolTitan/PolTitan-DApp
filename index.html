@@ -155,7 +155,7 @@
         .inspect-row span.label { color: var(--text-gray); }
         .inspect-row span.val { color: #fff; font-weight: bold; }
 
-        /* Floating Bot & Chat Modal - UPDATED MENU DESIGN */
+        /* Floating Bot & Chat Modal */
         .chat-fab { position: fixed; bottom: 90px; right: 20px; background: var(--gold); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: move; z-index: 9999; box-shadow: 0 4px 15px rgba(245, 197, 24, 0.5); touch-action: none; }
         .chat-modal { display: none; flex-direction: column; position: fixed; bottom: 160px; right: 20px; width: 280px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px; z-index: 10000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); overflow: hidden; }
         .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
@@ -200,7 +200,11 @@
         </div>
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
-        <div class="menu-item" onclick="resetHistoryAndLoadTree(userAddress, 0); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
+        <div class="menu-item" onclick="resetHistoryAndLoadTree(myOriginalAddress || userAddress, 0); toggleMenu();"><i class="fa-solid fa-users"></i> My Partners</div>
+        
+        <!-- NEW FEATURE: TEAM ID SEARCH -->
+        <div class="menu-item" onclick="openTeamSearchModal(); toggleMenu();"><i class="fa-solid fa-magnifying-glass"></i> Team ID Search</div>
+        
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
@@ -210,6 +214,7 @@
     </div>
 
     <!-- MODALS -->
+    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -228,6 +233,23 @@
         </div>
     </div>
 
+    <!-- TEAM SEARCH MODAL -->
+    <div class="modal-overlay" id="teamSearchModal">
+        <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
+            <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeTeamSearchModal()"></i>
+            <h2 style="color: var(--gold); margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-magnifying-glass"></i> Team Search</h2>
+            <p style="font-size: 11px; color: var(--text-gray); margin-bottom: 15px; text-align: left;">* Note: You can only search for members who are registered in your downline team.</p>
+            <form onsubmit="executeTeamSearch(event)">
+                <div class="input-box" style="margin-bottom: 20px;">
+                    <i class="fa-solid fa-id-card" style="color: var(--gold); margin-right: 10px;"></i>
+                    <input type="text" id="teamSearchInput" placeholder="Enter Team ID or Wallet Address" required>
+                </div>
+                <button type="submit" id="teamSearchBtn" class="btn-gold" style="padding: 10px; font-size: 14px;">Search Team Member</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -245,6 +267,7 @@
         </div>
     </div>
 
+    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -259,6 +282,7 @@
         </div>
     </div>
 
+    <!-- INQUIRY MODAL -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeInquiryModal()"></i>
@@ -312,10 +336,14 @@
 
         <!-- 2. DASHBOARD VIEW -->
         <div id="dashboardView" class="view-section">
-            <div id="readOnlyBanner" style="display: none; background: #ff4d4d; color: #fff; text-align: center; padding: 10px; font-size: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
-                <i class="fa-solid fa-eye"></i> You are viewing someone else's Dashboard <br>
-                <button onclick="logoutWallet()" style="margin-top: 8px; padding: 5px 10px; border-radius: 5px; border: none; background: #fff; color: #ff4d4d; font-weight: bold; cursor: pointer;">Exit View Mode</button>
+            <!-- NEW WATCHING MODE BANNER -->
+            <div id="readOnlyBanner" style="display: none; background: rgba(245, 197, 24, 0.1); border: 1px dashed var(--gold); color: var(--gold); text-align: center; padding: 15px; font-size: 13px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; position: relative;">
+                <i class="fa-solid fa-eye" style="font-size: 20px; margin-bottom: 5px; display: block;"></i> 
+                WATCHING MODE <br>
+                <span style="font-size: 10px; color: #ccc; font-weight: normal;">You are securely viewing a Team Member's Data.</span><br>
+                <button onclick="exitTeamViewMode()" style="margin-top: 10px; padding: 8px 15px; border-radius: 5px; border: 1px solid var(--gold); background: var(--gold); color: #000; font-weight: bold; cursor: pointer; font-size: 11px;">Back to My Dashboard</button>
             </div>
+
             <div class="profile-card">
                 <div class="profile-header">
                     <div class="avatar"><i class="fa-solid fa-user-astronaut"></i></div>
@@ -433,7 +461,7 @@
             </div>
         </div>
         
-        <!-- 6. TRANSACTION VIEW (FIXED WITH LIVE API) -->
+        <!-- 6. TRANSACTION VIEW -->
         <div id="transactionView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -482,7 +510,7 @@
 
     </main>
 
-    <!-- NEW FIX: ADVANCED CHAT BOT ACTION MENU -->
+    <!-- CHAT BOT ACTION MENU -->
     <div class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></div>
     <div class="chat-modal" id="chatModal">
         <div class="chat-header"><span><i class="fa-solid fa-robot"></i> AI ASSISTANT</span><i class="fa-solid fa-times" style="cursor:pointer;" onclick="toggleChat()"></i></div>
@@ -506,13 +534,12 @@
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0x2BD2B4D2D2379Ce31c62f35813BD05863980BE85";
-        // Free Polygon API Key for live tx history
-        const POLYGONSCAN_API_KEY = "YourFreeAPIKeyHereIfYouHaveOne"; 
         
         const CONTRACT_ABI = [
             "function register(address _upline) external payable",
             "function claimRefund() external",
             "function users(address) external view returns (uint256 id, address wallet, address upline, uint256 directCount, uint256 currentSlot, uint256 holdAmount, bool isRealID, address leftDirect, address rightDirect, uint256 slot2TeamCount)",
+            "function idToAddress(uint256) external view returns (address)",
             "function userDirects(address, uint256) external view returns (address)",
             "function slot2Team(address, uint256) external view returns (address)",
             "function slotQueues(uint256, uint256) external view returns (address)",
@@ -521,6 +548,8 @@
 
         let provider, signer, contract, userAddress, userCurrentSlotNum;
         let isViewOnly = false;
+        let myOriginalAddress = null; // Important: To track original logged-in user
+        
         let treeNavigationHistory = []; 
         let currentTreeContext = 0; 
 
@@ -599,6 +628,91 @@
         }
 
         // ==========================================
+        // TEAM SEARCH LOGIC
+        // ==========================================
+        function openTeamSearchModal() {
+            if(isViewOnly) {
+                showCustomAlertModal("Notice", "You are already viewing someone's dashboard. Click 'Back to My Dashboard' first.");
+                return;
+            }
+            document.getElementById('teamSearchInput').value = '';
+            document.getElementById('teamSearchModal').style.display = 'flex';
+        }
+
+        function closeTeamSearchModal() {
+            document.getElementById('teamSearchModal').style.display = 'none';
+        }
+
+        async function executeTeamSearch(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('teamSearchInput').value.trim();
+            const btn = document.getElementById('teamSearchBtn');
+            if(!inputVal) return;
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying Team...';
+            btn.disabled = true;
+
+            try {
+                let targetAddr = inputVal;
+                
+                if(!inputVal.startsWith("0x")) {
+                    let idNum = parseInt(inputVal);
+                    if(isNaN(idNum) || idNum <= 0) throw "Invalid ID Number";
+                    try {
+                        targetAddr = await contract.idToAddress(idNum);
+                    } catch(err) {
+                        throw "ID not found. Please try searching by Wallet Address.";
+                    }
+                }
+
+                if(!targetAddr || targetAddr === "0x0000000000000000000000000000000000000000" || targetAddr.length !== 42) {
+                    throw "User not found in Matrix!";
+                }
+
+                if(targetAddr.toLowerCase() === myOriginalAddress.toLowerCase()) {
+                    throw "You searched your own ID!";
+                }
+
+                // Strict Team Downline Check (Max 100 levels to prevent infinite freeze)
+                let isTeam = false;
+                let currentCheck = targetAddr;
+                for(let i=0; i<100; i++) { 
+                    let info = await contract.users(currentCheck);
+                    let up = info[2];
+                    if(up.toLowerCase() === myOriginalAddress.toLowerCase()) {
+                        isTeam = true; break;
+                    }
+                    if(up === "0x0000000000000000000000000000000000000000") {
+                        break;
+                    }
+                    currentCheck = up;
+                }
+
+                if(!isTeam) {
+                    throw "Access Denied: This ID is crossline or not in your downline team!";
+                }
+
+                closeTeamSearchModal();
+                await loadDashboardData(targetAddr, true);
+
+            } catch (error) {
+                let errorMsg = typeof error === "string" ? error : "Search failed. Check ID/Address.";
+                showCustomAlertModal("Search Error", errorMsg);
+            } finally {
+                btn.innerHTML = 'Search Team Member';
+                btn.disabled = false;
+            }
+        }
+
+        function exitTeamViewMode() {
+            if(myOriginalAddress) {
+                loadDashboardData(myOriginalAddress, false);
+            } else {
+                logoutWallet();
+            }
+        }
+
+        // ==========================================
         // TREE NAVIGATION HISTORY LOGIC
         // ==========================================
         function resetHistoryAndLoadTree(addr, context) {
@@ -635,8 +749,53 @@
         }
 
         // ==========================================
-        // NEW FIX: CHAT BOT ACTION MENU LOGIC
+        // CHAT BOT ACTION MENU LOGIC
         // ==========================================
+        const chatFab = document.getElementById('chatFab');
+        let isDraggingChat = false, chatStartX, chatStartY, chatInitLeft, chatInitTop;
+        chatFab.addEventListener('touchstart', (e) => {
+            isDraggingChat = false; chatStartX = e.touches[0].clientX; chatStartY = e.touches[0].clientY;
+            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
+        }, {passive: false});
+        chatFab.addEventListener('touchmove', (e) => {
+            let dx = e.touches[0].clientX - chatStartX; let dy = e.touches[0].clientY - chatStartY;
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                isDraggingChat = true; e.preventDefault();
+                chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
+                chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
+            }
+        }, {passive: false});
+        chatFab.addEventListener('mousedown', (e) => {
+            isDraggingChat = false; chatStartX = e.clientX; chatStartY = e.clientY;
+            chatInitLeft = chatFab.offsetLeft; chatInitTop = chatFab.offsetTop;
+            document.onmousemove = (me) => {
+                let dx = me.clientX - chatStartX; let dy = me.clientY - chatStartY;
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    isDraggingChat = true;
+                    chatFab.style.left = (chatInitLeft + dx) + 'px'; chatFab.style.top = (chatInitTop + dy) + 'px';
+                    chatFab.style.right = 'auto'; chatFab.style.bottom = 'auto';
+                }
+            };
+            document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
+        });
+        function toggleChat() { 
+            if(isDraggingChat) return; 
+            const modal = document.getElementById('chatModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+            if (modal.style.display === 'flex') {
+                let fabRect = chatFab.getBoundingClientRect();
+                modal.style.bottom = "auto"; modal.style.right = "auto";
+                let topPos = fabRect.top - 280; let leftPos = fabRect.left - 220;
+                if (topPos < 0) topPos = fabRect.bottom + 10;
+                if (leftPos < 0) leftPos = 10;
+                if (leftPos + 280 > window.innerWidth) leftPos = window.innerWidth - 290;
+                modal.style.top = topPos + 'px'; modal.style.left = leftPos + 'px';
+                
+                // Reset welcome message
+                document.getElementById('chatBotMsg').innerHTML = "🙏 Namaste VIP! How can I help you today? Please select an option:";
+            }
+        }
+
         async function chatAction(action) {
             const msgBox = document.getElementById('chatBotMsg');
             if(!userAddress) {
@@ -693,7 +852,7 @@
         }
 
         // ==========================================
-        // NEW FIX: LIVE TRANSACTIONS API CALL
+        // LIVE TRANSACTIONS API CALL
         // ==========================================
         async function loadLiveTransactions() {
             switchView('transactionView');
@@ -705,7 +864,6 @@
             
             container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Live Blockchain Data...</div>`;
             
-            // Using public PolygonScan API for normal txns
             const apiUrl = `https://api.polygonscan.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc`;
             
             try {
@@ -716,7 +874,6 @@
                     let html = `<div class="activity-header"><span>Transaction Detail</span><span>Status</span></div>`;
                     
                     data.result.forEach(tx => {
-                        // Very basic parser for UI demo purposes
                         let isToContract = tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
                         let txType = isToContract ? "Smart Contract Interaction" : (tx.value > 0 ? "Transfer (Sent/Received)" : "Transaction");
                         let valPol = (tx.value / 1e18).toFixed(2);
@@ -1119,6 +1276,7 @@
                 
                 if(!isViewOnly) {
                     localStorage.setItem('poltitan_saved_session', address);
+                    myOriginalAddress = address; 
                 }
 
                 if(!provider) { provider = new ethers.providers.Web3Provider(window.ethereum, "any"); signer = provider.getSigner(); contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); }
@@ -1198,7 +1356,7 @@
                     menuBtn.style.display = "block"; switchView('dashboardView');
                 } else { 
                     showAlert('authAlert', 'Address not found in Matrix!', true); 
-                    localStorage.removeItem('poltitan_saved_session');
+                    if(!isViewOnly) localStorage.removeItem('poltitan_saved_session');
                 }
             } catch (error) { showAlert('authAlert', 'Network Error!', true); }
         }
@@ -1373,6 +1531,7 @@
         function logoutWallet() { 
             localStorage.removeItem('poltitan_saved_session');
             userAddress = null; 
+            myOriginalAddress = null;
             isViewOnly = false; 
             toggleMenu(); 
             menuBtn.style.display = "none"; 
