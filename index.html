@@ -113,11 +113,11 @@
         .act-details p { color: var(--text-gray); font-size: 11px; margin-top: 2px;}
         .act-right { color: var(--gold); font-weight: bold; font-size: 14px; text-align: right;}
 
-        /* TREE Matrix Styling */
-        .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 0 30px 0; text-align: center; }
+        /* TREE Matrix Styling - OPTIMIZED FOR 1->4->8 FULL SCREEN FIT */
+        .tree-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 15px 5px 30px 5px; text-align: center; }
         .tree { display: inline-block; min-width: max-content; text-align: center; }
         .tree ul { display: flex; justify-content: center; padding-top: 15px; position: relative; margin: 0; padding-left: 0; white-space: nowrap; }
-        .tree li { display: inline-block; vertical-align: top; text-align: center; list-style-type: none; position: relative; padding: 15px 3px 0 3px; }
+        .tree li { display: inline-block; vertical-align: top; text-align: center; list-style-type: none; position: relative; padding: 15px 1px 0 1px; } /* Tight padding to fit 8 nodes */
         .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid var(--gold); width: 50%; height: 15px; }
         .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--gold); }
         .tree li:only-child::after, .tree li:only-child::before { display: none; }
@@ -127,21 +127,38 @@
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold); width: 0; height: 15px; }
         
-        .tree li a { border: 1px solid var(--border-color); padding: 5px 8px; text-decoration: none; color: #fff; display: inline-block; border-radius: 6px; background: #111; min-width: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; margin: 0 2px;}
-        .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-2px); }
-        .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 10px; margin-bottom: 2px;}
-        .tree li a i { font-size: 14px; color: var(--text-gray); margin-bottom: 2px; }
-        .tree li a .rb-tag { display: block; font-size: 8px; color: #ff4d4d; font-weight: bold; margin-top: 2px; letter-spacing: 0.5px;}
+        .tree li a { 
+            border: 1px solid var(--border-color); 
+            padding: 6px 2px; 
+            text-decoration: none; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            border-radius: 8px; 
+            background: #111; 
+            min-width: 40px; /* Extremely compact to fit exactly 8 nodes on screen */
+            max-width: 48px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin: 0 2px;
+        }
+        .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-3px); }
+        .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 9px; margin-top: 4px; letter-spacing: 0.2px;}
+        .tree li a i { font-size: 16px; color: var(--text-gray); }
+        .tree li a .rb-tag { display: block; font-size: 8px; color: #fff; background: #10b981; padding: 1px 4px; border-radius: 4px; font-weight: bold; margin-top: 3px; letter-spacing: 0.5px;}
         
+        /* REBIRTH GREEN NODE */
         .tree li a.rb-node { background: #004d00; border-color: #10b981; }
         .tree li a.rb-node:hover { background: #006600; border-color: #34d399; }
         .tree li a.rb-node .id-label { color: #fff; }
         .tree li a.rb-node i { color: #10b981; }
-        .tree li a.rb-node .rb-tag { color: #10b981; }
+        .tree li a.rb-node .rb-tag { background: #fff; color: #004d00; }
 
-        .tree li a.empty-node { border: 1px dashed #555; background: transparent; color: #555; cursor: default;}
+        .tree li a.empty-node { border: 1px dashed #555; background: transparent; color: #555; cursor: default; min-width: 35px;}
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
-        .tree li a.empty-node i { color: #333; }
+        .tree li a.empty-node i { color: #333; font-size: 12px;}
 
         /* FOOTER DESIGN */
         .site-footer { background: var(--card-bg); border-top: 1px solid var(--border-color); text-align: center; padding: 25px 15px; font-size: 12px; color: var(--text-gray); width: 100%; position: absolute; bottom: 0; left: 0; }
@@ -343,6 +360,7 @@
 
         <!-- 2. DASHBOARD VIEW -->
         <div id="dashboardView" class="view-section">
+            <!-- WATCHING MODE BANNER -->
             <div id="readOnlyBanner" style="display: none; background: rgba(245, 197, 24, 0.1); border: 1px dashed var(--gold); color: var(--gold); text-align: center; padding: 15px; font-size: 13px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; position: relative;">
                 <i class="fa-solid fa-eye" style="font-size: 20px; margin-bottom: 5px; display: block;"></i> 
                 WATCHING MODE <br>
@@ -395,10 +413,10 @@
                             <p>Generated Rebirths</p>
                         </div>
                     </div>
+                    <!-- RECEIVED REBIRTHS BOX -->
                     <div class="team-box" style="border-color: #10b981;" onclick="checkReceivedRebirths()">
                         <div class="icon" style="color: #fff; background: #10b981;"><i class="fa-solid fa-hand-holding-heart"></i></div>
                         <div class="data">
-                            <!-- DOUBLE COUNTING FIX APPLIED HERE -->
                             <h4 id="displayReceivedRebirths" style="color: #10b981;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
                             <p style="color: #10b981;">Received Rebirths</p>
                         </div>
@@ -566,9 +584,7 @@
         
         let treeNavigationHistory = []; 
         let currentTreeContext = 0; 
-        
-        // FIX: Remove Global counting logic from here
-        let myReceivedRebirthsCount = 0; 
+        let myReceivedRebirthsCount = 0;
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) { 
@@ -1114,8 +1130,9 @@
                     ? `<span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>` 
                     : `<span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span><span class="rb-tag">R/B</span>`;
 
-                let html = `<ul><li><a class="${nodeClass}" style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 0)}>
-                    <i class="fa-solid fa-user-astronaut" style="color:#3b82f6;"></i>
+                let html = `<ul><li><a class="${nodeClass}" style="background: rgba(245, 197, 24, 0.15); border-color: var(--gold); border-width: 2px; min-width: 60px; padding: 10px 5px;" ${getSmartEvents(targetAddress, 0)}>
+                    <i class="fa-solid fa-crown" style="color:var(--gold); font-size:12px; margin-bottom:5px;"></i>
+                    <i class="fa-solid fa-user-astronaut" style="color:var(--gold); font-size:20px;"></i>
                     ${displayHtml}
                 </a>`;
 
@@ -1365,7 +1382,6 @@
             container.innerHTML = html;
         }
 
-        // FIX: The issue was double-counting due to global variable accumulation on fast consecutive calls
         async function fetchExtraStats(addr) {
             try {
                 let teamSet = new Set();
@@ -1373,7 +1389,6 @@
                 let visited = new Set();
                 visited.add(addr.toLowerCase());
                 
-                // Using LOCAL variable to perfectly prevent overlap accumulation
                 let localRebirthsCount = 0; 
                 let count = 0;
 
@@ -1413,7 +1428,6 @@
                     } catch(e){}
                     count++;
                     
-                    // Sync the local safe count to the UI and global state safely
                     myReceivedRebirthsCount = localRebirthsCount;
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
                     document.getElementById('displayReceivedRebirths').innerText = localRebirthsCount;
