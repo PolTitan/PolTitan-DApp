@@ -22,7 +22,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; padding-bottom: 60px; }
+        body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
 
         /* HEADER */
         header { background: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
@@ -44,7 +44,7 @@
         .submenu { display: none; background: #0a0a0a; border-radius: 8px; margin-bottom: 5px; border-left: 2px solid var(--gold); }
 
         /* CONTAINER & CARDS */
-        .container { padding: 15px; max-width: 500px; margin: 0 auto; min-height: 80vh; }
+        .container { padding: 15px; max-width: 500px; width: 100%; margin: 0 auto; flex: 1; }
         .vip-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-align: center; }
         
         /* PROFILE CARD */
@@ -98,8 +98,25 @@
         
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
-        
-        .inquiry-textarea { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; resize: none; height: 80px; font-family: 'Poppins', sans-serif; }
+
+        /* NEW INQUIRY SECTION DESIGN (VIDEO 1 STYLE) */
+        .inquiry-outer-card { background: #0e0e0e; border: 1px solid #222; border-radius: 22px; padding: 28px 16px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .inquiry-top-logo-wrap { width: 190px; height: 85px; margin: 0 auto 18px auto; background: #000; border-radius: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid #1f1f1f; }
+        .inquiry-top-logo-wrap video { width: 100%; height: 100%; object-fit: cover; }
+        .inquiry-main-heading { color: #e5b842; font-size: 26px; font-weight: 800; letter-spacing: 1px; line-height: 1.3; margin-bottom: 25px; text-transform: uppercase; }
+        .inquiry-inner-box { background: #151515; border-radius: 16px; border-top: 2.5px solid #e5b842; padding: 25px 18px; text-align: left; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+        .inquiry-inner-title { color: #e5b842; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 22px; text-transform: uppercase; line-height: 1.35; }
+        .inq-field-group { margin-bottom: 18px; }
+        .inq-label { display: block; color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .inq-label span { color: #6b7280; text-transform: none; font-weight: 400; font-size: 10px; }
+        .inq-input, .inq-select, .inq-textarea { width: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 13px 14px; color: #fff; font-size: 13px; outline: none; transition: 0.3s; }
+        .inq-input::placeholder, .inq-textarea::placeholder { color: #6b7280; }
+        .inq-input:focus, .inq-select:focus, .inq-textarea:focus { border-color: #e5b842; background: #222; }
+        .inq-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 16px; padding-right: 40px; cursor: pointer; }
+        .inq-select option { background: #151515; color: #fff; }
+        .inq-textarea { height: 110px; resize: vertical; line-height: 1.5; }
+        .inq-submit-btn { width: 100%; background: linear-gradient(180deg, #eac459, #d4a72c); color: #000; border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer; margin-top: 6px; transition: 0.3s; }
+        .inq-submit-btn:hover { filter: brightness(1.08); }
 
         /* ACTIVITY LIST */
         .activity-list { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); }
@@ -143,15 +160,29 @@
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
 
-        /* FOOTER DESIGN */
-        .site-footer { background: var(--card-bg); border-top: 1px solid var(--border-color); text-align: center; padding: 25px 15px; font-size: 12px; color: var(--text-gray); width: 100%; position: absolute; bottom: 0; left: 0; }
-        .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 20px; }
-        .footer-links a { color: var(--gold); text-decoration: none; cursor: pointer; transition: 0.3s; font-weight: 600; }
-        .footer-links a:hover { color: #fff; }
+        /* NEW RICH FOOTER DESIGN (VIDEO 2 STYLE) */
+        .site-footer { background: #0c0c0c; border-top: 1px solid #222; padding: 35px 20px 25px 20px; color: #9ca3af; width: 100%; margin-top: 30px; }
+        .footer-inner { max-width: 500px; margin: 0 auto; text-align: left; }
+        .footer-brand-logo { width: 130px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid #2a2a2a; display: block; margin-bottom: 12px; background: #000; }
+        .footer-brand-title { color: #fff; font-size: 20px; font-weight: 800; letter-spacing: 0.8px; margin-bottom: 8px; text-transform: uppercase; }
+        .footer-brand-desc { color: #9ca3af; font-size: 12px; line-height: 1.6; margin-bottom: 28px; }
+        .footer-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .footer-col-group { margin-bottom: 24px; }
+        .footer-col-title { color: #e5b842; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; position: relative; padding-bottom: 6px; line-height: 1.3; }
+        .footer-col-title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 28px; height: 2px; background: #e5b842; border-radius: 2px; }
+        .footer-link-list { list-style: none; padding: 0; margin: 0; }
+        .footer-link-list li { margin-bottom: 10px; font-size: 12px; color: #9ca3af; cursor: pointer; transition: 0.25s; display: flex; align-items: center; gap: 7px; line-height: 1.4; }
+        .footer-link-list li:hover { color: #e5b842; transform: translateX(2px); }
+        .footer-link-list li.gold-highlight { color: #e5b842; font-weight: 600; }
+        .green-dot { width: 7px; height: 7px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
+        .footer-social-grid { display: grid; grid-template-columns: repeat(3, 38px); gap: 10px; margin-top: 10px; }
+        .footer-social-btn { width: 38px; height: 38px; border-radius: 50%; background: #161616; border: 1px solid #2e2e2e; color: #e5b842; display: flex; justify-content: center; align-items: center; font-size: 15px; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .footer-social-btn:hover { background: #e5b842; color: #000; border-color: #e5b842; }
+        .footer-bottom-copy { border-top: 1px solid #1f1f1f; margin-top: 15px; padding-top: 18px; text-align: center; font-size: 11px; color: #6b7280; line-height: 1.6; }
 
         /* View Sections */
         .view-section { display: none; }
-        #authView { display: block; margin-top: 5vh; }
+        #authView { display: block; margin-top: 3vh; }
         
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
@@ -212,10 +243,10 @@
         
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
-        <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
-        <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
-
+        <!-- ORDER AS REQUESTED: 1. REBIRTH ID -> 2. ABOUT US -> 3. INQUIRY -->
         <div class="menu-item" onclick="checkReceivedRebirths(); toggleMenu();"><i class="fa-solid fa-recycle" style="color:#10b981;"></i> Received Rebirths</div>
+        <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
+        <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
 
         <div class="menu-item logout-btn" onclick="logoutWallet();"><i class="fa-solid fa-right-from-bracket"></i> Log Out</div>
     </div>
@@ -289,31 +320,8 @@
         </div>
     </div>
 
-    <!-- INQUIRY MODAL -->
-    <div class="modal-overlay" id="inquiryModal">
-        <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
-            <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeInquiryModal()"></i>
-            <h2 style="color: var(--gold); margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-envelope"></i> Inquiry Form</h2>
-            <form id="inquiryForm" onsubmit="submitInquiry(event)">
-                <div class="input-box" style="margin-bottom: 15px;">
-                    <i class="fa-solid fa-user" style="color: var(--gold); margin-right: 10px;"></i>
-                    <input type="text" placeholder="Your Name" required>
-                </div>
-                <div class="input-box" style="margin-bottom: 15px;">
-                    <i class="fa-solid fa-phone" style="color: var(--gold); margin-right: 10px;"></i>
-                    <input type="text" placeholder="Phone or Email" required>
-                </div>
-                <div class="input-box" style="margin-bottom: 20px; align-items: flex-start;">
-                    <i class="fa-solid fa-comment-dots" style="color: var(--gold); margin-right: 10px; margin-top: 10px;"></i>
-                    <textarea class="inquiry-textarea" placeholder="Your Inquiry or Message..." required></textarea>
-                </div>
-                <button type="submit" class="btn-gold" style="padding: 10px; font-size: 14px;">Submit Inquiry</button>
-            </form>
-        </div>
-    </div>
-
     <!-- MAIN DASHBOARD SECTIONS -->
-    <main class="container" style="padding-bottom: 80px;">
+    <main class="container">
         <!-- 1. SMART AUTH VIEW -->
         <div id="authView" class="view-section">
             <div style="text-align: center; margin-bottom: 30px;">
@@ -488,7 +496,7 @@
         <!-- 7. ABOUT US VIEW -->
         <div id="aboutView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">About PolTitan</h3>
             </div>
             
@@ -521,6 +529,62 @@
             </div>
         </div>
 
+        <!-- 8. CONTACT US & INQUIRY VIEW (VIDEO 1 EXACT DESIGN) -->
+        <div id="inquiryView" class="view-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h3 style="color: var(--gold); font-size: 16px;">Contact & Inquiry</h3>
+            </div>
+
+            <div class="inquiry-outer-card">
+                <div class="inquiry-top-logo-wrap">
+                    <video autoplay loop muted playsinline>
+                        <source src="poltitan-logo.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <h1 class="inquiry-main-heading">CONTACT US &<br>INQUIRY</h1>
+
+                <div class="inquiry-inner-box">
+                    <h2 class="inquiry-inner-title">SEND INQUIRY /<br>MESSAGE</h2>
+                    <form id="inquiryForm" onsubmit="submitInquiry(event)">
+                        <div class="inq-field-group">
+                            <label class="inq-label">YOUR NAME</label>
+                            <input type="text" class="inq-input" placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="inq-field-group">
+                            <label class="inq-label">EMAIL ADDRESS</label>
+                            <input type="email" class="inq-input" placeholder="Enter your email" required>
+                        </div>
+
+                        <div class="inq-field-group">
+                            <label class="inq-label">PHONE NUMBER</label>
+                            <input type="tel" class="inq-input" placeholder="Enter your phone number" required>
+                        </div>
+
+                        <div class="inq-field-group">
+                            <label class="inq-label">INQUIRY CATEGORY</label>
+                            <select class="inq-select" required>
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="Registration / Joining">Registration / Joining</option>
+                                <option value="Matrix Slot Upgrade">Matrix Slot Upgrade</option>
+                                <option value="Rebirth ID Query">Rebirth ID Query</option>
+                                <option value="Payout / Hold POL">Payout / Hold POL</option>
+                                <option value="Business / Other Query">Business / Other Query</option>
+                            </select>
+                        </div>
+
+                        <div class="inq-field-group">
+                            <label class="inq-label">YOUR MESSAGE / DETAILS <span>(Max 500 Words)</span></label>
+                            <textarea class="inq-textarea" placeholder="Write your full message, query, or business details here..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="inq-submit-btn">SUBMIT INQUIRY</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- CHAT BOT ACTION MENU -->
@@ -536,11 +600,111 @@
         </div>
     </div>
 
-    <!-- GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER (VIDEO 2 EXACT DESIGN) -->
     <footer class="site-footer">
-        <p>&copy; 2026 PolTitan VIP Matrix. All rights reserved.</p>
-        <div class="footer-links">
-            <a onclick="openInquiryModal()"><i class="fa-solid fa-envelope"></i> Inquiry / Contact Support</a>
+        <div class="footer-inner">
+            <!-- Brand Top Section -->
+            <video class="footer-brand-logo" autoplay loop muted playsinline>
+                <source src="poltitan-logo.mp4" type="video/mp4">
+            </video>
+            <h2 class="footer-brand-title">POLTITAN VIP</h2>
+            <p class="footer-brand-desc">
+                A 100% Decentralized Web3 Smart Contract Matrix Ecosystem on Polygon Blockchain. Uniting Automated Matrix Slots, Auto-Rebirth Placement, and Instant Peer-to-Peer Crypto Distribution to empower the global community.
+            </p>
+
+            <!-- 2-Column Links Grid -->
+            <div class="footer-columns">
+                <!-- Left Column -->
+                <div>
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">MATRIX &amp; SLOTS</h4>
+                        <ul class="footer-link-list">
+                            <li onclick="goToDashboard()">Home</li>
+                            <li onclick="if(userAddress) switchView('slotsView'); else switchView('authView');">Matrix Slots</li>
+                            <li onclick="if(userAddress) resetHistoryAndLoadTree(myOriginalAddress || userAddress, 0); else switchView('authView');">My Partners Tree</li>
+                            <li onclick="if(userAddress) loadIncomeHistory('direct'); else switchView('authView');">Direct Income</li>
+                            <li onclick="if(userAddress) loadIncomeHistory('slot'); else switchView('authView');">Slot Rewards</li>
+                            <li onclick="if(userAddress) checkReceivedRebirths(); else switchView('authView');">Rebirth System</li>
+                            <li onclick="if(userAddress) loadLiveTransactions(); else switchView('authView');">Live Transactions</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">ABOUT US</h4>
+                        <ul class="footer-link-list">
+                            <li onclick="switchView('aboutView')">About PolTitan</li>
+                            <li onclick="switchView('aboutView')">Smart Contract Rules</li>
+                            <li onclick="openInquiryModal()">Contact Us</li>
+                            <li onclick="switchView('aboutView')">News &amp; Updates</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">LEGAL &amp; HELP</h4>
+                        <ul class="footer-link-list">
+                            <li onclick="switchView('aboutView')">Terms &amp; Conditions</li>
+                            <li onclick="switchView('aboutView')">Privacy Policy</li>
+                            <li onclick="switchView('aboutView')">180 Days Refund Policy</li>
+                            <li onclick="openInquiryModal()">Help / FAQs</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">MY ACCOUNT</h4>
+                        <ul class="footer-link-list">
+                            <li class="gold-highlight" onclick="goToDashboard()">VIP Dashboard</li>
+                            <li onclick="goToDashboard()">POL Matrix Reward</li>
+                            <li onclick="goToDashboard()">My Wallet</li>
+                            <li onclick="if(userAddress) resetHistoryAndLoadTree(myOriginalAddress || userAddress, 0); else switchView('authView');">My Referrals</li>
+                            <li onclick="if(!userAddress) switchView('authView'); else goToDashboard();">Login / Signup</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">LIVE ECOSYSTEM</h4>
+                        <ul class="footer-link-list">
+                            <li onclick="goToDashboard()"><span class="green-dot"></span> PolTitan Matrix</li>
+                            <li onclick="if(userAddress) switchView('slotsView'); else switchView('authView');"><span class="green-dot"></span> Auto-Upgrade Slots</li>
+                            <li onclick="if(userAddress) openTeamSearchModal(); else switchView('authView');"><span class="green-dot"></span> Team ID Search</li>
+                            <li onclick="toggleChat()"><span class="green-dot"></span> AI Assistant Bot</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">ECOSYSTEM FEATURES</h4>
+                        <ul class="footer-link-list">
+                            <li onclick="switchView('aboutView')">Polygon Mainnet Scan</li>
+                            <li onclick="switchView('aboutView')">100% On-Chain Verified</li>
+                            <li onclick="switchView('aboutView')">Zero Admin Control</li>
+                            <li onclick="switchView('aboutView')">Instant Wallet Payout</li>
+                            <li onclick="switchView('aboutView')">Auto Rebirth Engine</li>
+                            <li onclick="switchView('aboutView')">Global Pool Matrix</li>
+                            <li onclick="switchView('aboutView')">Smart Refund Window</li>
+                            <li onclick="switchView('aboutView')">24/7 Web3 Support</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">CONNECT WITH US</h4>
+                        <div class="footer-social-grid">
+                            <a class="footer-social-btn" onclick="openInquiryModal()" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                            <a class="footer-social-btn" onclick="openInquiryModal()" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a class="footer-social-btn" onclick="openInquiryModal()" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a class="footer-social-btn" onclick="openInquiryModal()" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                            <a class="footer-social-btn" onclick="openInquiryModal()" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
+                            <a class="footer-social-btn" onclick="openInquiryModal()" title="Inquiry / Email"><i class="fa-regular fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright Bottom -->
+            <div class="footer-bottom-copy">
+                &copy; 2026 PolTitan VIP Matrix Global Web3 Ecosystem. All Rights Reserved.
+            </div>
         </div>
     </footer>
 
@@ -617,16 +781,19 @@
         }
 
         function openInquiryModal() { 
-            document.getElementById('inquiryModal').style.display = 'flex'; 
+            switchView('inquiryView');
         }
         
         function closeInquiryModal() { 
-            document.getElementById('inquiryModal').style.display = 'none'; 
+            if (userAddress) {
+                switchView('dashboardView');
+            } else {
+                switchView('authView');
+            }
         }
         
         function submitInquiry(e) {
             e.preventDefault();
-            closeInquiryModal();
             showCustomAlertModal("Success", "Your inquiry has been submitted successfully. We will contact you soon.");
             document.getElementById('inquiryForm').reset();
         }
@@ -644,6 +811,8 @@
         function goToDashboard() { 
             if (userAddress) {
                 switchView('dashboardView'); 
+            } else {
+                switchView('authView');
             }
         }
 
