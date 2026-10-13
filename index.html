@@ -398,7 +398,6 @@
                     <div class="team-box" style="border-color: #10b981;" onclick="checkReceivedRebirths()">
                         <div class="icon" style="color: #fff; background: #10b981;"><i class="fa-solid fa-hand-holding-heart"></i></div>
                         <div class="data">
-                            <!-- DOUBLE COUNTING FIX APPLIED HERE -->
                             <h4 id="displayReceivedRebirths" style="color: #10b981;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
                             <p style="color: #10b981;">Received Rebirths</p>
                         </div>
@@ -567,8 +566,8 @@
         let treeNavigationHistory = []; 
         let currentTreeContext = 0; 
         
-        // FIX: Remove Global counting logic from here
         let myReceivedRebirthsCount = 0; 
+        let currentStatsFetchId = 0;
 
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) { 
@@ -1365,55 +1364,72 @@
             container.innerHTML = html;
         }
 
-        // FIX: The issue was double-counting due to global variable accumulation on fast consecutive calls
+        // FIXED: Auto-Stop Lock + Fast Parallel Level-by-Level Counting
         async function fetchExtraStats(addr) {
+            const myFetchId = ++currentStatsFetchId;
             try {
                 let teamSet = new Set();
-                let queue = [addr];
                 let visited = new Set();
                 visited.add(addr.toLowerCase());
                 
-                // Using LOCAL variable to perfectly prevent overlap accumulation
                 let localRebirthsCount = 0; 
-                let count = 0;
+                let currentLevel = [addr];
+                let processedCount = 0;
 
-                while(queue.length > 0 && count < 300) { 
-                    let current = queue.shift();
-                    try {
-                        let info = await contract.users(current);
-                        let dCount = info[3].toNumber();
-                        let left = info[7];
-                        let right = info[8];
-                        
-                        let childrenToCheck = [];
-                        for(let i=0; i<dCount; i++) { 
-                            let cAddr = await contract.userDirects(current, i);
-                            childrenToCheck.push(cAddr);
-                        }
-                        if(left && left !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(left)) {
-                            childrenToCheck.push(left);
-                        }
-                        if(right && right !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(right)) {
-                            childrenToCheck.push(right);
-                        }
-                        
-                        for(let d of childrenToCheck) {
-                            let lowerD = d.toLowerCase();
-                            if(!visited.has(lowerD)) {
-                                visited.add(lowerD);
-                                teamSet.add(lowerD);
-                                queue.push(lowerD);
-                                
-                                let cInfo = await contract.users(d);
-                                if(cInfo[6] === false) { 
-                                    localRebirthsCount++; 
+                while(currentLevel.length > 0 && processedCount < 300) { 
+                    if (myFetchId !== currentStatsFetchId) return;
+
+                    let nextLevel = [];
+
+                    await Promise.all(currentLevel.map(async (current) => {
+                        try {
+                            let info = await contract.users(current);
+                            if (myFetchId !== currentStatsFetchId) return;
+
+                            let dCount = info[3].toNumber();
+                            let left = info[7];
+                            let right = info[8];
+                            
+                            let directPromises = [];
+                            for(let i=0; i<dCount; i++) { 
+                                directPromises.push(contract.userDirects(current, i));
+                            }
+                            let childrenToCheck = await Promise.all(directPromises);
+
+                            if(left && left !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(left)) {
+                                childrenToCheck.push(left);
+                            }
+                            if(right && right !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(right)) {
+                                childrenToCheck.push(right);
+                            }
+                            
+                            let uniqueNewChildren = [];
+                            for(let d of childrenToCheck) {
+                                let lowerD = d.toLowerCase();
+                                if(!visited.has(lowerD)) {
+                                    visited.add(lowerD);
+                                    teamSet.add(lowerD);
+                                    uniqueNewChildren.push(d);
+                                    nextLevel.push(d);
                                 }
                             }
-                        }
-                    } catch(e){}
-                    count++;
+
+                            if(uniqueNewChildren.length > 0) {
+                                let childInfos = await Promise.all(uniqueNewChildren.map(c => contract.users(c)));
+                                for(let cInfo of childInfos) {
+                                    if(cInfo[6] === false) { 
+                                        localRebirthsCount++; 
+                                    }
+                                }
+                            }
+                        } catch(e){}
+                    }));
+
+                    if (myFetchId !== currentStatsFetchId) return;
+
+                    processedCount += currentLevel.length;
+                    currentLevel = nextLevel;
                     
-                    // Sync the local safe count to the UI and global state safely
                     myReceivedRebirthsCount = localRebirthsCount;
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
                     document.getElementById('displayReceivedRebirths').innerText = localRebirthsCount;
@@ -1751,6 +1767,7 @@
         }
         
         function logoutWallet() { 
+            currentStatsFetchId++;
             localStorage.removeItem('poltitan_saved_session');
             userAddress = null; 
             myOriginalAddress = null;
