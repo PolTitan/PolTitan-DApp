@@ -733,6 +733,7 @@
         let myReceivedRebirthsCount = 0; 
         let currentStatsFetchId = 0;
 
+        // FIXED WALLET AUTO-RELOAD FOR TRUST WALLET & SAFEPAL
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length === 0) {
