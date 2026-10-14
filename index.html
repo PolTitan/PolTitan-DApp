@@ -99,7 +99,7 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
 
-        /* INQUIRY SECTION DESIGN */
+        /* NEW INQUIRY SECTION DESIGN (VIDEO 1 STYLE) */
         .inquiry-outer-card { background: #0e0e0e; border: 1px solid #222; border-radius: 22px; padding: 28px 16px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .inquiry-top-logo-wrap { width: 190px; height: 85px; margin: 0 auto 18px auto; background: #000; border-radius: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid #1f1f1f; }
         .inquiry-top-logo-wrap video { width: 100%; height: 100%; object-fit: cover; }
@@ -160,7 +160,7 @@
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
 
-        /* RICH FOOTER DESIGN */
+        /* RICH FOOTER DESIGN (VIDEO 2 STYLE) */
         .site-footer { background: #0c0c0c; border-top: 1px solid #222; padding: 35px 20px 25px 20px; color: #9ca3af; width: 100%; margin-top: 30px; }
         .footer-inner { max-width: 500px; margin: 0 auto; text-align: left; }
         .footer-brand-logo { width: 130px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid #2a2a2a; display: block; margin-bottom: 12px; background: #000; }
@@ -243,6 +243,7 @@
         
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
+        <!-- ORDER AS REQUESTED: 1. REBIRTH ID -> 2. ABOUT US -> 3. INQUIRY -->
         <div class="menu-item" onclick="checkReceivedRebirths(); toggleMenu();"><i class="fa-solid fa-recycle" style="color:#10b981;"></i> Received Rebirths</div>
         <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
@@ -251,6 +252,7 @@
     </div>
 
     <!-- MODALS -->
+    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -269,6 +271,7 @@
         </div>
     </div>
 
+    <!-- TEAM SEARCH MODAL -->
     <div class="modal-overlay" id="teamSearchModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeTeamSearchModal()"></i>
@@ -284,6 +287,7 @@
         </div>
     </div>
 
+    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -301,6 +305,7 @@
         </div>
     </div>
 
+    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -357,6 +362,7 @@
                         <h1>ID <span id="displayId">--</span></h1>
                     </div>
                 </div>
+                <!-- UPDATED PROFILE DETAILS WITH RECEIVE ADDRESS & JOINING DATE -->
                 <div class="profile-details">
                     <div class="p-row">
                         <span class="p-label">POL Receive Address</span>
@@ -524,7 +530,7 @@
             </div>
         </div>
 
-        <!-- 8. CONTACT US & INQUIRY VIEW -->
+        <!-- 8. CONTACT US & INQUIRY VIEW (VIDEO 1 EXACT DESIGN) -->
         <div id="inquiryView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -590,7 +596,7 @@
         </div>
     </div>
 
-    <!-- GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER (VIDEO 2 EXACT DESIGN) -->
     <footer class="site-footer">
         <div class="footer-inner">
             <!-- Brand Top Section -->
@@ -728,7 +734,7 @@
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length === 0) {
                     logoutWallet();
-                } else if (userAddress) {
+                } else if (userAddress && accounts[0].toLowerCase() !== userAddress.toLowerCase()) {
                     window.location.reload();
                 }
             });
@@ -1790,7 +1796,7 @@
         let pressStartTime = 0;
         let pressTimer;
         
-        window.startNodePress = function(e, addr) {
+        function startNodePress(e, addr) {
             pressStartTime = new Date().getTime();
             pressTimer = setTimeout(async () => {
                 pressStartTime = 0; 
@@ -1815,9 +1821,9 @@
                     document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Error fetching Upline</span>"; 
                 }
             }, 500);
-        };
+        }
         
-        window.endNodePress = function(e, addr, currentSlotContext) {
+        function endNodePress(e, addr, currentSlotContext) {
             if (e.type === 'touchend') { 
                 e.preventDefault(); 
             }
@@ -1827,14 +1833,14 @@
                 pressStartTime = 0;
                 addHistoryAndLoadTree(addr, currentSlotContext);
             }
-        };
+        }
         
-        window.cancelNodePress = function() { 
+        function cancelNodePress() { 
             clearTimeout(pressTimer); 
             pressStartTime = 0; 
-        };
+        }
 
-        window.claimMyRefund = async function() {
+        async function claimMyRefund() {
             if (isViewOnly) { 
                 alert("Action not allowed in view mode!"); 
                 return; 
@@ -1897,11 +1903,23 @@
             }
         });
 
+        // FIXED: Original Safe Connect Logic (Ensures Network check works smoothly)
         masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
                     
+                    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                    if (chainId !== '0x89' && chainId !== 137) {
+                        try {
+                            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
+                        } catch (switchError) {
+                            showAlert('authAlert', 'Please switch network to Polygon Mainnet!', true);
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
+                            return;
+                        }
+                    }
+
                     let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     let addr = accounts[0];
                     
@@ -1919,7 +1937,9 @@
                     try { 
                         userInfo = await contract.users(addr); 
                     } catch(e) { 
-                        userInfo = null; 
+                        showAlert('authAlert', 'Network Error! Please refresh and try again.', true);
+                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
+                        return;
                     }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
