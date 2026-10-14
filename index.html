@@ -99,7 +99,7 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
 
-        /* NEW INQUIRY SECTION DESIGN */
+        /* NEW INQUIRY SECTION DESIGN (VIDEO 1 STYLE) */
         .inquiry-outer-card { background: #0e0e0e; border: 1px solid #222; border-radius: 22px; padding: 28px 16px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .inquiry-top-logo-wrap { width: 190px; height: 85px; margin: 0 auto 18px auto; background: #000; border-radius: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid #1f1f1f; }
         .inquiry-top-logo-wrap video { width: 100%; height: 100%; object-fit: cover; }
@@ -143,13 +143,13 @@
         .tree li:last-child::before { border-right: 2px solid var(--gold); border-radius: 0 5px 0 0; }
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold); width: 0; height: 15px; }
-
+        
         .tree li a { border: 1px solid var(--border-color); padding: 5px 8px; text-decoration: none; color: #fff; display: inline-block; border-radius: 6px; background: #111; min-width: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; margin: 0 2px;}
         .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-2px); }
         .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 10px; margin-bottom: 2px;}
         .tree li a i { font-size: 14px; color: var(--text-gray); margin-bottom: 2px; }
         .tree li a .rb-tag { display: block; font-size: 8px; color: #ff4d4d; font-weight: bold; margin-top: 2px; letter-spacing: 0.5px;}
-
+        
         .tree li a.rb-node { background: #004d00; border-color: #10b981; }
         .tree li a.rb-node:hover { background: #006600; border-color: #34d399; }
         .tree li a.rb-node .id-label { color: #fff; }
@@ -160,7 +160,7 @@
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
 
-        /* RICH FOOTER DESIGN */
+        /* NEW RICH FOOTER DESIGN (VIDEO 2 STYLE) */
         .site-footer { background: #0c0c0c; border-top: 1px solid #222; padding: 35px 20px 25px 20px; color: #9ca3af; width: 100%; margin-top: 30px; }
         .footer-inner { max-width: 500px; margin: 0 auto; text-align: left; }
         .footer-brand-logo { width: 130px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid #2a2a2a; display: block; margin-bottom: 12px; background: #000; }
@@ -183,7 +183,7 @@
         /* View Sections */
         .view-section { display: none; }
         #authView { display: block; margin-top: 3vh; }
-
+        
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .inspect-card { background: var(--card-bg); width: 90%; max-width: 350px; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; text-align: left; box-shadow: 0 10px 30px rgba(245, 197, 24, 0.3); position: relative;}
@@ -252,6 +252,7 @@
     </div>
 
     <!-- MODALS -->
+    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -270,6 +271,7 @@
         </div>
     </div>
 
+    <!-- TEAM SEARCH MODAL -->
     <div class="modal-overlay" id="teamSearchModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeTeamSearchModal()"></i>
@@ -285,6 +287,7 @@
         </div>
     </div>
 
+    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -302,12 +305,17 @@
         </div>
     </div>
 
+    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
-            <i class="fa-solid fa-bell" style="font-size: 40px; color: var(--gold); margin-bottom: 15px;"></i>
+            <video class="video-logo" autoplay loop muted playsinline style="margin-bottom: 15px; width: 140px; height: 45px; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 0 15px rgba(245, 197, 24, 0.4);">
+                <source src="poltitan-logo.mp4" type="video/mp4">
+            </video>
             <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
-            <p style="color: #fff; font-size: 14px; margin-bottom: 20px; font-weight: 500;" id="alertModalBody">Message goes here.</p>
+            <p style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
+            <p style="color: var(--text-gray); font-size: 10px; margin-bottom: 15px;">* Terms & Conditions apply.</p>
+            <h1 style="color: #10b981; font-size: 34px; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ACTIVE</h1>
             <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
         </div>
     </div>
@@ -360,12 +368,8 @@
                 </div>
                 <div class="profile-details">
                     <div class="p-row">
-                        <span class="p-label">POL Receive Address</span>
-                        <span class="p-val" style="font-size: 11px; color: #10b981; cursor: pointer;" id="displayReceiveAddr" onclick="copyFullAddress()">0x... <i class="fa-regular fa-copy" style="color:var(--gold); margin-left:5px;"></i></span>
-                    </div>
-                    <div class="p-row">
-                        <span class="p-label">Date of Joining</span>
-                        <span class="p-val" style="color: #3b82f6;" id="displayJoiningDate">--</span>
+                        <span class="p-label">Wallet Address</span>
+                        <span class="p-val" id="displayWalletMasked">0x...</span>
                     </div>
                     <div class="p-row">
                         <span class="p-label">Invited by</span>
@@ -492,7 +496,7 @@
         <!-- 7. ABOUT US VIEW -->
         <div id="aboutView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">About PolTitan</h3>
             </div>
             
@@ -525,7 +529,7 @@
             </div>
         </div>
 
-        <!-- 8. CONTACT US & INQUIRY VIEW -->
+        <!-- 8. CONTACT US & INQUIRY VIEW (VIDEO 1 EXACT DESIGN) -->
         <div id="inquiryView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -547,14 +551,17 @@
                             <label class="inq-label">YOUR NAME</label>
                             <input type="text" class="inq-input" placeholder="Enter your full name" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">EMAIL ADDRESS</label>
                             <input type="email" class="inq-input" placeholder="Enter your email" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">PHONE NUMBER</label>
                             <input type="tel" class="inq-input" placeholder="Enter your phone number" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">INQUIRY CATEGORY</label>
                             <select class="inq-select" required>
@@ -566,10 +573,12 @@
                                 <option value="Business / Other Query">Business / Other Query</option>
                             </select>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">YOUR MESSAGE / DETAILS <span>(Max 500 Words)</span></label>
                             <textarea class="inq-textarea" placeholder="Write your full message, query, or business details here..." required></textarea>
                         </div>
+
                         <button type="submit" class="inq-submit-btn">SUBMIT INQUIRY</button>
                     </form>
                 </div>
@@ -591,7 +600,7 @@
         </div>
     </div>
 
-    <!-- GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER (VIDEO 2 EXACT DESIGN) -->
     <footer class="site-footer">
         <div class="footer-inner">
             <!-- Brand Top Section -->
@@ -724,16 +733,19 @@
         let myReceivedRebirthsCount = 0; 
         let currentStatsFetchId = 0;
 
+        // FIXED WALLET AUTO-RELOAD FOR TRUST WALLET & SAFEPAL
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', function (accounts) { 
-                if (accounts.length === 0) { 
-                    logoutWallet(); 
-                } else { 
-                    window.location.reload(); 
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length === 0) {
+                    logoutWallet();
+                } else if (userAddress && accounts[0].toLowerCase() !== userAddress.toLowerCase()) {
+                    window.location.reload();
                 }
             });
-            window.ethereum.on('chainChanged', function () { 
-                window.location.reload(); 
+            window.ethereum.on('chainChanged', function () {
+                if (userAddress) {
+                    window.location.reload();
+                }
             });
         }
 
@@ -819,7 +831,7 @@
             }
         }
 
-        function copyDashboardRefLink() {
+        window.copyDashboardRefLink = function() {
             const link = document.getElementById('displayRefLink').innerText;
             navigator.clipboard.writeText(link).then(() => {
                 const copyBtn = document.getElementById('copyRefBtn');
@@ -830,14 +842,6 @@
                     copyBtn.style.color = "var(--gold)";
                 }, 2000);
             });
-        }
-        
-        function copyFullAddress() {
-            if(userAddress) {
-                navigator.clipboard.writeText(userAddress).then(() => {
-                    showCustomAlertModal("Copied", "POL Receive Address copied to clipboard!");
-                });
-            }
         }
 
         function openTeamSearchModal() {
@@ -958,8 +962,8 @@
                 loadSlot1Matrix(addr);
             } else if(context === 2) {
                 loadSlot2Matrix(addr);
-            } else if(context >= 3 && context <= 7) {
-                loadGlobalPoolMatrix(addr, context);
+            } else if(context === 3) {
+                loadSlot3Matrix(addr);
             } else {
                 loadMyPartnersGenealogy(addr);
             }
@@ -1212,37 +1216,36 @@
         }
 
         async function buildUnilevelTree(addr, level) {
-            if(level > 20) {
+            if(level > 4) {
                 return ''; 
             }
             let uInfo = await contract.users(addr);
             let dCount = uInfo[3].toNumber();
             
-            let childrenSet = new Set();
+            let promises = [];
             for(let i=0; i<dCount; i++) { 
-                childrenSet.add(await contract.userDirects(addr, i)); 
+                promises.push(contract.userDirects(addr, i)); 
             }
+            let allChildrenAddrs = await Promise.all(promises);
 
             let leftAddr = uInfo[7];
             let rightAddr = uInfo[8];
-            if(leftAddr && leftAddr !== "0x0000000000000000000000000000000000000000") {
-                childrenSet.add(leftAddr);
+            if(leftAddr && leftAddr !== "0x0000000000000000000000000000000000000000" && !allChildrenAddrs.includes(leftAddr)) {
+                allChildrenAddrs.push(leftAddr);
             }
-            if(rightAddr && rightAddr !== "0x0000000000000000000000000000000000000000") {
-                childrenSet.add(rightAddr);
+            if(rightAddr && rightAddr !== "0x0000000000000000000000000000000000000000" && !allChildrenAddrs.includes(rightAddr)) {
+                allChildrenAddrs.push(rightAddr);
             }
 
-            let allChildrenAddrs = Array.from(childrenSet);
             if(allChildrenAddrs.length === 0) {
                 return '';
             }
 
-            let childInfos = await Promise.all(allChildrenAddrs.map(c => contract.users(c)));
-            childInfos.sort((a, b) => a[0].toNumber() - b[0].toNumber());
-
             let html = '<ul>';
-            for(let i=0; i<childInfos.length; i++) {
-                let cInfo = childInfos[i];
+            for(let i=0; i<allChildrenAddrs.length; i++) {
+                let childAddr = allChildrenAddrs[i];
+                let cInfo = await contract.users(childAddr);
+                
                 let isReal = cInfo[6]; 
                 let iconC = isReal ? '#f5c518' : '#10b981';
                 let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
@@ -1252,12 +1255,12 @@
                     ? `<span class="id-label">ID ${cInfo[0].toNumber()}</span>` 
                     : `<span class="id-label">ID ${cInfo[0].toNumber()}</span><span class="rb-tag">R/B</span>`;
 
-                html += `<li><a class="${nodeClass}" ${getSmartEvents(cInfo[1], 0)}>
+                html += `<li><a class="${nodeClass}" ${getSmartEvents(childAddr, 0)}>
                     <i class="fa-solid ${iconCl}" style="color:${iconC};"></i>
                     ${displayHtml}
                 </a>`;
                 
-                html += await buildUnilevelTree(cInfo[1], level + 1);
+                html += await buildUnilevelTree(childAddr, level + 1);
                 html += `</li>`;
             }
             html += '</ul>';
@@ -1342,9 +1345,9 @@
             }
         }
 
-        async function loadGlobalPoolMatrix(targetAddress, slotNum) {
+        async function loadSlot3Matrix(targetAddress) {
             switchView('treeView');
-            document.getElementById('treeViewTitle').innerText = "Slot " + slotNum + " (Global Pool)";
+            document.getElementById('treeViewTitle').innerText = "3rd Slot (Global Pool)";
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Pool Data...</div>';
 
@@ -1354,16 +1357,16 @@
                     throw "User not found";
                 }
 
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, slotNum)}>
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 3)}>
                     <i class="fa-solid fa-globe" style="color:#3b82f6;"></i>
                     <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
                 </a><ul style="padding-top: 20px;">`;
 
                 let userIndex = -1;
                 let indexFound = false;
-                for(let i=0; i<1000; i++) {
+                for(let i=0; i<500; i++) {
                     try {
-                        let qAddr = await contract.slotQueues(slotNum, i);
+                        let qAddr = await contract.slotQueues(3, i);
                         if(qAddr.toLowerCase() === targetAddress.toLowerCase()) {
                             userIndex = i; 
                             indexFound = true; 
@@ -1375,16 +1378,10 @@
                 }
 
                 let downlines = [];
-                let requiredNodes = 8;
-                if(slotNum == 4) requiredNodes = 16;
-                if(slotNum == 5) requiredNodes = 32;
-                if(slotNum == 6) requiredNodes = 64;
-                if(slotNum == 7) requiredNodes = 128;
-
                 if(indexFound) {
-                    for(let i=1; i<=requiredNodes; i++) {
+                    for(let i=1; i<=8; i++) {
                         try {
-                            let childAddr = await contract.slotQueues(slotNum, (userIndex * requiredNodes) + i);
+                            let childAddr = await contract.slotQueues(3, (userIndex * 8) + i);
                             if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") { 
                                 downlines.push(childAddr); 
                             } else { 
@@ -1399,10 +1396,10 @@
                 let promises = downlines.map(addr => contract.users(addr));
                 let resolvedUsers = await Promise.all(promises);
 
-                for(let i=0; i<requiredNodes; i++) {
+                for(let i=0; i<8; i++) {
                     if(i < resolvedUsers.length) {
                         let childInfo = resolvedUsers[i];
-                        html += `<li><a ${getSmartEvents(childInfo[1], slotNum)}>
+                        html += `<li><a ${getSmartEvents(childInfo[1], 3)}>
                             <i class="fa-solid fa-user-check" style="color:var(--gold);"></i><span class="id-label">ID ${childInfo[0].toNumber()}</span>
                         </a></li>`;
                     } else { 
@@ -1413,7 +1410,7 @@
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot Matrix.</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 3 Matrix.</div>';
             }
         }
 
@@ -1479,34 +1476,9 @@
                     
                 } else if (type === 'upline') {
                     document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
-                    
                     if(myInfo[6] === false) { 
                         html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6"); 
                         count++;
-                    }
-                    
-                    let dCount = myInfo[3].toNumber();
-                    for(let i=0; i<dCount; i++) {
-                        let dAddr = await contract.userDirects(userAddress, i);
-                        let dInfo = await contract.users(dAddr);
-                        let dSlot = dInfo[4].toNumber();
-                        let dId = dInfo[0].toNumber();
-                        if(dSlot >= 4) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 4)", "50.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 5) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 5)", "500.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 6) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 6)", "5000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 7) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 7)", "50000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                    }
-                    
-                    let upAddr = myInfo[2];
-                    if(upAddr !== "0x0000000000000000000000000000000000000000") {
-                        let upInfo = await contract.users(upAddr);
-                        let upSlot = upInfo[4].toNumber();
-                        let upDCount = upInfo[3].toNumber();
-                        if(upDCount === 0) upDCount = 1; 
-                        if(upSlot >= 4) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 4)", (50/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 5) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 5)", (500/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 6) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 6)", (5000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 7) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 7)", (50000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
                     }
                 }
 
@@ -1564,6 +1536,7 @@
             container.innerHTML = html;
         }
 
+        // FIXED: Auto-Stop Lock + Fast Parallel Level-by-Level Counting
         async function fetchExtraStats(addr) {
             const myFetchId = ++currentStatsFetchId;
             try {
@@ -1575,7 +1548,7 @@
                 let currentLevel = [addr];
                 let processedCount = 0;
 
-                while(currentLevel.length > 0 && processedCount < 10000) { 
+                while(currentLevel.length > 0 && processedCount < 300) { 
                     if (myFetchId !== currentStatsFetchId) return;
 
                     let nextLevel = [];
@@ -1636,25 +1609,6 @@
             } catch(e){}
         }
 
-        async function fetchJoiningDate(addr) {
-            try {
-                let url = `https://api.polygonscan.com/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`;
-                let res = await fetch(url);
-                let data = await res.json();
-                if(data.status === "1" && data.result.length > 0) {
-                    for(let tx of data.result) {
-                        if(tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase() || tx.from.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()) {
-                            let date = new Date(tx.timeStamp * 1000);
-                            return date.toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'});
-                        }
-                    }
-                }
-                return "13 Oct 2026";
-            } catch(e) {
-                return "13 Oct 2026";
-            }
-        }
-
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; 
@@ -1684,14 +1638,7 @@
                 
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
-                    
-                    document.getElementById('displayReceiveAddr').innerHTML = userAddress.substring(0, 10) + "..." + userAddress.substring(34) + ' <i class="fa-regular fa-copy" style="color:var(--gold); margin-left:5px;"></i>';
-                    
-                    document.getElementById('displayJoiningDate').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                    fetchJoiningDate(userAddress).then(dateStr => {
-                        let dateEl = document.getElementById('displayJoiningDate');
-                        if (dateEl) dateEl.innerText = dateStr;
-                    });
+                    document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
                     
                     let upline = userInfo[2];
                     if(upline !== "0x0000000000000000000000000000000000000000") { 
@@ -1788,7 +1735,7 @@
         let pressStartTime = 0;
         let pressTimer;
         
-        function startNodePress(e, addr) {
+        window.startNodePress = function(e, addr) {
             pressStartTime = new Date().getTime();
             pressTimer = setTimeout(async () => {
                 pressStartTime = 0; 
@@ -1813,9 +1760,9 @@
                     document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Error fetching Upline</span>"; 
                 }
             }, 500);
-        }
+        };
         
-        function endNodePress(e, addr, currentSlotContext) {
+        window.endNodePress = function(e, addr, currentSlotContext) {
             if (e.type === 'touchend') { 
                 e.preventDefault(); 
             }
@@ -1825,11 +1772,15 @@
                 pressStartTime = 0;
                 addHistoryAndLoadTree(addr, currentSlotContext);
             }
-        }
+        };
         
-        function cancelNodePress() { 
+        window.cancelNodePress = function() { 
             clearTimeout(pressTimer); 
             pressStartTime = 0; 
+        };
+        
+        function getSmartEvents(addr, context) {
+            return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
         }
 
         async function claimMyRefund() {
@@ -1977,16 +1928,16 @@
         function closeInspectModal() { 
             inspectModalOverlay.style.display = "none"; 
         }
-
+        
         function closeWelcomeModalOnly() { 
             welcomeModal.style.display = 'none'; 
         }
-
+        
         function closeWelcomeModalAndGo() { 
             welcomeModal.style.display = 'none'; 
             loadDashboardData(userAddress, false); 
         }
-
+        
         function logoutWallet() { 
             currentStatsFetchId++;
             localStorage.removeItem('poltitan_saved_session');
