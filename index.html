@@ -243,6 +243,7 @@
         
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
+        <!-- ORDER AS REQUESTED: 1. REBIRTH ID -> 2. ABOUT US -> 3. INQUIRY -->
         <div class="menu-item" onclick="checkReceivedRebirths(); toggleMenu();"><i class="fa-solid fa-recycle" style="color:#10b981;"></i> Received Rebirths</div>
         <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
@@ -251,6 +252,7 @@
     </div>
 
     <!-- MODALS -->
+    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -269,6 +271,7 @@
         </div>
     </div>
 
+    <!-- TEAM SEARCH MODAL -->
     <div class="modal-overlay" id="teamSearchModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeTeamSearchModal()"></i>
@@ -284,6 +287,7 @@
         </div>
     </div>
 
+    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -301,6 +305,7 @@
         </div>
     </div>
 
+    <!-- CUSTOM ALERT MODAL (RESTORED TO PREVIOUS NORMAL DESIGN) -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -357,6 +362,7 @@
                         <h1>ID <span id="displayId">--</span></h1>
                     </div>
                 </div>
+                <!-- UPDATED PROFILE DETAILS WITH RECEIVE ADDRESS & JOINING DATE -->
                 <div class="profile-details">
                     <div class="p-row">
                         <span class="p-label">POL Receive Address</span>
@@ -524,7 +530,7 @@
             </div>
         </div>
 
-        <!-- 8. CONTACT US & INQUIRY VIEW -->
+        <!-- 8. CONTACT US & INQUIRY VIEW (VIDEO 1 EXACT DESIGN) -->
         <div id="inquiryView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -546,14 +552,17 @@
                             <label class="inq-label">YOUR NAME</label>
                             <input type="text" class="inq-input" placeholder="Enter your full name" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">EMAIL ADDRESS</label>
                             <input type="email" class="inq-input" placeholder="Enter your email" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">PHONE NUMBER</label>
                             <input type="tel" class="inq-input" placeholder="Enter your phone number" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">INQUIRY CATEGORY</label>
                             <select class="inq-select" required>
@@ -565,10 +574,12 @@
                                 <option value="Business / Other Query">Business / Other Query</option>
                             </select>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">YOUR MESSAGE / DETAILS <span>(Max 500 Words)</span></label>
                             <textarea class="inq-textarea" placeholder="Write your full message, query, or business details here..." required></textarea>
                         </div>
+
                         <button type="submit" class="inq-submit-btn">SUBMIT INQUIRY</button>
                     </form>
                 </div>
@@ -590,7 +601,7 @@
         </div>
     </div>
 
-    <!-- GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER (VIDEO 2 EXACT DESIGN) -->
     <footer class="site-footer">
         <div class="footer-inner">
             <!-- Brand Top Section -->
@@ -723,6 +734,7 @@
         let myReceivedRebirthsCount = 0; 
         let currentStatsFetchId = 0;
 
+        // FIXED WALLET AUTO-RELOAD FOR TRUST WALLET & SAFEPAL
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length === 0) {
@@ -833,6 +845,7 @@
             });
         }
         
+        // COPY WALLET ADDRESS FUNCTION
         window.copyFullAddress = function() {
             if(userAddress) {
                 navigator.clipboard.writeText(userAddress).then(() => {
@@ -959,9 +972,8 @@
                 loadSlot1Matrix(addr);
             } else if(context === 2) {
                 loadSlot2Matrix(addr);
-            } else if(context >= 3 && context <= 7) {
-                // FIXED: Slot 4, 5, 6, 7 will now correctly open Global Pool matrix instead of personal genealogy
-                loadGlobalPoolMatrix(addr, context);
+            } else if(context === 3) {
+                loadSlot3Matrix(addr);
             } else {
                 loadMyPartnersGenealogy(addr);
             }
@@ -1213,41 +1225,37 @@
             }
         }
 
-        // FIXED: Rebirth IDs (A & B) will now properly show before Directs (C & D) based on Chronological ID order
-        // FIXED: Increased load limit from 4 to 20 levels so all 136 IDs load correctly
         async function buildUnilevelTree(addr, level) {
-            if(level > 20) {
+            if(level > 4) {
                 return ''; 
             }
             let uInfo = await contract.users(addr);
             let dCount = uInfo[3].toNumber();
             
-            let childrenSet = new Set();
+            let promises = [];
             for(let i=0; i<dCount; i++) { 
-                childrenSet.add(await contract.userDirects(addr, i)); 
+                promises.push(contract.userDirects(addr, i)); 
             }
+            let allChildrenAddrs = await Promise.all(promises);
 
             let leftAddr = uInfo[7];
             let rightAddr = uInfo[8];
-            if(leftAddr && leftAddr !== "0x0000000000000000000000000000000000000000") {
-                childrenSet.add(leftAddr);
+            if(leftAddr && leftAddr !== "0x0000000000000000000000000000000000000000" && !allChildrenAddrs.includes(leftAddr)) {
+                allChildrenAddrs.push(leftAddr);
             }
-            if(rightAddr && rightAddr !== "0x0000000000000000000000000000000000000000") {
-                childrenSet.add(rightAddr);
+            if(rightAddr && rightAddr !== "0x0000000000000000000000000000000000000000" && !allChildrenAddrs.includes(rightAddr)) {
+                allChildrenAddrs.push(rightAddr);
             }
 
-            let allChildrenAddrs = Array.from(childrenSet);
             if(allChildrenAddrs.length === 0) {
                 return '';
             }
 
-            let childInfos = await Promise.all(allChildrenAddrs.map(c => contract.users(c)));
-            // CRITICAL FIX: Sort by ID number. Older IDs (like Rebirth A & B) will always render before newer Directs (C & D)
-            childInfos.sort((a, b) => a[0].toNumber() - b[0].toNumber());
-
             let html = '<ul>';
-            for(let i=0; i<childInfos.length; i++) {
-                let cInfo = childInfos[i];
+            for(let i=0; i<allChildrenAddrs.length; i++) {
+                let childAddr = allChildrenAddrs[i];
+                let cInfo = await contract.users(childAddr);
+                
                 let isReal = cInfo[6]; 
                 let iconC = isReal ? '#f5c518' : '#10b981';
                 let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
@@ -1257,12 +1265,12 @@
                     ? `<span class="id-label">ID ${cInfo[0].toNumber()}</span>` 
                     : `<span class="id-label">ID ${cInfo[0].toNumber()}</span><span class="rb-tag">R/B</span>`;
 
-                html += `<li><a class="${nodeClass}" ${getSmartEvents(cInfo[1], 0)}>
+                html += `<li><a class="${nodeClass}" ${getSmartEvents(childAddr, 0)}>
                     <i class="fa-solid ${iconCl}" style="color:${iconC};"></i>
                     ${displayHtml}
                 </a>`;
                 
-                html += await buildUnilevelTree(cInfo[1], level + 1);
+                html += await buildUnilevelTree(childAddr, level + 1);
                 html += `</li>`;
             }
             html += '</ul>';
@@ -1347,10 +1355,9 @@
             }
         }
 
-        // FIXED: Universal Global Pool Loader for Slot 3 to 7
-        async function loadGlobalPoolMatrix(targetAddress, slotNum) {
+        async function loadSlot3Matrix(targetAddress) {
             switchView('treeView');
-            document.getElementById('treeViewTitle').innerText = "Slot " + slotNum + " (Global Pool)";
+            document.getElementById('treeViewTitle').innerText = "3rd Slot (Global Pool)";
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Pool Data...</div>';
 
@@ -1360,16 +1367,16 @@
                     throw "User not found";
                 }
 
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, slotNum)}>
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 3)}>
                     <i class="fa-solid fa-globe" style="color:#3b82f6;"></i>
                     <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
                 </a><ul style="padding-top: 20px;">`;
 
                 let userIndex = -1;
                 let indexFound = false;
-                for(let i=0; i<1000; i++) {
+                for(let i=0; i<500; i++) {
                     try {
-                        let qAddr = await contract.slotQueues(slotNum, i);
+                        let qAddr = await contract.slotQueues(3, i);
                         if(qAddr.toLowerCase() === targetAddress.toLowerCase()) {
                             userIndex = i; 
                             indexFound = true; 
@@ -1381,16 +1388,10 @@
                 }
 
                 let downlines = [];
-                let requiredNodes = 8;
-                if(slotNum == 4) requiredNodes = 16;
-                if(slotNum == 5) requiredNodes = 32;
-                if(slotNum == 6) requiredNodes = 64;
-                if(slotNum == 7) requiredNodes = 128;
-
                 if(indexFound) {
-                    for(let i=1; i<=requiredNodes; i++) {
+                    for(let i=1; i<=8; i++) {
                         try {
-                            let childAddr = await contract.slotQueues(slotNum, (userIndex * requiredNodes) + i);
+                            let childAddr = await contract.slotQueues(3, (userIndex * 8) + i);
                             if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") { 
                                 downlines.push(childAddr); 
                             } else { 
@@ -1405,10 +1406,10 @@
                 let promises = downlines.map(addr => contract.users(addr));
                 let resolvedUsers = await Promise.all(promises);
 
-                for(let i=0; i<requiredNodes; i++) {
+                for(let i=0; i<8; i++) {
                     if(i < resolvedUsers.length) {
                         let childInfo = resolvedUsers[i];
-                        html += `<li><a ${getSmartEvents(childInfo[1], slotNum)}>
+                        html += `<li><a ${getSmartEvents(childInfo[1], 3)}>
                             <i class="fa-solid fa-user-check" style="color:var(--gold);"></i><span class="id-label">ID ${childInfo[0].toNumber()}</span>
                         </a></li>`;
                     } else { 
@@ -1419,7 +1420,7 @@
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot Matrix.</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 3 Matrix.</div>';
             }
         }
 
@@ -1485,36 +1486,9 @@
                     
                 } else if (type === 'upline') {
                     document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
-                    
-                    // 1. Rebirth System Income Tracker
                     if(myInfo[6] === false) { 
                         html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6"); 
                         count++;
-                    }
-                    
-                    // FIXED 3: Upline Level Income & Downline Upgrade Income Tracker added here
-                    let dCount = myInfo[3].toNumber();
-                    for(let i=0; i<dCount; i++) {
-                        let dAddr = await contract.userDirects(userAddress, i);
-                        let dInfo = await contract.users(dAddr);
-                        let dSlot = dInfo[4].toNumber();
-                        let dId = dInfo[0].toNumber();
-                        if(dSlot >= 4) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 4)", "50.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 5) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 5)", "500.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 6) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 6)", "5000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 7) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 7)", "50000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                    }
-                    
-                    let upAddr = myInfo[2];
-                    if(upAddr !== "0x0000000000000000000000000000000000000000") {
-                        let upInfo = await contract.users(upAddr);
-                        let upSlot = upInfo[4].toNumber();
-                        let upDCount = upInfo[3].toNumber();
-                        if(upDCount === 0) upDCount = 1; 
-                        if(upSlot >= 4) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 4)", (50/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 5) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 5)", (500/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 6) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 6)", (5000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 7) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 7)", (50000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
                     }
                 }
 
@@ -1572,7 +1546,7 @@
             container.innerHTML = html;
         }
 
-        // FIXED: Count Limit increased for accurate Total Team representation
+        // FIXED: Auto-Stop Lock + Fast Parallel Level-by-Level Counting
         async function fetchExtraStats(addr) {
             const myFetchId = ++currentStatsFetchId;
             try {
@@ -1584,7 +1558,7 @@
                 let currentLevel = [addr];
                 let processedCount = 0;
 
-                while(currentLevel.length > 0 && processedCount < 10000) { 
+                while(currentLevel.length > 0 && processedCount < 300) { 
                     if (myFetchId !== currentStatsFetchId) return;
 
                     let nextLevel = [];
@@ -1645,6 +1619,7 @@
             } catch(e){}
         }
 
+        // FETCH JOINING DATE FROM POLYGONSCAN
         async function fetchJoiningDate(addr) {
             try {
                 let url = `https://api.polygonscan.com/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`;
@@ -1694,6 +1669,7 @@
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     
+                    // NEW: Display Receive Address & Date of Joining
                     document.getElementById('displayReceiveAddr').innerHTML = userAddress.substring(0, 10) + "..." + userAddress.substring(34) + ' <i class="fa-regular fa-copy" style="color:var(--gold); margin-left:5px;"></i>';
                     
                     document.getElementById('displayJoiningDate').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
