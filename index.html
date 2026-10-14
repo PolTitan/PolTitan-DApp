@@ -99,7 +99,7 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
 
-        /* INQUIRY SECTION DESIGN */
+        /* NEW INQUIRY SECTION DESIGN */
         .inquiry-outer-card { background: #0e0e0e; border: 1px solid #222; border-radius: 22px; padding: 28px 16px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .inquiry-top-logo-wrap { width: 190px; height: 85px; margin: 0 auto 18px auto; background: #000; border-radius: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid #1f1f1f; }
         .inquiry-top-logo-wrap video { width: 100%; height: 100%; object-fit: cover; }
@@ -243,6 +243,7 @@
         
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
+        <!-- ORDER AS REQUESTED: 1. REBIRTH ID -> 2. ABOUT US -> 3. INQUIRY -->
         <div class="menu-item" onclick="checkReceivedRebirths(); toggleMenu();"><i class="fa-solid fa-recycle" style="color:#10b981;"></i> Received Rebirths</div>
         <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
@@ -698,6 +699,7 @@
         </div>
     </footer>
 
+    <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0x8F9afF47ea1448773Cf84f71C1Af65121275DC9f";
         
@@ -723,17 +725,15 @@
         let currentStatsFetchId = 0;
 
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', function (accounts) {
-                if (accounts.length === 0) {
-                    logoutWallet();
-                } else if (userAddress && accounts[0].toLowerCase() !== userAddress.toLowerCase()) {
-                    window.location.reload();
+            window.ethereum.on('accountsChanged', function (accounts) { 
+                if (accounts.length === 0) { 
+                    logoutWallet(); 
+                } else { 
+                    window.location.reload(); 
                 }
             });
-            window.ethereum.on('chainChanged', function () {
-                if (userAddress) {
-                    window.location.reload();
-                }
+            window.ethereum.on('chainChanged', function () { 
+                window.location.reload(); 
             });
         }
 
@@ -763,7 +763,7 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        window.checkReceivedRebirths = function() {
+        function checkReceivedRebirths() {
             if(myReceivedRebirthsCount > 0) {
                 showCustomAlertModal("Received Rebirths", `Congratulations! You have received ${myReceivedRebirthsCount} Rebirth (Green) IDs in your downline structure.`);
             } else {
@@ -771,11 +771,11 @@
             }
         }
 
-        window.openInquiryModal = function() { 
+        function openInquiryModal() { 
             switchView('inquiryView');
         }
         
-        window.closeInquiryModal = function() { 
+        function closeInquiryModal() { 
             if (userAddress) {
                 switchView('dashboardView');
             } else {
@@ -783,23 +783,23 @@
             }
         }
         
-        window.submitInquiry = function(e) {
+        function submitInquiry(e) {
             e.preventDefault();
             showCustomAlertModal("Success", "Your inquiry has been submitted successfully. We will contact you soon.");
             document.getElementById('inquiryForm').reset();
         }
 
-        window.toggleMenu = function() { 
+        function toggleMenu() { 
             sideMenu.classList.toggle('active'); 
         }
-
-        window.switchView = function(viewId) {
+        
+        function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
             window.scrollTo(0, 0); 
         }
-
-        window.goToDashboard = function() { 
+        
+        function goToDashboard() { 
             if (userAddress) {
                 switchView('dashboardView'); 
             } else {
@@ -807,7 +807,7 @@
             }
         }
 
-        window.toggleIncomeDropdown = function() {
+        function toggleIncomeDropdown() {
             const dropdown = document.getElementById('incomeDropdown');
             const arrow = document.getElementById('incomeArrow');
             if(dropdown.style.display === 'block') {
@@ -819,7 +819,7 @@
             }
         }
 
-        window.copyDashboardRefLink = function() {
+        function copyDashboardRefLink() {
             const link = document.getElementById('displayRefLink').innerText;
             navigator.clipboard.writeText(link).then(() => {
                 const copyBtn = document.getElementById('copyRefBtn');
@@ -832,7 +832,7 @@
             });
         }
         
-        window.copyFullAddress = function() {
+        function copyFullAddress() {
             if(userAddress) {
                 navigator.clipboard.writeText(userAddress).then(() => {
                     showCustomAlertModal("Copied", "POL Receive Address copied to clipboard!");
@@ -840,7 +840,7 @@
             }
         }
 
-        window.openTeamSearchModal = function() {
+        function openTeamSearchModal() {
             if(isViewOnly) {
                 showCustomAlertModal("Notice", "You are already viewing someone's dashboard. Click 'Back to My Dashboard' first.");
                 return;
@@ -849,11 +849,11 @@
             document.getElementById('teamSearchModal').style.display = 'flex';
         }
 
-        window.closeTeamSearchModal = function() {
+        function closeTeamSearchModal() {
             document.getElementById('teamSearchModal').style.display = 'none';
         }
 
-        window.executeTeamSearch = async function(e) {
+        async function executeTeamSearch(e) {
             e.preventDefault();
             const inputVal = document.getElementById('teamSearchInput').value.trim();
             const btn = document.getElementById('teamSearchBtn');
@@ -916,7 +916,7 @@
             }
         }
 
-        window.exitTeamViewMode = function() {
+        function exitTeamViewMode() {
             if(myOriginalAddress) {
                 loadDashboardData(myOriginalAddress, false);
             } else {
@@ -924,7 +924,7 @@
             }
         }
 
-        window.resetHistoryAndLoadTree = function(addr, context) {
+        function resetHistoryAndLoadTree(addr, context) {
             treeNavigationHistory = []; 
             currentTreeContext = context;
             executeTreeLoad(addr, context, true);
@@ -935,7 +935,7 @@
             executeTreeLoad(addr, context, true);
         }
 
-        window.goBackInTreeHistory = function() {
+        function goBackInTreeHistory() {
             if(treeNavigationHistory.length > 1) {
                 treeNavigationHistory.pop(); 
                 let previousState = treeNavigationHistory[treeNavigationHistory.length - 1]; 
@@ -1011,7 +1011,7 @@
             };
         });
         
-        window.toggleChat = function() { 
+        function toggleChat() { 
             if(isDraggingChat) return; 
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
@@ -1036,7 +1036,7 @@
             }
         }
 
-        window.chatAction = async function(action) {
+        async function chatAction(action) {
             const msgBox = document.getElementById('chatBotMsg');
             if(!userAddress) {
                 msgBox.innerHTML = "<span style='color:#ff4d4d;'>Please login first to use AI Assistant.</span>"; 
@@ -1100,7 +1100,7 @@
             }
         }
 
-        window.loadLiveTransactions = async function() {
+        async function loadLiveTransactions() {
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
             if(!userAddress) {
@@ -1417,7 +1417,7 @@
             }
         }
 
-        window.loadIncomeHistory = async function(type) {
+        async function loadIncomeHistory(type) {
             switchView('incomeView');
             document.getElementById('tab-direct').classList.remove('active-tab');
             document.getElementById('tab-slot').classList.remove('active-tab');
@@ -1655,7 +1655,7 @@
             }
         }
 
-        window.loadDashboardData = async function(address, viewMode) {
+        async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; 
                 globalRootAddress = address; 
@@ -1689,7 +1689,8 @@
                     
                     document.getElementById('displayJoiningDate').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                     fetchJoiningDate(userAddress).then(dateStr => {
-                        document.getElementById('displayJoiningDate').innerText = dateStr;
+                        let dateEl = document.getElementById('displayJoiningDate');
+                        if (dateEl) dateEl.innerText = dateStr;
                     });
                     
                     let upline = userInfo[2];
@@ -1784,7 +1785,10 @@
             }
         }
 
-        window.startNodePress = function(e, addr) {
+        let pressStartTime = 0;
+        let pressTimer;
+        
+        function startNodePress(e, addr) {
             pressStartTime = new Date().getTime();
             pressTimer = setTimeout(async () => {
                 pressStartTime = 0; 
@@ -1809,9 +1813,9 @@
                     document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Error fetching Upline</span>"; 
                 }
             }, 500);
-        };
+        }
         
-        window.endNodePress = function(e, addr, currentSlotContext) {
+        function endNodePress(e, addr, currentSlotContext) {
             if (e.type === 'touchend') { 
                 e.preventDefault(); 
             }
@@ -1821,14 +1825,14 @@
                 pressStartTime = 0;
                 addHistoryAndLoadTree(addr, currentSlotContext);
             }
-        };
+        }
         
-        window.cancelNodePress = function() { 
+        function cancelNodePress() { 
             clearTimeout(pressTimer); 
             pressStartTime = 0; 
-        };
+        }
 
-        window.claimMyRefund = async function() {
+        async function claimMyRefund() {
             if (isViewOnly) { 
                 alert("Action not allowed in view mode!"); 
                 return; 
@@ -1959,7 +1963,7 @@
             }
         });
 
-        window.inspectFromLogin = async function() {
+        async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
             if(inputAddr.length === 42) { 
                 provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); 
@@ -1970,20 +1974,20 @@
             }
         }
 
-        window.closeInspectModal = function() { 
+        function closeInspectModal() { 
             inspectModalOverlay.style.display = "none"; 
         }
 
-        window.closeWelcomeModalOnly = function() { 
+        function closeWelcomeModalOnly() { 
             welcomeModal.style.display = 'none'; 
         }
 
-        window.closeWelcomeModalAndGo = function() { 
+        function closeWelcomeModalAndGo() { 
             welcomeModal.style.display = 'none'; 
             loadDashboardData(userAddress, false); 
         }
 
-        window.logoutWallet = function() { 
+        function logoutWallet() { 
             currentStatsFetchId++;
             localStorage.removeItem('poltitan_saved_session');
             userAddress = null; 
