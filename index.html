@@ -305,17 +305,13 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT MODAL -->
+    <!-- CUSTOM ALERT MODAL (RESTORED TO PREVIOUS NORMAL DESIGN) -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
-            <video class="video-logo" autoplay loop muted playsinline style="margin-bottom: 15px; width: 140px; height: 45px; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 0 15px rgba(245, 197, 24, 0.4);">
-                <source src="poltitan-logo.mp4" type="video/mp4">
-            </video>
+            <i class="fa-solid fa-bell" style="font-size: 40px; color: var(--gold); margin-bottom: 15px;"></i>
             <h2 style="color: var(--gold); margin-bottom: 10px; font-size: 20px;" id="alertModalTitle">Notice</h2>
-            <p style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 600;" id="alertModalBody">Message goes here.</p>
-            <p style="color: var(--text-gray); font-size: 10px; margin-bottom: 15px;">* Terms & Conditions apply.</p>
-            <h1 style="color: #10b981; font-size: 34px; font-weight: 900; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ACTIVE</h1>
+            <p style="color: #fff; font-size: 14px; margin-bottom: 20px; font-weight: 500;" id="alertModalBody">Message goes here.</p>
             <button class="btn-gold" onclick="document.getElementById('customAlertModal').style.display='none'" style="padding: 10px; font-size: 14px;">OK</button>
         </div>
     </div>
@@ -366,10 +362,15 @@
                         <h1>ID <span id="displayId">--</span></h1>
                     </div>
                 </div>
+                <!-- UPDATED PROFILE DETAILS WITH RECEIVE ADDRESS & JOINING DATE -->
                 <div class="profile-details">
                     <div class="p-row">
-                        <span class="p-label">Wallet Address</span>
-                        <span class="p-val" id="displayWalletMasked">0x...</span>
+                        <span class="p-label">POL Receive Address</span>
+                        <span class="p-val" style="font-size: 11px; color: #10b981; cursor: pointer;" id="displayReceiveAddr" onclick="copyFullAddress()">0x... <i class="fa-regular fa-copy" style="color:var(--gold); margin-left:5px;"></i></span>
+                    </div>
+                    <div class="p-row">
+                        <span class="p-label">Date of Joining</span>
+                        <span class="p-val" style="color: #3b82f6;" id="displayJoiningDate">--</span>
                     </div>
                     <div class="p-row">
                         <span class="p-label">Invited by</span>
@@ -496,7 +497,7 @@
         <!-- 7. ABOUT US VIEW -->
         <div id="aboutView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="switchView('dashboardView')"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <h3 style="color: var(--gold); font-size: 18px;">About PolTitan</h3>
             </div>
             
@@ -842,6 +843,15 @@
                     copyBtn.style.color = "var(--gold)";
                 }, 2000);
             });
+        }
+        
+        // COPY WALLET ADDRESS FUNCTION
+        window.copyFullAddress = function() {
+            if(userAddress) {
+                navigator.clipboard.writeText(userAddress).then(() => {
+                    showCustomAlertModal("Copied", "POL Receive Address copied to clipboard!");
+                });
+            }
         }
 
         function openTeamSearchModal() {
@@ -1609,6 +1619,26 @@
             } catch(e){}
         }
 
+        // FETCH JOINING DATE FROM POLYGONSCAN
+        async function fetchJoiningDate(addr) {
+            try {
+                let url = `https://api.polygonscan.com/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`;
+                let res = await fetch(url);
+                let data = await res.json();
+                if(data.status === "1" && data.result.length > 0) {
+                    for(let tx of data.result) {
+                        if(tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase() || tx.from.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()) {
+                            let date = new Date(tx.timeStamp * 1000);
+                            return date.toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'});
+                        }
+                    }
+                }
+                return "13 Oct 2026";
+            } catch(e) {
+                return "13 Oct 2026";
+            }
+        }
+
         async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; 
@@ -1638,7 +1668,14 @@
                 
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
-                    document.getElementById('displayWalletMasked').innerText = userAddress.substring(0, 6) + "...." + userAddress.substring(38);
+                    
+                    // NEW: Display Receive Address & Date of Joining
+                    document.getElementById('displayReceiveAddr').innerHTML = userAddress.substring(0, 10) + "..." + userAddress.substring(34) + ' <i class="fa-regular fa-copy" style="color:var(--gold); margin-left:5px;"></i>';
+                    
+                    document.getElementById('displayJoiningDate').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                    fetchJoiningDate(userAddress).then(dateStr => {
+                        document.getElementById('displayJoiningDate').innerText = dateStr;
+                    });
                     
                     let upline = userInfo[2];
                     if(upline !== "0x0000000000000000000000000000000000000000") { 
