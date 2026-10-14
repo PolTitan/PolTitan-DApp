@@ -99,7 +99,7 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
 
-        /* INQUIRY SECTION DESIGN */
+        /* NEW INQUIRY SECTION DESIGN (VIDEO 1 STYLE) */
         .inquiry-outer-card { background: #0e0e0e; border: 1px solid #222; border-radius: 22px; padding: 28px 16px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .inquiry-top-logo-wrap { width: 190px; height: 85px; margin: 0 auto 18px auto; background: #000; border-radius: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid #1f1f1f; }
         .inquiry-top-logo-wrap video { width: 100%; height: 100%; object-fit: cover; }
@@ -143,13 +143,13 @@
         .tree li:last-child::before { border-right: 2px solid var(--gold); border-radius: 0 5px 0 0; }
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold); width: 0; height: 15px; }
-
+        
         .tree li a { border: 1px solid var(--border-color); padding: 5px 8px; text-decoration: none; color: #fff; display: inline-block; border-radius: 6px; background: #111; min-width: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; margin: 0 2px;}
         .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-2px); }
         .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 10px; margin-bottom: 2px;}
         .tree li a i { font-size: 14px; color: var(--text-gray); margin-bottom: 2px; }
         .tree li a .rb-tag { display: block; font-size: 8px; color: #ff4d4d; font-weight: bold; margin-top: 2px; letter-spacing: 0.5px;}
-
+        
         .tree li a.rb-node { background: #004d00; border-color: #10b981; }
         .tree li a.rb-node:hover { background: #006600; border-color: #34d399; }
         .tree li a.rb-node .id-label { color: #fff; }
@@ -160,7 +160,7 @@
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
 
-        /* RICH FOOTER DESIGN */
+        /* NEW RICH FOOTER DESIGN (VIDEO 2 STYLE) */
         .site-footer { background: #0c0c0c; border-top: 1px solid #222; padding: 35px 20px 25px 20px; color: #9ca3af; width: 100%; margin-top: 30px; }
         .footer-inner { max-width: 500px; margin: 0 auto; text-align: left; }
         .footer-brand-logo { width: 130px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid #2a2a2a; display: block; margin-bottom: 12px; background: #000; }
@@ -183,7 +183,7 @@
         /* View Sections */
         .view-section { display: none; }
         #authView { display: block; margin-top: 3vh; }
-
+        
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .inspect-card { background: var(--card-bg); width: 90%; max-width: 350px; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; text-align: left; box-shadow: 0 10px 30px rgba(245, 197, 24, 0.3); position: relative;}
@@ -243,6 +243,7 @@
         
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
+        <!-- ORDER AS REQUESTED: 1. REBIRTH ID -> 2. ABOUT US -> 3. INQUIRY -->
         <div class="menu-item" onclick="checkReceivedRebirths(); toggleMenu();"><i class="fa-solid fa-recycle" style="color:#10b981;"></i> Received Rebirths</div>
         <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
@@ -251,6 +252,7 @@
     </div>
 
     <!-- MODALS -->
+    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -269,6 +271,7 @@
         </div>
     </div>
 
+    <!-- TEAM SEARCH MODAL -->
     <div class="modal-overlay" id="teamSearchModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeTeamSearchModal()"></i>
@@ -284,6 +287,7 @@
         </div>
     </div>
 
+    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -301,6 +305,7 @@
         </div>
     </div>
 
+    <!-- CUSTOM ALERT MODAL (RESTORED TO PREVIOUS NORMAL DESIGN) -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -357,6 +362,7 @@
                         <h1>ID <span id="displayId">--</span></h1>
                     </div>
                 </div>
+                <!-- UPDATED PROFILE DETAILS WITH RECEIVE ADDRESS & JOINING DATE -->
                 <div class="profile-details">
                     <div class="p-row">
                         <span class="p-label">POL Receive Address</span>
@@ -524,7 +530,7 @@
             </div>
         </div>
 
-        <!-- 8. CONTACT US & INQUIRY VIEW -->
+        <!-- 8. CONTACT US & INQUIRY VIEW (VIDEO 1 EXACT DESIGN) -->
         <div id="inquiryView" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <button class="btn-outline btn-small" style="margin: 0; padding:8px 15px; width:auto;" onclick="closeInquiryModal()"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -546,14 +552,17 @@
                             <label class="inq-label">YOUR NAME</label>
                             <input type="text" class="inq-input" placeholder="Enter your full name" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">EMAIL ADDRESS</label>
                             <input type="email" class="inq-input" placeholder="Enter your email" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">PHONE NUMBER</label>
                             <input type="tel" class="inq-input" placeholder="Enter your phone number" required>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">INQUIRY CATEGORY</label>
                             <select class="inq-select" required>
@@ -565,10 +574,12 @@
                                 <option value="Business / Other Query">Business / Other Query</option>
                             </select>
                         </div>
+
                         <div class="inq-field-group">
                             <label class="inq-label">YOUR MESSAGE / DETAILS <span>(Max 500 Words)</span></label>
                             <textarea class="inq-textarea" placeholder="Write your full message, query, or business details here..." required></textarea>
                         </div>
+
                         <button type="submit" class="inq-submit-btn">SUBMIT INQUIRY</button>
                     </form>
                 </div>
@@ -590,7 +601,7 @@
         </div>
     </div>
 
-    <!-- GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER (VIDEO 2 EXACT DESIGN) -->
     <footer class="site-footer">
         <div class="footer-inner">
             <!-- Brand Top Section -->
@@ -698,6 +709,7 @@
         </div>
     </footer>
 
+    <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0x8F9afF47ea1448773Cf84f71C1Af65121275DC9f";
         
@@ -722,6 +734,7 @@
         let myReceivedRebirthsCount = 0; 
         let currentStatsFetchId = 0;
 
+        // FIXED WALLET AUTO-RELOAD FOR TRUST WALLET & SAFEPAL
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length === 0) {
@@ -763,7 +776,7 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        window.checkReceivedRebirths = function() {
+        function checkReceivedRebirths() {
             if(myReceivedRebirthsCount > 0) {
                 showCustomAlertModal("Received Rebirths", `Congratulations! You have received ${myReceivedRebirthsCount} Rebirth (Green) IDs in your downline structure.`);
             } else {
@@ -771,11 +784,11 @@
             }
         }
 
-        window.openInquiryModal = function() { 
+        function openInquiryModal() { 
             switchView('inquiryView');
         }
         
-        window.closeInquiryModal = function() { 
+        function closeInquiryModal() { 
             if (userAddress) {
                 switchView('dashboardView');
             } else {
@@ -783,23 +796,23 @@
             }
         }
         
-        window.submitInquiry = function(e) {
+        function submitInquiry(e) {
             e.preventDefault();
             showCustomAlertModal("Success", "Your inquiry has been submitted successfully. We will contact you soon.");
             document.getElementById('inquiryForm').reset();
         }
 
-        window.toggleMenu = function() { 
+        function toggleMenu() { 
             sideMenu.classList.toggle('active'); 
         }
-
-        window.switchView = function(viewId) {
+        
+        function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
             window.scrollTo(0, 0); 
         }
-
-        window.goToDashboard = function() { 
+        
+        function goToDashboard() { 
             if (userAddress) {
                 switchView('dashboardView'); 
             } else {
@@ -807,7 +820,7 @@
             }
         }
 
-        window.toggleIncomeDropdown = function() {
+        function toggleIncomeDropdown() {
             const dropdown = document.getElementById('incomeDropdown');
             const arrow = document.getElementById('incomeArrow');
             if(dropdown.style.display === 'block') {
@@ -832,6 +845,7 @@
             });
         }
         
+        // COPY WALLET ADDRESS FUNCTION
         window.copyFullAddress = function() {
             if(userAddress) {
                 navigator.clipboard.writeText(userAddress).then(() => {
@@ -840,7 +854,7 @@
             }
         }
 
-        window.openTeamSearchModal = function() {
+        function openTeamSearchModal() {
             if(isViewOnly) {
                 showCustomAlertModal("Notice", "You are already viewing someone's dashboard. Click 'Back to My Dashboard' first.");
                 return;
@@ -849,11 +863,11 @@
             document.getElementById('teamSearchModal').style.display = 'flex';
         }
 
-        window.closeTeamSearchModal = function() {
+        function closeTeamSearchModal() {
             document.getElementById('teamSearchModal').style.display = 'none';
         }
 
-        window.executeTeamSearch = async function(e) {
+        async function executeTeamSearch(e) {
             e.preventDefault();
             const inputVal = document.getElementById('teamSearchInput').value.trim();
             const btn = document.getElementById('teamSearchBtn');
@@ -916,7 +930,7 @@
             }
         }
 
-        window.exitTeamViewMode = function() {
+        function exitTeamViewMode() {
             if(myOriginalAddress) {
                 loadDashboardData(myOriginalAddress, false);
             } else {
@@ -924,7 +938,7 @@
             }
         }
 
-        window.resetHistoryAndLoadTree = function(addr, context) {
+        function resetHistoryAndLoadTree(addr, context) {
             treeNavigationHistory = []; 
             currentTreeContext = context;
             executeTreeLoad(addr, context, true);
@@ -935,7 +949,7 @@
             executeTreeLoad(addr, context, true);
         }
 
-        window.goBackInTreeHistory = function() {
+        function goBackInTreeHistory() {
             if(treeNavigationHistory.length > 1) {
                 treeNavigationHistory.pop(); 
                 let previousState = treeNavigationHistory[treeNavigationHistory.length - 1]; 
@@ -958,8 +972,8 @@
                 loadSlot1Matrix(addr);
             } else if(context === 2) {
                 loadSlot2Matrix(addr);
-            } else if(context >= 3 && context <= 7) {
-                loadGlobalPoolMatrix(addr, context);
+            } else if(context === 3) {
+                loadSlot3Matrix(addr);
             } else {
                 loadMyPartnersGenealogy(addr);
             }
@@ -1011,7 +1025,7 @@
             };
         });
         
-        window.toggleChat = function() { 
+        function toggleChat() { 
             if(isDraggingChat) return; 
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
@@ -1036,7 +1050,7 @@
             }
         }
 
-        window.chatAction = async function(action) {
+        async function chatAction(action) {
             const msgBox = document.getElementById('chatBotMsg');
             if(!userAddress) {
                 msgBox.innerHTML = "<span style='color:#ff4d4d;'>Please login first to use AI Assistant.</span>"; 
@@ -1100,7 +1114,7 @@
             }
         }
 
-        window.loadLiveTransactions = async function() {
+        async function loadLiveTransactions() {
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
             if(!userAddress) {
@@ -1212,37 +1226,36 @@
         }
 
         async function buildUnilevelTree(addr, level) {
-            if(level > 20) {
+            if(level > 4) {
                 return ''; 
             }
             let uInfo = await contract.users(addr);
             let dCount = uInfo[3].toNumber();
             
-            let childrenSet = new Set();
+            let promises = [];
             for(let i=0; i<dCount; i++) { 
-                childrenSet.add(await contract.userDirects(addr, i)); 
+                promises.push(contract.userDirects(addr, i)); 
             }
+            let allChildrenAddrs = await Promise.all(promises);
 
             let leftAddr = uInfo[7];
             let rightAddr = uInfo[8];
-            if(leftAddr && leftAddr !== "0x0000000000000000000000000000000000000000") {
-                childrenSet.add(leftAddr);
+            if(leftAddr && leftAddr !== "0x0000000000000000000000000000000000000000" && !allChildrenAddrs.includes(leftAddr)) {
+                allChildrenAddrs.push(leftAddr);
             }
-            if(rightAddr && rightAddr !== "0x0000000000000000000000000000000000000000") {
-                childrenSet.add(rightAddr);
+            if(rightAddr && rightAddr !== "0x0000000000000000000000000000000000000000" && !allChildrenAddrs.includes(rightAddr)) {
+                allChildrenAddrs.push(rightAddr);
             }
 
-            let allChildrenAddrs = Array.from(childrenSet);
             if(allChildrenAddrs.length === 0) {
                 return '';
             }
 
-            let childInfos = await Promise.all(allChildrenAddrs.map(c => contract.users(c)));
-            childInfos.sort((a, b) => a[0].toNumber() - b[0].toNumber());
-
             let html = '<ul>';
-            for(let i=0; i<childInfos.length; i++) {
-                let cInfo = childInfos[i];
+            for(let i=0; i<allChildrenAddrs.length; i++) {
+                let childAddr = allChildrenAddrs[i];
+                let cInfo = await contract.users(childAddr);
+                
                 let isReal = cInfo[6]; 
                 let iconC = isReal ? '#f5c518' : '#10b981';
                 let iconCl = isReal ? 'fa-user-check' : 'fa-recycle';
@@ -1252,12 +1265,12 @@
                     ? `<span class="id-label">ID ${cInfo[0].toNumber()}</span>` 
                     : `<span class="id-label">ID ${cInfo[0].toNumber()}</span><span class="rb-tag">R/B</span>`;
 
-                html += `<li><a class="${nodeClass}" ${getSmartEvents(cInfo[1], 0)}>
+                html += `<li><a class="${nodeClass}" ${getSmartEvents(childAddr, 0)}>
                     <i class="fa-solid ${iconCl}" style="color:${iconC};"></i>
                     ${displayHtml}
                 </a>`;
                 
-                html += await buildUnilevelTree(cInfo[1], level + 1);
+                html += await buildUnilevelTree(childAddr, level + 1);
                 html += `</li>`;
             }
             html += '</ul>';
@@ -1342,9 +1355,9 @@
             }
         }
 
-        async function loadGlobalPoolMatrix(targetAddress, slotNum) {
+        async function loadSlot3Matrix(targetAddress) {
             switchView('treeView');
-            document.getElementById('treeViewTitle').innerText = "Slot " + slotNum + " (Global Pool)";
+            document.getElementById('treeViewTitle').innerText = "3rd Slot (Global Pool)";
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Pool Data...</div>';
 
@@ -1354,16 +1367,16 @@
                     throw "User not found";
                 }
 
-                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, slotNum)}>
+                let html = `<ul><li><a style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;" ${getSmartEvents(targetAddress, 3)}>
                     <i class="fa-solid fa-globe" style="color:#3b82f6;"></i>
                     <span class="id-label" style="color:#fff;">ID ${rootInfo[0].toNumber()}</span>
                 </a><ul style="padding-top: 20px;">`;
 
                 let userIndex = -1;
                 let indexFound = false;
-                for(let i=0; i<1000; i++) {
+                for(let i=0; i<500; i++) {
                     try {
-                        let qAddr = await contract.slotQueues(slotNum, i);
+                        let qAddr = await contract.slotQueues(3, i);
                         if(qAddr.toLowerCase() === targetAddress.toLowerCase()) {
                             userIndex = i; 
                             indexFound = true; 
@@ -1375,16 +1388,10 @@
                 }
 
                 let downlines = [];
-                let requiredNodes = 8;
-                if(slotNum == 4) requiredNodes = 16;
-                if(slotNum == 5) requiredNodes = 32;
-                if(slotNum == 6) requiredNodes = 64;
-                if(slotNum == 7) requiredNodes = 128;
-
                 if(indexFound) {
-                    for(let i=1; i<=requiredNodes; i++) {
+                    for(let i=1; i<=8; i++) {
                         try {
-                            let childAddr = await contract.slotQueues(slotNum, (userIndex * requiredNodes) + i);
+                            let childAddr = await contract.slotQueues(3, (userIndex * 8) + i);
                             if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") { 
                                 downlines.push(childAddr); 
                             } else { 
@@ -1399,10 +1406,10 @@
                 let promises = downlines.map(addr => contract.users(addr));
                 let resolvedUsers = await Promise.all(promises);
 
-                for(let i=0; i<requiredNodes; i++) {
+                for(let i=0; i<8; i++) {
                     if(i < resolvedUsers.length) {
                         let childInfo = resolvedUsers[i];
-                        html += `<li><a ${getSmartEvents(childInfo[1], slotNum)}>
+                        html += `<li><a ${getSmartEvents(childInfo[1], 3)}>
                             <i class="fa-solid fa-user-check" style="color:var(--gold);"></i><span class="id-label">ID ${childInfo[0].toNumber()}</span>
                         </a></li>`;
                     } else { 
@@ -1413,11 +1420,11 @@
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot Matrix.</div>';
+                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 3 Matrix.</div>';
             }
         }
 
-        window.loadIncomeHistory = async function(type) {
+        async function loadIncomeHistory(type) {
             switchView('incomeView');
             document.getElementById('tab-direct').classList.remove('active-tab');
             document.getElementById('tab-slot').classList.remove('active-tab');
@@ -1479,34 +1486,9 @@
                     
                 } else if (type === 'upline') {
                     document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
-                    
                     if(myInfo[6] === false) { 
                         html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6"); 
                         count++;
-                    }
-                    
-                    let dCount = myInfo[3].toNumber();
-                    for(let i=0; i<dCount; i++) {
-                        let dAddr = await contract.userDirects(userAddress, i);
-                        let dInfo = await contract.users(dAddr);
-                        let dSlot = dInfo[4].toNumber();
-                        let dId = dInfo[0].toNumber();
-                        if(dSlot >= 4) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 4)", "50.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 5) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 5)", "500.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 6) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 6)", "5000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 7) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 7)", "50000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                    }
-                    
-                    let upAddr = myInfo[2];
-                    if(upAddr !== "0x0000000000000000000000000000000000000000") {
-                        let upInfo = await contract.users(upAddr);
-                        let upSlot = upInfo[4].toNumber();
-                        let upDCount = upInfo[3].toNumber();
-                        if(upDCount === 0) upDCount = 1; 
-                        if(upSlot >= 4) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 4)", (50/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 5) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 5)", (500/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 6) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 6)", (5000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
-                        if(upSlot >= 7) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Upline Pool Reward (Slot 7)", (50000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#10b981"); count++; }
                     }
                 }
 
@@ -1564,6 +1546,7 @@
             container.innerHTML = html;
         }
 
+        // FIXED: Auto-Stop Lock + Fast Parallel Level-by-Level Counting
         async function fetchExtraStats(addr) {
             const myFetchId = ++currentStatsFetchId;
             try {
@@ -1575,7 +1558,7 @@
                 let currentLevel = [addr];
                 let processedCount = 0;
 
-                while(currentLevel.length > 0 && processedCount < 10000) { 
+                while(currentLevel.length > 0 && processedCount < 300) { 
                     if (myFetchId !== currentStatsFetchId) return;
 
                     let nextLevel = [];
@@ -1636,6 +1619,7 @@
             } catch(e){}
         }
 
+        // FETCH JOINING DATE FROM POLYGONSCAN
         async function fetchJoiningDate(addr) {
             try {
                 let url = `https://api.polygonscan.com/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`;
@@ -1655,7 +1639,7 @@
             }
         }
 
-        window.loadDashboardData = async function(address, viewMode) {
+        async function loadDashboardData(address, viewMode) {
             try {
                 userAddress = address; 
                 globalRootAddress = address; 
@@ -1685,6 +1669,7 @@
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     
+                    // NEW: Display Receive Address & Date of Joining
                     document.getElementById('displayReceiveAddr').innerHTML = userAddress.substring(0, 10) + "..." + userAddress.substring(34) + ' <i class="fa-regular fa-copy" style="color:var(--gold); margin-left:5px;"></i>';
                     
                     document.getElementById('displayJoiningDate').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -1784,6 +1769,9 @@
             }
         }
 
+        let pressStartTime = 0;
+        let pressTimer;
+        
         window.startNodePress = function(e, addr) {
             pressStartTime = new Date().getTime();
             pressTimer = setTimeout(async () => {
@@ -1827,8 +1815,12 @@
             clearTimeout(pressTimer); 
             pressStartTime = 0; 
         };
+        
+        function getSmartEvents(addr, context) {
+            return `style="-webkit-touch-callout: none; user-select: none;" onmousedown="startNodePress(event, '${addr}')" onmouseup="endNodePress(event, '${addr}', ${context})" onmouseleave="cancelNodePress()" ontouchstart="startNodePress(event, '${addr}')" ontouchend="endNodePress(event, '${addr}', ${context})" ontouchcancel="cancelNodePress()"`;
+        }
 
-        window.claimMyRefund = async function() {
+        async function claimMyRefund() {
             if (isViewOnly) { 
                 alert("Action not allowed in view mode!"); 
                 return; 
@@ -1959,7 +1951,7 @@
             }
         });
 
-        window.inspectFromLogin = async function() {
+        async function inspectFromLogin() {
             const inputAddr = document.getElementById('inspectAddressInput').value.trim();
             if(inputAddr.length === 42) { 
                 provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); 
@@ -1970,20 +1962,20 @@
             }
         }
 
-        window.closeInspectModal = function() { 
+        function closeInspectModal() { 
             inspectModalOverlay.style.display = "none"; 
         }
-
-        window.closeWelcomeModalOnly = function() { 
+        
+        function closeWelcomeModalOnly() { 
             welcomeModal.style.display = 'none'; 
         }
-
-        window.closeWelcomeModalAndGo = function() { 
+        
+        function closeWelcomeModalAndGo() { 
             welcomeModal.style.display = 'none'; 
             loadDashboardData(userAddress, false); 
         }
-
-        window.logoutWallet = function() { 
+        
+        function logoutWallet() { 
             currentStatsFetchId++;
             localStorage.removeItem('poltitan_saved_session');
             userAddress = null; 
