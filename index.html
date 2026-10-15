@@ -1227,15 +1227,24 @@
         }
 
         async function buildUnilevelTree(addr, level) {
-            if(level > 20) {
+            // Speed Optimize: Ek bar me sirf 2 levels (Generations) load honge taki hang na ho.
+            // Aur andar dekhne ke liye user kisi bhi node par click kar sakta hai.
+            if(level > 2) {
                 return ''; 
             }
             let uInfo = await contract.users(addr);
             let dCount = uInfo[3].toNumber();
             
             let childrenSet = new Set();
-            for(let i=0; i<dCount; i++) { 
-                childrenSet.add(await contract.userDirects(addr, i)); 
+            
+            // Speed Optimize: Directs ko ek sath (Parallel) fetch karna
+            if (dCount > 0) {
+                let dPromises = [];
+                for(let i=0; i<dCount; i++) { 
+                    dPromises.push(contract.userDirects(addr, i).catch(()=>null)); 
+                }
+                let dResults = await Promise.all(dPromises);
+                dResults.forEach(r => { if(r) childrenSet.add(r); });
             }
 
             let leftAddr = uInfo[7];
@@ -1581,6 +1590,18 @@
 
         async function fetchExtraStats(addr) {
             const myFetchId = ++currentStatsFetchId;
+            
+            // Speed Optimize: Local Cache System (Taki Dashboard turant Total Team show kare)
+            let cacheKey = "poltitan_stats_" + addr.toLowerCase();
+            let cachedData = sessionStorage.getItem(cacheKey);
+            if (cachedData) {
+                try {
+                    let parsed = JSON.parse(cachedData);
+                    document.getElementById('displayTotalTeam').innerText = parsed.teamSize;
+                    document.getElementById('displayReceivedRebirths').innerText = parsed.rebirths;
+                } catch(e){}
+            }
+
             try {
                 let teamSet = new Set();
                 let visited = new Set();
@@ -1602,9 +1623,10 @@
                     let nextLevel = [];
                     let uniqueNewChildren = [];
 
-                    for (let i = 0; i < currentLevel.length; i += 5) {
+                    // Speed Optimize: Batch size ko 5 se badha kar 50 kiya
+                    for (let i = 0; i < currentLevel.length; i += 50) {
                         if (myFetchId !== currentStatsFetchId) return;
-                        let chunk = currentLevel.slice(i, i + 5);
+                        let chunk = currentLevel.slice(i, i + 50);
                         let infos = await Promise.all(chunk.map(c => contract.users(c).catch(() => null)));
                         
                         for (let j = 0; j < infos.length; j++) {
@@ -1617,10 +1639,15 @@
                             let right = info[8];
                             
                             let childrenToCheck = [];
-                            for(let k=0; k<dCount; k++) { 
-                                try {
-                                    childrenToCheck.push(await contract.userDirects(current, k));
-                                } catch(e){}
+                            
+                            // Speed Optimize: Directs ko Parallel (ek sath) Blockchain se mangwana
+                            if (dCount > 0) {
+                                let dPromises = [];
+                                for(let k=0; k<dCount; k++) { 
+                                    dPromises.push(contract.userDirects(current, k).catch(()=>null));
+                                }
+                                let dResults = await Promise.all(dPromises);
+                                childrenToCheck.push(...dResults.filter(r => r !== null));
                             }
 
                             if(left && left !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(left)) {
@@ -1643,9 +1670,9 @@
                     }
 
                     if(uniqueNewChildren.length > 0) {
-                        for (let i = 0; i < uniqueNewChildren.length; i += 5) {
+                        for (let i = 0; i < uniqueNewChildren.length; i += 50) { 
                             if (myFetchId !== currentStatsFetchId) return;
-                            let chunk = uniqueNewChildren.slice(i, i + 5);
+                            let chunk = uniqueNewChildren.slice(i, i + 50);
                             let childInfos = await Promise.all(chunk.map(c => contract.users(c).catch(() => null)));
                             for(let cInfo of childInfos) {
                                 if(cInfo && cInfo[6] === true) { 
@@ -1665,8 +1692,13 @@
                     currentLevel = nextLevel;
                     
                     myReceivedRebirthsCount = mathRebirths;
+                    
+                    // UI Turant update karega
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
                     document.getElementById('displayReceivedRebirths').innerText = mathRebirths;
+                    
+                    // Data Cache me save karega taaki wapas aane par turant dikh jaye
+                    sessionStorage.setItem(cacheKey, JSON.stringify({teamSize: teamSet.size, rebirths: mathRebirths}));
                 }
             } catch(e){}
         }
