@@ -724,6 +724,19 @@
         let myReceivedRebirthsCount = 0; 
         let currentStatsFetchId = 0;
 
+        let pressStartTime = 0;
+        let pressTimer = null;
+        let globalRootAddress = null;
+
+        function getSmartEvents(addr, context) {
+            return `onmousedown="startNodePress(event, '${addr}')" 
+                    ontouchstart="startNodePress(event, '${addr}')" 
+                    onmouseup="endNodePress(event, '${addr}', ${context})" 
+                    ontouchend="endNodePress(event, '${addr}', ${context})" 
+                    onmouseleave="cancelNodePress()" 
+                    ontouchcancel="cancelNodePress()"`;
+        }
+
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length === 0) {
