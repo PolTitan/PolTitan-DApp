@@ -99,7 +99,7 @@
         .input-box { background: #000; border: 1px solid var(--border-color); border-radius: 12px; padding: 5px 15px; display: flex; align-items: center; margin-bottom: 15px; }
         .input-box input { background: transparent; border: none; color: #fff; padding: 10px 0; width: 100%; font-size: 14px; outline: none; text-align: center;}
 
-        /* NEW INQUIRY SECTION DESIGN (VIDEO 1 STYLE) */
+        /* INQUIRY SECTION DESIGN */
         .inquiry-outer-card { background: #0e0e0e; border: 1px solid #222; border-radius: 22px; padding: 28px 16px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .inquiry-top-logo-wrap { width: 190px; height: 85px; margin: 0 auto 18px auto; background: #000; border-radius: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid #1f1f1f; }
         .inquiry-top-logo-wrap video { width: 100%; height: 100%; object-fit: cover; }
@@ -160,7 +160,7 @@
         .tree li a.empty-node:hover { transform: none; border-color: #555; background: transparent; }
         .tree li a.empty-node i { color: #333; }
 
-        /* RICH FOOTER DESIGN (VIDEO 2 STYLE) */
+        /* RICH FOOTER DESIGN */
         .site-footer { background: #0c0c0c; border-top: 1px solid #222; padding: 35px 20px 25px 20px; color: #9ca3af; width: 100%; margin-top: 30px; }
         .footer-inner { max-width: 500px; margin: 0 auto; text-align: left; }
         .footer-brand-logo { width: 130px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid #2a2a2a; display: block; margin-bottom: 12px; background: #000; }
@@ -243,7 +243,6 @@
         
         <div class="menu-item" onclick="loadLiveTransactions(); toggleMenu();"><i class="fa-solid fa-list-check"></i> Transactions</div>
         
-        <!-- ORDER AS REQUESTED: 1. REBIRTH ID -> 2. ABOUT US -> 3. INQUIRY -->
         <div class="menu-item" onclick="checkReceivedRebirths(); toggleMenu();"><i class="fa-solid fa-recycle" style="color:#10b981;"></i> Received Rebirths</div>
         <div class="menu-item" onclick="switchView('aboutView'); toggleMenu();"><i class="fa-solid fa-circle-info"></i> About Us</div>
         <div class="menu-item" onclick="openInquiryModal(); toggleMenu();"><i class="fa-solid fa-envelope"></i> Inquiry</div>
@@ -252,7 +251,6 @@
     </div>
 
     <!-- MODALS -->
-    <!-- UPLINE INSPECT MODAL -->
     <div class="modal-overlay" id="inspectModalOverlay" onclick="closeInspectModal()">
         <div class="inspect-card" onclick="event.stopPropagation();">
             <div class="inspect-header">
@@ -271,7 +269,6 @@
         </div>
     </div>
 
-    <!-- TEAM SEARCH MODAL -->
     <div class="modal-overlay" id="teamSearchModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeTeamSearchModal()"></i>
@@ -287,7 +284,6 @@
         </div>
     </div>
 
-    <!-- WELCOME MODAL -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -305,7 +301,6 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT MODAL -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.2); position: relative;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="document.getElementById('customAlertModal').style.display='none'"></i>
@@ -704,7 +699,6 @@
         </div>
     </footer>
 
-    <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const CONTRACT_ADDRESS = "0x8F9afF47ea1448773Cf84f71C1Af65121275DC9f";
         
@@ -729,21 +723,27 @@
         let myReceivedRebirthsCount = 0; 
         let currentStatsFetchId = 0;
 
-        // FIXED WALLET AUTO-RELOAD FOR TRUST WALLET & SAFEPAL
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', function (accounts) {
-                if (accounts.length === 0) {
-                    logoutWallet();
-                } else if (userAddress && accounts[0].toLowerCase() !== userAddress.toLowerCase()) {
-                    window.location.reload();
-                }
-            });
-            window.ethereum.on('chainChanged', function () {
-                if (userAddress) {
-                    window.location.reload();
-                }
-            });
-        }
+        window.addEventListener('load', async () => {
+            let savedSession = localStorage.getItem('poltitan_saved_session');
+            if (window.ethereum) {
+                setTimeout(async () => {
+                    try {
+                        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+                        if (savedSession && savedSession.length === 42) {
+                            document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--gold);"></i> Checking...`;
+                            await loadDashboardData(savedSession, false);
+                        } else {
+                            document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`;
+                            document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Register';
+                        }
+                    } catch (error) { 
+                        console.log("Init Error"); 
+                    }
+                }, 100);
+            }
+        });
 
         const headerWallet = document.getElementById('headerWallet');
         const menuBtn = document.getElementById('menuBtn');
@@ -771,7 +771,7 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        function checkReceivedRebirths() {
+        window.checkReceivedRebirths = function() {
             if(myReceivedRebirthsCount > 0) {
                 showCustomAlertModal("Received Rebirths", `Congratulations! You have received ${myReceivedRebirthsCount} Rebirth (Green) IDs in your downline structure.`);
             } else {
@@ -779,11 +779,11 @@
             }
         }
 
-        function openInquiryModal() { 
+        window.openInquiryModal = function() { 
             switchView('inquiryView');
         }
         
-        function closeInquiryModal() { 
+        window.closeInquiryModal = function() { 
             if (userAddress) {
                 switchView('dashboardView');
             } else {
@@ -791,23 +791,23 @@
             }
         }
         
-        function submitInquiry(e) {
+        window.submitInquiry = function(e) {
             e.preventDefault();
             showCustomAlertModal("Success", "Your inquiry has been submitted successfully. We will contact you soon.");
             document.getElementById('inquiryForm').reset();
         }
 
-        function toggleMenu() { 
+        window.toggleMenu = function() { 
             sideMenu.classList.toggle('active'); 
         }
 
-        function switchView(viewId) {
+        window.switchView = function(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
             window.scrollTo(0, 0); 
         }
 
-        function goToDashboard() { 
+        window.goToDashboard = function() { 
             if (userAddress) {
                 switchView('dashboardView'); 
             } else {
@@ -815,7 +815,7 @@
             }
         }
 
-        function toggleIncomeDropdown() {
+        window.toggleIncomeDropdown = function() {
             const dropdown = document.getElementById('incomeDropdown');
             const arrow = document.getElementById('incomeArrow');
             if(dropdown.style.display === 'block') {
@@ -827,7 +827,7 @@
             }
         }
 
-        function copyDashboardRefLink() {
+        window.copyDashboardRefLink = function() {
             const link = document.getElementById('displayRefLink').innerText;
             navigator.clipboard.writeText(link).then(() => {
                 const copyBtn = document.getElementById('copyRefBtn');
@@ -840,7 +840,7 @@
             });
         }
         
-        function copyFullAddress() {
+        window.copyFullAddress = function() {
             if(userAddress) {
                 navigator.clipboard.writeText(userAddress).then(() => {
                     showCustomAlertModal("Copied", "POL Receive Address copied to clipboard!");
@@ -848,7 +848,7 @@
             }
         }
 
-        function openTeamSearchModal() {
+        window.openTeamSearchModal = function() {
             if(isViewOnly) {
                 showCustomAlertModal("Notice", "You are already viewing someone's dashboard. Click 'Back to My Dashboard' first.");
                 return;
@@ -857,11 +857,11 @@
             document.getElementById('teamSearchModal').style.display = 'flex';
         }
 
-        function closeTeamSearchModal() {
+        window.closeTeamSearchModal = function() {
             document.getElementById('teamSearchModal').style.display = 'none';
         }
 
-        async function executeTeamSearch(e) {
+        window.executeTeamSearch = async function(e) {
             e.preventDefault();
             const inputVal = document.getElementById('teamSearchInput').value.trim();
             const btn = document.getElementById('teamSearchBtn');
@@ -924,7 +924,7 @@
             }
         }
 
-        function exitTeamViewMode() {
+        window.exitTeamViewMode = function() {
             if(myOriginalAddress) {
                 loadDashboardData(myOriginalAddress, false);
             } else {
@@ -932,7 +932,7 @@
             }
         }
 
-        function resetHistoryAndLoadTree(addr, context) {
+        window.resetHistoryAndLoadTree = function(addr, context) {
             treeNavigationHistory = []; 
             currentTreeContext = context;
             executeTreeLoad(addr, context, true);
@@ -943,7 +943,7 @@
             executeTreeLoad(addr, context, true);
         }
 
-        function goBackInTreeHistory() {
+        window.goBackInTreeHistory = function() {
             if(treeNavigationHistory.length > 1) {
                 treeNavigationHistory.pop(); 
                 let previousState = treeNavigationHistory[treeNavigationHistory.length - 1]; 
@@ -1019,7 +1019,7 @@
             };
         });
         
-        function toggleChat() { 
+        window.toggleChat = function() { 
             if(isDraggingChat) return; 
             const modal = document.getElementById('chatModal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
@@ -1044,7 +1044,7 @@
             }
         }
 
-        async function chatAction(action) {
+        window.chatAction = async function(action) {
             const msgBox = document.getElementById('chatBotMsg');
             if(!userAddress) {
                 msgBox.innerHTML = "<span style='color:#ff4d4d;'>Please login first to use AI Assistant.</span>"; 
@@ -1108,7 +1108,7 @@
             }
         }
 
-        async function loadLiveTransactions() {
+        window.loadLiveTransactions = async function() {
             switchView('transactionView');
             const container = document.getElementById('transactionListContainer');
             if(!userAddress) {
@@ -1220,7 +1220,7 @@
         }
 
         async function buildUnilevelTree(addr, level) {
-            if(level > 20) {
+            if(level > 3) {
                 return ''; 
             }
             let uInfo = await contract.users(addr);
@@ -1245,8 +1245,16 @@
                 return '';
             }
 
-            let childInfos = await Promise.all(allChildrenAddrs.map(c => contract.users(c)));
-            childInfos.sort((a, b) => a[0].toNumber() - b[0].toNumber());
+            let childInfos = [];
+            for (let c of allChildrenAddrs) {
+                childInfos.push(await contract.users(c));
+            }
+
+            childInfos.sort((a, b) => {
+                if (a[6] && !b[6]) return -1;
+                if (!a[6] && b[6]) return 1;
+                return a[0].toNumber() - b[0].toNumber();
+            });
 
             let html = '<ul>';
             for(let i=0; i<childInfos.length; i++) {
@@ -1404,8 +1412,10 @@
                     }
                 }
 
-                let promises = downlines.map(addr => contract.users(addr));
-                let resolvedUsers = await Promise.all(promises);
+                let resolvedUsers = [];
+                for (let addr of downlines) {
+                    resolvedUsers.push(await contract.users(addr));
+                }
 
                 for(let i=0; i<requiredNodes; i++) {
                     if(i < resolvedUsers.length) {
@@ -1425,7 +1435,7 @@
             }
         }
 
-        async function loadIncomeHistory(type) {
+        window.loadIncomeHistory = async function(type) {
             switchView('incomeView');
             document.getElementById('tab-direct').classList.remove('active-tab');
             document.getElementById('tab-slot').classList.remove('active-tab');
@@ -1579,29 +1589,42 @@
                 let visited = new Set();
                 visited.add(addr.toLowerCase());
                 
-                let localRebirthsCount = 0; 
+                let mathRebirths = 0; 
                 let currentLevel = [addr];
                 let processedCount = 0;
 
-                while(currentLevel.length > 0 && processedCount < 10000) { 
+                let rootInfo = await contract.users(addr);
+                if (rootInfo && rootInfo[4].toNumber() >= 4) mathRebirths += 10;
+                if (rootInfo && rootInfo[4].toNumber() >= 5) mathRebirths += 40;
+                if (rootInfo && rootInfo[4].toNumber() >= 6) mathRebirths += 160;
+                if (rootInfo && rootInfo[4].toNumber() >= 7) mathRebirths += 640;
+
+                while(currentLevel.length > 0 && processedCount < 5000) { 
                     if (myFetchId !== currentStatsFetchId) return;
 
                     let nextLevel = [];
+                    let uniqueNewChildren = [];
 
-                    await Promise.all(currentLevel.map(async (current) => {
-                        try {
-                            let info = await contract.users(current);
-                            if (myFetchId !== currentStatsFetchId) return;
+                    for (let i = 0; i < currentLevel.length; i += 5) {
+                        if (myFetchId !== currentStatsFetchId) return;
+                        let chunk = currentLevel.slice(i, i + 5);
+                        let infos = await Promise.all(chunk.map(c => contract.users(c).catch(() => null)));
+                        
+                        for (let j = 0; j < infos.length; j++) {
+                            let info = infos[j];
+                            if (!info) continue;
+                            let current = chunk[j];
 
                             let dCount = info[3].toNumber();
                             let left = info[7];
                             let right = info[8];
                             
-                            let directPromises = [];
-                            for(let i=0; i<dCount; i++) { 
-                                directPromises.push(contract.userDirects(current, i));
+                            let childrenToCheck = [];
+                            for(let k=0; k<dCount; k++) { 
+                                try {
+                                    childrenToCheck.push(await contract.userDirects(current, k));
+                                } catch(e){}
                             }
-                            let childrenToCheck = await Promise.all(directPromises);
 
                             if(left && left !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(left)) {
                                 childrenToCheck.push(left);
@@ -1610,7 +1633,6 @@
                                 childrenToCheck.push(right);
                             }
                             
-                            let uniqueNewChildren = [];
                             for(let d of childrenToCheck) {
                                 let lowerD = d.toLowerCase();
                                 if(!visited.has(lowerD)) {
@@ -1620,26 +1642,34 @@
                                     nextLevel.push(d);
                                 }
                             }
+                        }
+                    }
 
-                            if(uniqueNewChildren.length > 0) {
-                                let childInfos = await Promise.all(uniqueNewChildren.map(c => contract.users(c)));
-                                for(let cInfo of childInfos) {
-                                    if(cInfo[6] === false) { 
-                                        localRebirthsCount++; 
-                                    }
+                    if(uniqueNewChildren.length > 0) {
+                        for (let i = 0; i < uniqueNewChildren.length; i += 5) {
+                            if (myFetchId !== currentStatsFetchId) return;
+                            let chunk = uniqueNewChildren.slice(i, i + 5);
+                            let childInfos = await Promise.all(chunk.map(c => contract.users(c).catch(() => null)));
+                            for(let cInfo of childInfos) {
+                                if(cInfo && cInfo[6] === true) { 
+                                    let cSlot = cInfo[4].toNumber();
+                                    if(cSlot >= 4) mathRebirths += 10;
+                                    if(cSlot >= 5) mathRebirths += 40;
+                                    if(cSlot >= 6) mathRebirths += 160;
+                                    if(cSlot >= 7) mathRebirths += 640;
                                 }
                             }
-                        } catch(e){}
-                    }));
+                        }
+                    }
 
                     if (myFetchId !== currentStatsFetchId) return;
 
                     processedCount += currentLevel.length;
                     currentLevel = nextLevel;
                     
-                    myReceivedRebirthsCount = localRebirthsCount;
+                    myReceivedRebirthsCount = mathRebirths;
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
-                    document.getElementById('displayReceivedRebirths').innerText = localRebirthsCount;
+                    document.getElementById('displayReceivedRebirths').innerText = mathRebirths;
                 }
             } catch(e){}
         }
@@ -1663,7 +1693,7 @@
             }
         }
 
-        async function loadDashboardData(address, viewMode) {
+        window.loadDashboardData = async function(address, viewMode) {
             try {
                 userAddress = address; 
                 globalRootAddress = address; 
@@ -1793,118 +1823,7 @@
             }
         }
 
-        let pressStartTime = 0;
-        let pressTimer;
-        
-        function startNodePress(e, addr) {
-            pressStartTime = new Date().getTime();
-            pressTimer = setTimeout(async () => {
-                pressStartTime = 0; 
-                inspectModalOverlay.style.display = "flex";
-                document.getElementById('inspectLoading').style.display = "block";
-                document.getElementById('inspectData').style.display = "none";
-                try {
-                    const info = await contract.users(addr);
-                    document.getElementById('insId').innerText = info[0].toNumber();
-                    const uplineAddr = info[2];
-                    if(uplineAddr !== "0x0000000000000000000000000000000000000000") {
-                        const spInfo = await contract.users(uplineAddr);
-                        document.getElementById('insUpline').innerText = `ID ${spInfo[0].toNumber()}`;
-                        document.getElementById('insWallet').innerText = uplineAddr.substring(0,8) + "...";
-                    } else {
-                        document.getElementById('insUpline').innerText = "No Upline";
-                        document.getElementById('insWallet').innerText = "--";
-                    }
-                    document.getElementById('inspectLoading').style.display = "none";
-                    document.getElementById('inspectData').style.display = "block";
-                } catch(err) { 
-                    document.getElementById('inspectLoading').innerHTML = "<span style='color:red;'>Error fetching Upline</span>"; 
-                }
-            }, 500);
-        }
-        
-        function endNodePress(e, addr, currentSlotContext) {
-            if (e.type === 'touchend') { 
-                e.preventDefault(); 
-            }
-            clearTimeout(pressTimer);
-            const pressDuration = new Date().getTime() - pressStartTime;
-            if (pressStartTime !== 0 && pressDuration < 500) {
-                pressStartTime = 0;
-                addHistoryAndLoadTree(addr, currentSlotContext);
-            }
-        }
-        
-        function cancelNodePress() { 
-            clearTimeout(pressTimer); 
-            pressStartTime = 0; 
-        }
-
-        async function claimMyRefund() {
-            if (isViewOnly) { 
-                alert("Action not allowed in view mode!"); 
-                return; 
-            }
-            const btn = document.getElementById('claimRefundBtn');
-            try {
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-                btn.disabled = true;
-                const tx = await contract.claimRefund();
-                await tx.wait();
-                showCustomAlertModal("Success", "Refund Claimed Successfully!");
-                await loadDashboardData(userAddress, false);
-            } catch (error) {
-                let errorMsg = "Transaction failed!";
-                if (error.reason) {
-                    errorMsg = error.reason;
-                } else if (error.data && error.data.message) {
-                    errorMsg = error.data.message;
-                } else if (error.message) {
-                    if (error.message.includes("execution reverted:")) {
-                        errorMsg = error.message.split("execution reverted:")[1].split('"')[0].trim();
-                    } else if (error.message.includes("System is still active") || error.message.includes("Income received")) {
-                         errorMsg = "0 pol user claim your 30 pol if inactive system";
-                    } else {
-                        errorMsg = "Contract rejected the refund.";
-                    }
-                }
-                showCustomAlertModal("Notice", errorMsg);
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund';
-                btn.disabled = false;
-            }
-        }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const refParam = urlParams.get('ref');
-        if (refParam && refParam.length === 42) { 
-            document.getElementById('uplineInput').value = refParam; 
-        }
-
-        window.addEventListener('load', async () => {
-            let savedSession = localStorage.getItem('poltitan_saved_session');
-            if (window.ethereum) {
-                setTimeout(async () => {
-                    try {
-                        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-
-                        if (savedSession && savedSession.length === 42) {
-                            document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--gold);"></i> Checking...`;
-                            await loadDashboardData(savedSession, false);
-                        } else {
-                            document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`;
-                            document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Activate / Register';
-                        }
-                    } catch (error) { 
-                        console.log("Init Error"); 
-                    }
-                }, 100);
-            }
-        });
-
-        // FIXED: Original Safe Connect Logic (Ensures Network check works smoothly)
-        masterConnectBtn.addEventListener('click', async () => {
+        window.masterConnectBtn.addEventListener('click', async () => {
             if (window.ethereum || window.web3) {
                 try {
                     masterConnectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
@@ -1984,43 +1903,6 @@
                 alert("Please open this inside MetaMask or Trust Wallet DApp Browser!"); 
             }
         });
-
-        window.inspectFromLogin = async function() {
-            const inputAddr = document.getElementById('inspectAddressInput').value.trim();
-            if(inputAddr.length === 42) { 
-                provider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com"); 
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider); 
-                await loadDashboardData(inputAddr, true); 
-            } else { 
-                showAlert('authAlert', 'Invalid Address Format', true); 
-            }
-        }
-
-        window.closeInspectModal = function() { 
-            inspectModalOverlay.style.display = "none"; 
-        }
-
-        window.closeWelcomeModalOnly = function() { 
-            welcomeModal.style.display = 'none'; 
-        }
-
-        window.closeWelcomeModalAndGo = function() { 
-            welcomeModal.style.display = 'none'; 
-            loadDashboardData(userAddress, false); 
-        }
-
-        window.logoutWallet = function() { 
-            currentStatsFetchId++;
-            localStorage.removeItem('poltitan_saved_session');
-            userAddress = null; 
-            myOriginalAddress = null;
-            isViewOnly = false; 
-            toggleMenu(); 
-            menuBtn.style.display = "none"; 
-            headerWallet.innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
-            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
-            switchView('authView'); 
-        }
     </script>
 </body>
 </html>
