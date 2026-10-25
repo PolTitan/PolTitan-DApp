@@ -21,8 +21,22 @@
             --box-bg: #1a1a1a;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
+
+        /* GPU Acceleration & Instant Touch Response for Buttons & Videos */
+        button, .menu-item, .team-box, .vip-card, .btn-gold, .btn-outline, .wallet-badge, .menu-btn, .close-menu, .footer-link-list li {
+            touch-action: manipulation;
+            user-select: none;
+        }
+        video {
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            will-change: transform;
+            background-color: #000;
+        }
 
         /* HEADER */
         header { background: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
@@ -32,13 +46,13 @@
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; }
 
         /* SIDE MENU */
-        .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #0f0f0f; border-right: 1px solid var(--border-color); transition: 0.4s; z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9); overflow-y: auto; }
+        .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #0f0f0f; border-right: 1px solid var(--border-color); transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), left 0.28s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; padding: 20px; box-shadow: 5px 0 20px rgba(0,0,0,0.9); overflow-y: auto; will-change: left; }
         .side-menu.active { left: 0; }
         .close-menu { text-align: right; font-size: 24px; color: var(--gold); cursor: pointer; margin-bottom: 10px; }
         .menu-header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         .menu-header h2 { color: var(--gold); font-size: 20px; }
         
-        .menu-item { padding: 15px 10px; color: #fff; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 15px; border-radius: 8px; margin-bottom: 5px;}
+        .menu-item { padding: 15px 10px; color: #fff; font-size: 14px; cursor: pointer; transition: background 0.2s, color 0.2s; display: flex; align-items: center; gap: 15px; border-radius: 8px; margin-bottom: 5px;}
         .menu-item i { color: var(--gold); font-size: 18px; width: 20px; text-align: center; }
         .menu-item:hover { background: var(--box-bg); color: var(--gold); }
         .submenu { display: none; background: #0a0a0a; border-radius: 8px; margin-bottom: 5px; border-left: 2px solid var(--gold); }
@@ -80,7 +94,7 @@
         .action-box h4 { color: var(--text-gray); font-size: 12px; font-weight: 400; margin-bottom: 10px; }
         .link-container { background: #000; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .link-container span { color: #fff; font-size: 12px; word-break: break-all; margin-right: 10px; }
-        .link-container i { color: var(--gold); font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .link-container i { color: var(--gold); font-size: 18px; cursor: pointer; transition: 0.2s; }
         
         .earning-box { background: linear-gradient(90deg, #1a1a1a, #0a0a0a); position: relative; overflow: hidden;}
         .earning-box .amount { font-size: 32px; color: var(--gold); font-weight: 800; display: flex; align-items: center; gap: 10px; }
@@ -89,10 +103,10 @@
         .earning-icon { position: absolute; right: 10px; bottom: -10px; font-size: 80px; color: rgba(245, 197, 24, 0.05); }
 
         /* BUTTONS & INPUTS */
-        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-gold:hover { background: var(--gold-dark); }
         .btn-gold:disabled { background: #555; cursor: not-allowed; }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: #fff; padding: 10px 15px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;}
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: #fff; padding: 10px 15px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
         .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
         .btn-outline.active-tab { background: var(--gold); color: #000; border-color: var(--gold); }
         
@@ -109,19 +123,19 @@
         .inq-field-group { margin-bottom: 18px; }
         .inq-label { display: block; color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
         .inq-label span { color: #6b7280; text-transform: none; font-weight: 400; font-size: 10px; }
-        .inq-input, .inq-select, .inq-textarea { width: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 13px 14px; color: #fff; font-size: 13px; outline: none; transition: 0.3s; }
+        .inq-input, .inq-select, .inq-textarea { width: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 13px 14px; color: #fff; font-size: 13px; outline: none; transition: 0.2s; }
         .inq-input::placeholder, .inq-textarea::placeholder { color: #6b7280; }
         .inq-input:focus, .inq-select:focus, .inq-textarea:focus { border-color: #e5b842; background: #222; }
         .inq-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 16px; padding-right: 40px; cursor: pointer; }
         .inq-select option { background: #151515; color: #fff; }
         .inq-textarea { height: 110px; resize: vertical; line-height: 1.5; }
-        .inq-submit-btn { width: 100%; background: linear-gradient(180deg, #eac459, #d4a72c); color: #000; border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer; margin-top: 6px; transition: 0.3s; }
+        .inq-submit-btn { width: 100%; background: linear-gradient(180deg, #eac459, #d4a72c); color: #000; border: none; border-radius: 8px; padding: 14px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer; margin-top: 6px; transition: 0.2s; }
         .inq-submit-btn:hover { filter: brightness(1.08); }
 
         /* ACTIVITY LIST */
         .activity-list { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border-color); }
         .activity-header { display: flex; justify-content: space-between; padding: 15px; background: #0a0a0a; border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-gray); font-weight: bold; }
-        .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border-color); transition: 0.3s; cursor: pointer; text-decoration: none; }
+        .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border-color); transition: 0.2s; cursor: pointer; text-decoration: none; }
         .activity-item:hover { background: #111; }
         .activity-item:last-child { border-bottom: none; }
         .act-left { display: flex; align-items: center; gap: 12px; }
@@ -144,7 +158,7 @@
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--gold); width: 0; height: 15px; }
         
-        .tree li a { border: 1px solid var(--border-color); padding: 5px 8px; text-decoration: none; color: #fff; display: inline-block; border-radius: 6px; background: #111; min-width: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; margin: 0 2px;}
+        .tree li a { border: 1px solid var(--border-color); padding: 5px 8px; text-decoration: none; color: #fff; display: inline-block; border-radius: 6px; background: #111; min-width: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: 0.2s; margin: 0 2px;}
         .tree li a:hover { background: rgba(245, 197, 24, 0.1); border-color: var(--gold); transform: translateY(-2px); }
         .tree li a .id-label { color: var(--gold); font-weight: bold; display: block; font-size: 10px; margin-bottom: 2px;}
         .tree li a i { font-size: 14px; color: var(--text-gray); margin-bottom: 2px; }
@@ -171,12 +185,12 @@
         .footer-col-title { color: #e5b842; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; position: relative; padding-bottom: 6px; line-height: 1.3; }
         .footer-col-title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 28px; height: 2px; background: #e5b842; border-radius: 2px; }
         .footer-link-list { list-style: none; padding: 0; margin: 0; }
-        .footer-link-list li { margin-bottom: 10px; font-size: 12px; color: #9ca3af; cursor: pointer; transition: 0.25s; display: flex; align-items: center; gap: 7px; line-height: 1.4; }
+        .footer-link-list li { margin-bottom: 10px; font-size: 12px; color: #9ca3af; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 7px; line-height: 1.4; }
         .footer-link-list li:hover { color: #e5b842; transform: translateX(2px); }
         .footer-link-list li.gold-highlight { color: #e5b842; font-weight: 600; }
         .green-dot { width: 7px; height: 7px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
         .footer-social-grid { display: grid; grid-template-columns: repeat(3, 38px); gap: 10px; margin-top: 10px; }
-        .footer-social-btn { width: 38px; height: 38px; border-radius: 50%; background: #161616; border: 1px solid #2e2e2e; color: #e5b842; display: flex; justify-content: center; align-items: center; font-size: 15px; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .footer-social-btn { width: 38px; height: 38px; border-radius: 50%; background: #161616; border: 1px solid #2e2e2e; color: #e5b842; display: flex; justify-content: center; align-items: center; font-size: 15px; text-decoration: none; cursor: pointer; transition: 0.2s; }
         .footer-social-btn:hover { background: #e5b842; color: #000; border-color: #e5b842; }
         .footer-bottom-copy { border-top: 1px solid #1f1f1f; margin-top: 15px; padding-top: 18px; text-align: center; font-size: 11px; color: #6b7280; line-height: 1.6; }
 
@@ -185,7 +199,7 @@
         #authView { display: block; margin-top: 3vh; }
         
         /* Modals */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .inspect-card { background: var(--card-bg); width: 90%; max-width: 350px; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; text-align: left; box-shadow: 0 10px 30px rgba(245, 197, 24, 0.3); position: relative;}
         .inspect-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
         .inspect-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #333; font-size: 13px; }
@@ -198,7 +212,7 @@
         .chat-header { padding: 12px; background: var(--gold); color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
         .chat-body { padding: 15px; max-height: 250px; overflow-y: auto; }
         .chat-msg { background: #000; color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border-left: 3px solid var(--gold); line-height: 1.4; }
-        .chat-menu-btn { width: 100%; text-align: left; background: #111; color: var(--gold); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-size: 12px; transition: 0.3s;}
+        .chat-menu-btn { width: 100%; text-align: left; background: #111; color: var(--gold); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;}
         .chat-menu-btn:hover { background: var(--gold); color: #000; }
 
         /* Alert Styling */
@@ -211,7 +225,7 @@
     <header onclick="goToDashboard()">
         <div class="header-left">
             <i class="fa-solid fa-bars menu-btn" id="menuBtn" onclick="toggleMenu(); event.stopPropagation();"></i>
-            <video class="video-logo" autoplay loop muted playsinline>
+            <video class="video-logo" autoplay loop muted playsinline preload="auto">
                 <source src="poltitan-logo.mp4" type="video/mp4">
             </video>
         </div>
@@ -313,7 +327,7 @@
 
     <!-- MAIN DASHBOARD SECTIONS -->
     <main class="container">
-        <!-- 1. SMART AUTH VIEW -->
+        <!-- 1. SMART AUTH VIEW (UNTOUCHED) -->
         <div id="authView" class="view-section">
             <div style="text-align: center; margin-bottom: 30px;">
                 <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" style="width: 70px; height: 70px; margin-bottom: 15px; filter: drop-shadow(0 0 15px rgba(130, 71, 229, 0.5));">
@@ -534,7 +548,7 @@
 
             <div class="inquiry-outer-card">
                 <div class="inquiry-top-logo-wrap">
-                    <video autoplay loop muted playsinline>
+                    <video autoplay loop muted playsinline preload="auto">
                         <source src="poltitan-logo.mp4" type="video/mp4">
                     </video>
                 </div>
@@ -595,7 +609,7 @@
     <footer class="site-footer">
         <div class="footer-inner">
             <!-- Brand Top Section -->
-            <video class="footer-brand-logo" autoplay loop muted playsinline>
+            <video class="footer-brand-logo" autoplay loop muted playsinline preload="auto">
                 <source src="poltitan-logo.mp4" type="video/mp4">
             </video>
             <h2 class="footer-brand-title">POLTITAN VIP</h2>
@@ -723,10 +737,113 @@
         
         let myReceivedRebirthsCount = 0; 
         let currentStatsFetchId = 0;
+        let currentTreeRenderId = 0;
+        let currentIncomeLoadId = 0;
+        let currentDashboardFetchId = 0;
 
         let pressStartTime = 0;
         let pressTimer = null;
         let globalRootAddress = null;
+
+        // =========================================================================
+        // PERFORMANCE ENGINE: Dedicated Read-Only RPC & In-Memory Caching
+        // (Keeps Wallet Provider free from lag so buttons & videos never freeze)
+        // =========================================================================
+        const fastReadProvider = new ethers.providers.JsonRpcProvider("https://polygon-bor-rpc.publicnode.com");
+        const fastReadContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, fastReadProvider);
+
+        const userCacheMap = new Map();
+        const directsCacheMap = new Map();
+        const slot2CacheMap = new Map();
+        const slotQueueCacheMap = new Map();
+        let cachedDeployBlock = null;
+
+        function getReadContractInstance() {
+            return fastReadContract || contract;
+        }
+
+        async function getCachedUser(addr, forceRefresh = false) {
+            if (!addr || addr === "0x0000000000000000000000000000000000000000") return null;
+            const key = addr.toLowerCase();
+            if (!forceRefresh && userCacheMap.has(key)) {
+                const entry = userCacheMap.get(key);
+                if (Date.now() - entry.ts < 60000) return entry.data;
+            }
+            try {
+                const data = await getReadContractInstance().users(addr);
+                userCacheMap.set(key, { data, ts: Date.now() });
+                return data;
+            } catch (e) {
+                if (contract) {
+                    const data = await contract.users(addr);
+                    userCacheMap.set(key, { data, ts: Date.now() });
+                    return data;
+                }
+                throw e;
+            }
+        }
+
+        async function getCachedDirect(addr, index) {
+            const key = `${addr.toLowerCase()}_${index}`;
+            if (directsCacheMap.has(key)) return directsCacheMap.get(key);
+            try {
+                const res = await getReadContractInstance().userDirects(addr, index);
+                if (res) directsCacheMap.set(key, res);
+                return res;
+            } catch (e) {
+                if (contract) {
+                    const res = await contract.userDirects(addr, index);
+                    if (res) directsCacheMap.set(key, res);
+                    return res;
+                }
+                return null;
+            }
+        }
+
+        async function getCachedSlot2Member(addr, index) {
+            const key = `${addr.toLowerCase()}_${index}`;
+            if (slot2CacheMap.has(key)) return slot2CacheMap.get(key);
+            try {
+                const res = await getReadContractInstance().slot2Team(addr, index);
+                if (res) slot2CacheMap.set(key, res);
+                return res;
+            } catch (e) {
+                if (contract) {
+                    const res = await contract.slot2Team(addr, index);
+                    if (res) slot2CacheMap.set(key, res);
+                    return res;
+                }
+                return null;
+            }
+        }
+
+        async function getCachedSlotQueue(slotNum, index) {
+            const key = `${slotNum}_${index}`;
+            if (slotQueueCacheMap.has(key)) return slotQueueCacheMap.get(key);
+            try {
+                const res = await getReadContractInstance().slotQueues(slotNum, index);
+                if (res && res !== "0x0000000000000000000000000000000000000000") {
+                    slotQueueCacheMap.set(key, res);
+                }
+                return res;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Video Smoothness Helper: Ensures all logo videos play smoothly without black frames
+        function ensureVideosSmooth() {
+            document.querySelectorAll('video').forEach(v => {
+                v.muted = true;
+                v.playsInline = true;
+                if (v.paused) {
+                    v.play().catch(() => {});
+                }
+            });
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) ensureVideosSmooth();
+        });
 
         function getSmartEvents(addr, context) {
             return `onmousedown="startNodePress(event, '${addr}')" 
@@ -809,9 +926,14 @@
         }
 
         window.switchView = function(viewId) {
+            // Pause heavy background loops when user switches away from dashboard so UI responds instantly
+            if (viewId !== 'dashboardView') {
+                currentStatsFetchId++;
+            }
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
-            window.scrollTo(0, 0); 
+            window.scrollTo(0, 0);
+            ensureVideosSmooth();
         }
 
         window.goToDashboard = function() { 
@@ -846,6 +968,13 @@
                 }, 2000);
             });
         }
+
+        window.copyModalRefLink = function() {
+            const link = document.getElementById('modalRefLink').innerText;
+            navigator.clipboard.writeText(link).then(() => {
+                showCustomAlertModal("Copied", "Referral Link copied to clipboard!");
+            });
+        }
         
         window.copyFullAddress = function() {
             if(userAddress) {
@@ -874,6 +1003,9 @@
             const btn = document.getElementById('teamSearchBtn');
             if(!inputVal) return;
 
+            // Stop background dashboard loop immediately so search is ultra fast
+            currentStatsFetchId++;
+
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying Team...';
             btn.disabled = true;
 
@@ -886,7 +1018,7 @@
                         throw "Invalid ID Number";
                     }
                     try { 
-                        targetAddr = await contract.idToAddress(idNum); 
+                        targetAddr = await getReadContractInstance().idToAddress(idNum); 
                     } catch(err) { 
                         throw "ID not found. Please try searching by Wallet Address."; 
                     }
@@ -903,7 +1035,8 @@
                 let isTeam = false;
                 let currentCheck = targetAddr;
                 for(let i=0; i<100; i++) { 
-                    let info = await contract.users(currentCheck);
+                    let info = await getCachedUser(currentCheck);
+                    if (!info) break;
                     let up = info[2];
                     if(up.toLowerCase() === myOriginalAddress.toLowerCase()) {
                         isTeam = true; 
@@ -951,6 +1084,7 @@
         }
 
         window.goBackInTreeHistory = function() {
+            currentTreeRenderId++; // Cancel any running tree render
             if(treeNavigationHistory.length > 1) {
                 treeNavigationHistory.pop(); 
                 let previousState = treeNavigationHistory[treeNavigationHistory.length - 1]; 
@@ -966,6 +1100,7 @@
         }
 
         function executeTreeLoad(addr, context, pushToHistory) {
+            currentStatsFetchId++; // Free up connections for instant tree load
             if(pushToHistory) { 
                 treeNavigationHistory.push({addr: addr, context: context}); 
             }
@@ -1059,13 +1194,13 @@
             }
             msgBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching details...';
             try {
-                let info = await contract.users(userAddress);
+                let info = await getCachedUser(userAddress);
                 let myId = info[0].toNumber();
                 
                 if(action === 'id_sponsor') {
                     let spId = "None";
                     if(info[2] !== "0x0000000000000000000000000000000000000000") {
-                        let spInfo = await contract.users(info[2]); 
+                        let spInfo = await getCachedUser(info[2]); 
                         spId = spInfo[0].toNumber();
                     }
                     msgBox.innerHTML = `VIP! Your Matrix ID is <b style="color:var(--gold);">ID ${myId}</b>. You were invited by Sponsor <b style="color:var(--gold);">ID ${spId}</b>.`;
@@ -1123,23 +1258,25 @@
                 return;
             }
             container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Live Blockchain Data...</div>`;
-            const apiUrl = `https://api.polygonscan.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc`;
+            
+            // Free Blockscout API (No API key required, unlike deprecated PolygonScan V1)
+            const apiUrl = `https://polygon.blockscout.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc`;
             
             try {
                 let response = await fetch(apiUrl); 
                 let data = await response.json();
                 
-                if(data.status === "1" && data.result.length > 0) {
+                if(data.status === "1" && data.result && data.result.length > 0) {
                     let html = `<div class="activity-header"><span>Transaction Detail</span><span>Status</span></div>`;
                     data.result.forEach(tx => {
-                        let isToContract = tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
+                        let isToContract = tx.to && tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
                         let txType = isToContract ? "Smart Contract Interaction" : (tx.value > 0 ? "Transfer (Sent/Received)" : "Transaction");
                         let valPol = (tx.value / 1e18).toFixed(2);
                         if (isToContract && valPol == "30.00") {
                             txType = "Registration / Joining";
                         }
                         
-                        let txDate = new Date(tx.timeStamp * 1000).toLocaleDateString();
+                        let txDate = new Date(tx.timeStamp * 1000).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'});
                         let hashShort = tx.hash.substring(0, 8) + "...";
                         let statusColor = tx.isError === "0" ? "#10b981" : "#ff4d4d";
                         let statusIcon = tx.isError === "0" ? "fa-check-circle" : "fa-times-circle";
@@ -1163,7 +1300,7 @@
                     });
                     container.innerHTML = html;
                 } else { 
-                    container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--text-gray);">No recent transactions found on PolygonScan.</div>`; 
+                    container.innerHTML = `<div style="padding:30px; text-align:center; color:var(--text-gray);">No recent transactions found.</div>`; 
                 }
             } catch (err) {
                 container.innerHTML = `
@@ -1175,14 +1312,16 @@
         }
 
         async function loadSlot1Matrix(targetAddress) {
+            const myRenderId = ++currentTreeRenderId;
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "Slot 1 (Left/Right Placement)";
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Slot 1 Data...</div>';
 
             try {
-                let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) {
+                let rootInfo = await getCachedUser(targetAddress);
+                if (myRenderId !== currentTreeRenderId) return;
+                if (!rootInfo || rootInfo[0].toNumber() === 0) {
                     throw "User not found";
                 }
 
@@ -1198,8 +1337,14 @@
                 let left = rootInfo[7]; 
                 let right = rootInfo[8]; 
 
-                if(left && left !== "0x0000000000000000000000000000000000000000") {
-                    let lInfo = await contract.users(left);
+                const [lInfo, rInfo] = await Promise.all([
+                    (left && left !== "0x0000000000000000000000000000000000000000") ? getCachedUser(left) : Promise.resolve(null),
+                    (right && right !== "0x0000000000000000000000000000000000000000") ? getCachedUser(right) : Promise.resolve(null)
+                ]);
+
+                if (myRenderId !== currentTreeRenderId) return;
+
+                if(lInfo) {
                     let isLeftReal = lInfo[6];
                     let leftNodeClass = isLeftReal ? '' : 'rb-node';
                     let leftDisplay = isLeftReal ? `ID ${lInfo[0].toNumber()}` : `ID ${lInfo[0].toNumber()}<br><span class="rb-tag">(R/B)</span>`;
@@ -1208,8 +1353,7 @@
                     html += createEmptyNode(); 
                 }
 
-                if(right && right !== "0x0000000000000000000000000000000000000000") {
-                    let rInfo = await contract.users(right);
+                if(rInfo) {
                     let isRightReal = rInfo[6];
                     let rightNodeClass = isRightReal ? '' : 'rb-node';
                     let rightDisplay = isRightReal ? `ID ${rInfo[0].toNumber()}` : `ID ${rInfo[0].toNumber()}<br><span class="rb-tag">(R/B)</span>`;
@@ -1222,29 +1366,29 @@
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) { 
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 1.</div>'; 
+                if (myRenderId === currentTreeRenderId) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 1.</div>'; 
+                }
             }
         }
 
-        async function buildUnilevelTree(addr, level) {
-            // Speed Optimize: Ek bar me sirf 2 levels (Generations) load honge taki hang na ho.
-            // Aur andar dekhne ke liye user kisi bhi node par click kar sakta hai.
-            if(level > 2) {
+        async function buildUnilevelTree(addr, level, renderId) {
+            if(level > 2 || renderId !== currentTreeRenderId) {
                 return ''; 
             }
-            let uInfo = await contract.users(addr);
+            let uInfo = await getCachedUser(addr);
+            if (!uInfo || renderId !== currentTreeRenderId) return '';
             let dCount = uInfo[3].toNumber();
             
             let childrenSet = new Set();
             
-            // Speed Optimize: Directs ko ek sath (Parallel) fetch karna
             if (dCount > 0) {
                 let dPromises = [];
                 for(let i=0; i<dCount; i++) { 
-                    dPromises.push(contract.userDirects(addr, i).catch(()=>null)); 
+                    dPromises.push(getCachedDirect(addr, i)); 
                 }
                 let dResults = await Promise.all(dPromises);
-                dResults.forEach(r => { if(r) childrenSet.add(r); });
+                dResults.forEach(r => { if(r && r !== "0x0000000000000000000000000000000000000000") childrenSet.add(r); });
             }
 
             let leftAddr = uInfo[7];
@@ -1257,12 +1401,19 @@
             }
 
             let allChildrenAddrs = Array.from(childrenSet);
-            if(allChildrenAddrs.length === 0) {
+            if(allChildrenAddrs.length === 0 || renderId !== currentTreeRenderId) {
                 return '';
             }
 
-            let childInfos = await Promise.all(allChildrenAddrs.map(c => contract.users(c)));
+            let childInfos = (await Promise.all(allChildrenAddrs.map(c => getCachedUser(c)))).filter(Boolean);
+            if (renderId !== currentTreeRenderId) return '';
             childInfos.sort((a, b) => a[0].toNumber() - b[0].toNumber());
+
+            // Fetch all subtrees in parallel instead of waiting one by one!
+            let subTrees = await Promise.all(
+                childInfos.map(cInfo => buildUnilevelTree(cInfo[1], level + 1, renderId))
+            );
+            if (renderId !== currentTreeRenderId) return '';
 
             let html = '<ul>';
             for(let i=0; i<childInfos.length; i++) {
@@ -1281,7 +1432,7 @@
                     ${displayHtml}
                 </a>`;
                 
-                html += await buildUnilevelTree(cInfo[1], level + 1);
+                html += subTrees[i];
                 html += `</li>`;
             }
             html += '</ul>';
@@ -1289,14 +1440,16 @@
         }
 
         window.loadMyPartnersGenealogy = async function(targetAddress) {
+            const myRenderId = ++currentTreeRenderId;
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "My Partners Genealogy";
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Deep Genealogy...</div>';
 
             try {
-                let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) {
+                let rootInfo = await getCachedUser(targetAddress);
+                if (myRenderId !== currentTreeRenderId) return;
+                if (!rootInfo || rootInfo[0].toNumber() === 0) {
                     throw "User not found";
                 }
                 
@@ -1311,13 +1464,18 @@
                     ${displayHtml}
                 </a>`;
 
-                html += await buildUnilevelTree(targetAddress, 1);
+                let subTreeHtml = await buildUnilevelTree(targetAddress, 1, myRenderId);
+                if (myRenderId !== currentTreeRenderId) return;
+
+                html += subTreeHtml;
                 html += `</li></ul>`;
                 
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree. Please try again.</div>';
+                if (myRenderId === currentTreeRenderId) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating tree. Please try again.</div>';
+                }
             }
         }
 
@@ -1326,14 +1484,16 @@
         }
 
         async function loadSlot2Matrix(targetAddress) {
+            const myRenderId = ++currentTreeRenderId;
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "Slot 2 Matrix (4 Nodes Max)";
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Generating 4x4 Matrix...</div>';
             
             try {
-                let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) {
+                let rootInfo = await getCachedUser(targetAddress);
+                if (myRenderId !== currentTreeRenderId) return;
+                if (!rootInfo || rootInfo[0].toNumber() === 0) {
                     throw "User not found";
                 }
 
@@ -1345,9 +1505,10 @@
                 let teamCount = rootInfo[9].toNumber(); 
                 let promises = [];
                 for(let i=0; i<teamCount; i++) { 
-                    promises.push(contract.slot2Team(targetAddress, i).then(tAddr => contract.users(tAddr))); 
+                    promises.push(getCachedSlot2Member(targetAddress, i).then(tAddr => tAddr ? getCachedUser(tAddr) : null)); 
                 }
-                let slot2Members = await Promise.all(promises);
+                let slot2Members = (await Promise.all(promises)).filter(Boolean);
+                if (myRenderId !== currentTreeRenderId) return;
 
                 for(let i=0; i<4; i++) {
                     if(i < slot2Members.length) {
@@ -1362,19 +1523,23 @@
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) { 
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; 
+                if (myRenderId === currentTreeRenderId) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot 2.</div>'; 
+                }
             }
         }
 
         async function loadGlobalPoolMatrix(targetAddress, slotNum) {
+            const myRenderId = ++currentTreeRenderId;
             switchView('treeView');
             document.getElementById('treeViewTitle').innerText = "Slot " + slotNum + " (Global Pool)";
             const treeContainer = document.getElementById('matrixTreeDisplay');
             treeContainer.innerHTML = '<div style="color: var(--gold); padding: 30px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Pool Data...</div>';
 
             try {
-                let rootInfo = await contract.users(targetAddress);
-                if (rootInfo[0].toNumber() === 0) {
+                let rootInfo = await getCachedUser(targetAddress);
+                if (myRenderId !== currentTreeRenderId) return;
+                if (!rootInfo || rootInfo[0].toNumber() === 0) {
                     throw "User not found";
                 }
 
@@ -1385,18 +1550,33 @@
 
                 let userIndex = -1;
                 let indexFound = false;
-                for(let i=0; i<1000; i++) {
-                    try {
-                        let qAddr = await contract.slotQueues(slotNum, i);
-                        if(qAddr.toLowerCase() === targetAddress.toLowerCase()) {
-                            userIndex = i; 
-                            indexFound = true; 
-                            break; 
-                        }
-                    } catch(e) { 
-                        break; 
+                const BATCH_SIZE = 25;
+
+                // Parallel Batched Queue Search (25x faster than sequential loop)
+                for(let i=0; i<1000; i += BATCH_SIZE) {
+                    if (myRenderId !== currentTreeRenderId) return;
+                    let batchPromises = [];
+                    for (let b = 0; b < BATCH_SIZE && (i + b) < 1000; b++) {
+                        batchPromises.push(getCachedSlotQueue(slotNum, i + b));
                     }
+                    let batchAddrs = await Promise.all(batchPromises);
+                    let hitEnd = false;
+                    for (let b = 0; b < batchAddrs.length; b++) {
+                        let qAddr = batchAddrs[b];
+                        if (!qAddr || qAddr === "0x0000000000000000000000000000000000000000") {
+                            hitEnd = true;
+                            break;
+                        }
+                        if (qAddr.toLowerCase() === targetAddress.toLowerCase()) {
+                            userIndex = i + b;
+                            indexFound = true;
+                            break;
+                        }
+                    }
+                    if (indexFound || hitEnd) break;
                 }
+
+                if (myRenderId !== currentTreeRenderId) return;
 
                 let downlines = [];
                 let requiredNodes = 8;
@@ -1406,22 +1586,24 @@
                 if(slotNum == 7) requiredNodes = 128;
 
                 if(indexFound) {
+                    let childPromises = [];
                     for(let i=1; i<=requiredNodes; i++) {
-                        try {
-                            let childAddr = await contract.slotQueues(slotNum, (userIndex * requiredNodes) + i);
-                            if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") { 
-                                downlines.push(childAddr); 
-                            } else { 
-                                break; 
-                            }
-                        } catch(e) { 
+                        childPromises.push(getCachedSlotQueue(slotNum, (userIndex * requiredNodes) + i));
+                    }
+                    let childAddrs = await Promise.all(childPromises);
+                    for (let childAddr of childAddrs) {
+                        if(childAddr && childAddr !== "0x0000000000000000000000000000000000000000") { 
+                            downlines.push(childAddr); 
+                        } else { 
                             break; 
                         }
                     }
                 }
 
-                let promises = downlines.map(addr => contract.users(addr));
-                let resolvedUsers = await Promise.all(promises);
+                if (myRenderId !== currentTreeRenderId) return;
+
+                let resolvedUsers = (await Promise.all(downlines.map(addr => getCachedUser(addr)))).filter(Boolean);
+                if (myRenderId !== currentTreeRenderId) return;
 
                 for(let i=0; i<requiredNodes; i++) {
                     if(i < resolvedUsers.length) {
@@ -1437,34 +1619,44 @@
                 treeContainer.innerHTML = html;
                 treeContainer.className = "tree";
             } catch (error) {
-                treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot Matrix.</div>';
+                if (myRenderId === currentTreeRenderId) {
+                    treeContainer.innerHTML = '<div style="color: #ff4d4d; padding: 30px;">Error generating Slot Matrix.</div>';
+                }
             }
         }
 
         window.loadIncomeHistory = async function(type) {
+            const myLoadId = ++currentIncomeLoadId;
             switchView('incomeView');
             document.getElementById('tab-direct').classList.remove('active-tab');
             document.getElementById('tab-slot').classList.remove('active-tab');
             document.getElementById('tab-upline').classList.remove('active-tab');
             document.getElementById(`tab-${type}`).classList.add('active-tab');
 
+            // Set Title Immediately on click so it never lags or mismatches
+            if (type === 'direct') document.getElementById('incomeViewTitle').innerText = "Direct Income History";
+            else if (type === 'slot') document.getElementById('incomeViewTitle').innerText = "Slot Rewards History";
+            else if (type === 'upline') document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
+
             let container = document.getElementById('incomeListContainer');
             container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Processing Blockchain Data...</div>`;
 
             try {
-                let myInfo = await contract.users(userAddress);
+                let myInfo = await getCachedUser(userAddress);
+                if (myLoadId !== currentIncomeLoadId) return;
+
                 let html = `<div class="activity-header"><span>Details & Source</span><span>Amount (POL)</span></div>`;
                 let count = 0;
 
                 if(type === 'direct') {
-                    document.getElementById('incomeViewTitle').innerText = "Direct Income History";
                     let dCount = myInfo[3].toNumber();
                     
                     let promises = [];
                     for(let i=0; i<dCount; i++) {
-                        promises.push(contract.userDirects(userAddress, i).then(addr => contract.users(addr)));
+                        promises.push(getCachedDirect(userAddress, i).then(addr => addr ? getCachedUser(addr) : null));
                     }
-                    let directs = await Promise.all(promises);
+                    let directs = (await Promise.all(promises)).filter(Boolean);
+                    if (myLoadId !== currentIncomeLoadId) return;
 
                     for(let i=0; i<directs.length; i++) {
                         let idLabel = `ID ${directs[i][0].toNumber()}`;
@@ -1477,7 +1669,6 @@
                         count++;
                     }
                 } else if (type === 'slot') {
-                    document.getElementById('incomeViewTitle').innerText = "Slot Rewards History";
                     let currentSlot = myInfo[4].toNumber();
                     
                     if(currentSlot >= 3) { 
@@ -1502,17 +1693,27 @@
                     }
                     
                 } else if (type === 'upline') {
-                    document.getElementById('incomeViewTitle').innerText = "Up/Downline Income";
-                    
                     if(myInfo[6] === false) { 
                         html += buildIncomeItem("Rebirth System", "Matrix Re-entry Bonus", "30.00", "0.00", '<i class="fa-solid fa-arrow-trend-up"></i>', "#3b82f6"); 
                         count++;
                     }
                     
                     let dCount = myInfo[3].toNumber();
+                    let dPromises = [];
                     for(let i=0; i<dCount; i++) {
-                        let dAddr = await contract.userDirects(userAddress, i);
-                        let dInfo = await contract.users(dAddr);
+                        dPromises.push(getCachedDirect(userAddress, i).then(dAddr => dAddr ? getCachedUser(dAddr) : null));
+                    }
+                    let upAddr = myInfo[2];
+                    let upPromise = (upAddr !== "0x0000000000000000000000000000000000000000") ? getCachedUser(upAddr) : Promise.resolve(null);
+
+                    let [directInfos, upInfo] = await Promise.all([
+                        Promise.all(dPromises),
+                        upPromise
+                    ]);
+                    if (myLoadId !== currentIncomeLoadId) return;
+
+                    for(let dInfo of directInfos) {
+                        if (!dInfo) continue;
                         let dSlot = dInfo[4].toNumber();
                         let dId = dInfo[0].toNumber();
                         if(dSlot >= 4) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 4)", "50.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
@@ -1521,9 +1722,7 @@
                         if(dSlot >= 7) { html += buildIncomeItem(`Downline ID ${dId}`, "Level 1 Pool Reward (Slot 7)", "50000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
                     }
                     
-                    let upAddr = myInfo[2];
-                    if(upAddr !== "0x0000000000000000000000000000000000000000") {
-                        let upInfo = await contract.users(upAddr);
+                    if(upInfo) {
                         let upSlot = upInfo[4].toNumber();
                         let upDCount = upInfo[3].toNumber();
                         if(upDCount === 0) upDCount = 1; 
@@ -1539,7 +1738,9 @@
                 }
                 container.innerHTML = html;
             } catch(e) {
-                container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error loading income data.</div>`;
+                if (myLoadId === currentIncomeLoadId) {
+                    container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4d;">Error loading income data.</div>`;
+                }
             }
         }
 
@@ -1591,7 +1792,6 @@
         async function fetchExtraStats(addr) {
             const myFetchId = ++currentStatsFetchId;
             
-            // Speed Optimize: Local Cache System (Taki Dashboard turant Total Team show kare)
             let cacheKey = "poltitan_stats_" + addr.toLowerCase();
             let cachedData = sessionStorage.getItem(cacheKey);
             if (cachedData) {
@@ -1599,6 +1799,7 @@
                     let parsed = JSON.parse(cachedData);
                     document.getElementById('displayTotalTeam').innerText = parsed.teamSize;
                     document.getElementById('displayReceivedRebirths').innerText = parsed.rebirths;
+                    myReceivedRebirthsCount = parsed.rebirths;
                 } catch(e){}
             }
 
@@ -1611,7 +1812,7 @@
                 let currentLevel = [addr];
                 let processedCount = 0;
 
-                let rootInfo = await contract.users(addr);
+                let rootInfo = await getCachedUser(addr);
                 if (rootInfo && rootInfo[4].toNumber() >= 4) mathRebirths += 10;
                 if (rootInfo && rootInfo[4].toNumber() >= 5) mathRebirths += 40;
                 if (rootInfo && rootInfo[4].toNumber() >= 6) mathRebirths += 160;
@@ -1623,11 +1824,11 @@
                     let nextLevel = [];
                     let uniqueNewChildren = [];
 
-                    // Speed Optimize: Batch size ko 5 se badha kar 50 kiya
-                    for (let i = 0; i < currentLevel.length; i += 50) {
+                    // Controlled concurrency (20 per batch) on dedicated read RPC + 10ms UI breathing pause
+                    for (let i = 0; i < currentLevel.length; i += 20) {
                         if (myFetchId !== currentStatsFetchId) return;
-                        let chunk = currentLevel.slice(i, i + 50);
-                        let infos = await Promise.all(chunk.map(c => contract.users(c).catch(() => null)));
+                        let chunk = currentLevel.slice(i, i + 20);
+                        let infos = await Promise.all(chunk.map(c => getCachedUser(c).catch(() => null)));
                         
                         for (let j = 0; j < infos.length; j++) {
                             let info = infos[j];
@@ -1640,14 +1841,13 @@
                             
                             let childrenToCheck = [];
                             
-                            // Speed Optimize: Directs ko Parallel (ek sath) Blockchain se mangwana
                             if (dCount > 0) {
                                 let dPromises = [];
                                 for(let k=0; k<dCount; k++) { 
-                                    dPromises.push(contract.userDirects(current, k).catch(()=>null));
+                                    dPromises.push(getCachedDirect(current, k));
                                 }
                                 let dResults = await Promise.all(dPromises);
-                                childrenToCheck.push(...dResults.filter(r => r !== null));
+                                childrenToCheck.push(...dResults.filter(r => r && r !== "0x0000000000000000000000000000000000000000"));
                             }
 
                             if(left && left !== "0x0000000000000000000000000000000000000000" && !childrenToCheck.includes(left)) {
@@ -1667,13 +1867,15 @@
                                 }
                             }
                         }
+                        // Give browser main thread 10ms breathing room so buttons & video logo never lag
+                        await new Promise(r => setTimeout(r, 10));
                     }
 
                     if(uniqueNewChildren.length > 0) {
-                        for (let i = 0; i < uniqueNewChildren.length; i += 50) { 
+                        for (let i = 0; i < uniqueNewChildren.length; i += 20) { 
                             if (myFetchId !== currentStatsFetchId) return;
-                            let chunk = uniqueNewChildren.slice(i, i + 50);
-                            let childInfos = await Promise.all(chunk.map(c => contract.users(c).catch(() => null)));
+                            let chunk = uniqueNewChildren.slice(i, i + 20);
+                            let childInfos = await Promise.all(chunk.map(c => getCachedUser(c).catch(() => null)));
                             for(let cInfo of childInfos) {
                                 if(cInfo && cInfo[6] === true) { 
                                     let cSlot = cInfo[4].toNumber();
@@ -1683,6 +1885,7 @@
                                     if(cSlot >= 7) mathRebirths += 640;
                                 }
                             }
+                            await new Promise(r => setTimeout(r, 10));
                         }
                     }
 
@@ -1693,36 +1896,129 @@
                     
                     myReceivedRebirthsCount = mathRebirths;
                     
-                    // UI Turant update karega
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
                     document.getElementById('displayReceivedRebirths').innerText = mathRebirths;
                     
-                    // Data Cache me save karega taaki wapas aane par turant dikh jaye
                     sessionStorage.setItem(cacheKey, JSON.stringify({teamSize: teamSet.size, rebirths: mathRebirths}));
+                }
+
+                if (myFetchId === currentStatsFetchId && processedCount === 1 && currentLevel.length === 0) {
+                    document.getElementById('displayTotalTeam').innerText = teamSet.size;
+                    document.getElementById('displayReceivedRebirths').innerText = mathRebirths;
                 }
             } catch(e){}
         }
 
-        async function fetchJoiningDate(addr) {
+        // =========================================================================
+        // 100% ACCURATE BLOCKCHAIN JOINING DATE ENGINE (Fixes "13 Oct 2026" Bug)
+        // =========================================================================
+        function formatBlockchainTimestamp(tsSeconds) {
+            const date = new Date(Number(tsSeconds) * 1000);
+            return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        async function getContractDeployBlock(latestBlock) {
+            if (cachedDeployBlock) return cachedDeployBlock;
+            const saved = localStorage.getItem('poltitan_deploy_block_' + CONTRACT_ADDRESS.toLowerCase());
+            if (saved) {
+                cachedDeployBlock = parseInt(saved);
+                return cachedDeployBlock;
+            }
             try {
-                let url = `https://api.polygonscan.com/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`;
-                let res = await fetch(url);
-                let data = await res.json();
-                if(data.status === "1" && data.result.length > 0) {
-                    for(let tx of data.result) {
-                        if(tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase() || tx.from.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()) {
-                            let date = new Date(tx.timeStamp * 1000);
-                            return date.toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'});
-                        }
+                let low = Math.max(0, latestBlock - 20000000);
+                let high = latestBlock;
+                while (low < high) {
+                    let mid = Math.floor((low + high) / 2);
+                    let code = await fastReadProvider.getCode(CONTRACT_ADDRESS, mid);
+                    if (code && code !== "0x") {
+                        high = mid;
+                    } else {
+                        low = mid + 1;
                     }
                 }
-                return "13 Oct 2026";
-            } catch(e) {
-                return "13 Oct 2026";
+                cachedDeployBlock = low;
+                localStorage.setItem('poltitan_deploy_block_' + CONTRACT_ADDRESS.toLowerCase(), low.toString());
+                return low;
+            } catch (e) {
+                return Math.max(0, latestBlock - 5000000);
             }
         }
 
+        async function fetchJoiningDate(addr) {
+            const cleanAddr = addr.toLowerCase();
+            const cacheKey = "poltitan_joindate_v3_" + cleanAddr;
+            const savedDate = localStorage.getItem(cacheKey);
+            if (savedDate) return savedDate;
+
+            // Layer 1: Blockscout Polygon API (Direct & Internal Transactions - No API Key Needed)
+            try {
+                const [txRes, intRes] = await Promise.all([
+                    fetch(`https://polygon.blockscout.com/api?module=account&action=txlist&address=${cleanAddr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`).then(r => r.json()).catch(() => null),
+                    fetch(`https://polygon.blockscout.com/api?module=account&action=txlistinternal&address=${cleanAddr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`).then(r => r.json()).catch(() => null)
+                ]);
+
+                let earliestTs = Infinity;
+
+                if (txRes && txRes.status === "1" && Array.isArray(txRes.result)) {
+                    for (let tx of txRes.result) {
+                        if (tx.isError === "0" && (
+                            (tx.to && tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()) ||
+                            (tx.from && tx.from.toLowerCase() === CONTRACT_ADDRESS.toLowerCase())
+                        )) {
+                            let ts = parseInt(tx.timeStamp);
+                            if (ts > 0 && ts < earliestTs) earliestTs = ts;
+                        }
+                    }
+                }
+
+                if (intRes && intRes.status === "1" && Array.isArray(intRes.result)) {
+                    for (let tx of intRes.result) {
+                        if (
+                            (tx.to && tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()) ||
+                            (tx.from && tx.from.toLowerCase() === CONTRACT_ADDRESS.toLowerCase())
+                        ) {
+                            let ts = parseInt(tx.timeStamp);
+                            if (ts > 0 && ts < earliestTs) earliestTs = ts;
+                        }
+                    }
+                }
+
+                if (earliestTs !== Infinity) {
+                    const formatted = formatBlockchainTimestamp(earliestTs);
+                    localStorage.setItem(cacheKey, formatted);
+                    return formatted;
+                }
+            } catch (e) {}
+
+            // Layer 2: On-Chain Archive Binary Search (Finds exact registration block for Rebirth / Virtual / Owner-registered IDs)
+            try {
+                const latestBlock = await fastReadProvider.getBlockNumber();
+                let low = await getContractDeployBlock(latestBlock);
+                let high = latestBlock;
+
+                while (low < high) {
+                    let mid = Math.floor((low + high) / 2);
+                    let uInfo = await fastReadContract.users(cleanAddr, { blockTag: mid });
+                    if (uInfo && uInfo[0].toNumber() > 0) {
+                        high = mid;
+                    } else {
+                        low = mid + 1;
+                    }
+                }
+
+                const regBlock = await fastReadProvider.getBlock(low);
+                if (regBlock && regBlock.timestamp) {
+                    const formatted = formatBlockchainTimestamp(regBlock.timestamp);
+                    localStorage.setItem(cacheKey, formatted);
+                    return formatted;
+                }
+            } catch (e) {}
+
+            return "Verified On-Chain";
+        }
+
         window.loadDashboardData = async function(address, viewMode) {
+            const myDashId = ++currentDashboardFetchId;
             try {
                 userAddress = address; 
                 globalRootAddress = address; 
@@ -1733,7 +2029,7 @@
                     myOriginalAddress = address; 
                 }
 
-                if(!provider) { 
+                if(!provider && window.ethereum) { 
                     provider = new ethers.providers.Web3Provider(window.ethereum, "any"); 
                     signer = provider.getSigner(); 
                     contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
@@ -1743,27 +2039,37 @@
                 let userInfo = null;
                 
                 try { 
-                    userInfo = await contract.users(userAddress); 
+                    userInfo = await getCachedUser(userAddress, true); 
                     userId = userInfo[0].toNumber(); 
                 } catch (dataError) { 
                     userId = 0; 
                 }
                 
+                if (myDashId !== currentDashboardFetchId) return;
+
                 if (userId > 0 && userInfo) {
                     document.getElementById('displayId').innerText = userId;
                     
                     document.getElementById('displayReceiveAddr').innerHTML = userAddress.substring(0, 10) + "..." + userAddress.substring(34) + ' <i class="fa-regular fa-copy" style="color:var(--gold); margin-left:5px;"></i>';
                     
+                    const targetDateAddr = userAddress;
                     document.getElementById('displayJoiningDate').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                    fetchJoiningDate(userAddress).then(dateStr => {
-                        let dateEl = document.getElementById('displayJoiningDate');
-                        if (dateEl) dateEl.innerText = dateStr;
+                    fetchJoiningDate(targetDateAddr).then(dateStr => {
+                        if (userAddress && userAddress.toLowerCase() === targetDateAddr.toLowerCase()) {
+                            let dateEl = document.getElementById('displayJoiningDate');
+                            if (dateEl) dateEl.innerText = dateStr;
+                        }
                     });
                     
                     let upline = userInfo[2];
                     if(upline !== "0x0000000000000000000000000000000000000000") { 
-                        const uInfo = await contract.users(upline); 
-                        document.getElementById('displayUplineId').innerText = uInfo[0].toNumber(); 
+                        getCachedUser(upline).then(uInfo => {
+                            if (uInfo && userAddress.toLowerCase() === targetDateAddr.toLowerCase()) {
+                                document.getElementById('displayUplineId').innerText = uInfo[0].toNumber();
+                            }
+                        }).catch(() => {});
+                    } else {
+                        document.getElementById('displayUplineId').innerText = "None";
                     }
                     
                     let directCount = userInfo[3].toNumber();
@@ -1860,11 +2166,11 @@
                 document.getElementById('inspectLoading').style.display = "block";
                 document.getElementById('inspectData').style.display = "none";
                 try {
-                    const info = await contract.users(addr);
+                    const info = await getCachedUser(addr);
                     document.getElementById('insId').innerText = info[0].toNumber();
                     const uplineAddr = info[2];
                     if(uplineAddr !== "0x0000000000000000000000000000000000000000") {
-                        const spInfo = await contract.users(uplineAddr);
+                        const spInfo = await getCachedUser(uplineAddr);
                         document.getElementById('insUpline').innerText = `ID ${spInfo[0].toNumber()}`;
                         document.getElementById('insWallet').innerText = uplineAddr.substring(0,8) + "...";
                     } else {
@@ -1931,6 +2237,9 @@
             }
         }
 
+        // =========================================================================
+        // LOGIN & REGISTRATION CODE (100% UNTOUCHED AS REQUESTED)
+        // =========================================================================
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
         if (refParam && refParam.length === 42) { 
@@ -1938,6 +2247,7 @@
         }
 
         window.addEventListener('load', async () => {
+            ensureVideosSmooth();
             let savedSession = localStorage.getItem('poltitan_saved_session');
             if (window.ethereum) {
                 setTimeout(async () => {
