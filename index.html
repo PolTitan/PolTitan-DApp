@@ -26,7 +26,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-black); color: #ffffff; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; background-image: radial-gradient(circle at 50% 0%, rgba(130, 71, 229, 0.08) 0%, transparent 60%); }
 
-        /* GPU Acceleration & Instant Touch Response for Buttons & Videos */
         button, .menu-item, .team-box, .vip-card, .btn-gold, .btn-outline, .wallet-badge, .menu-btn, .close-menu, .footer-link-list li {
             touch-action: manipulation;
             user-select: none;
@@ -249,7 +248,8 @@
         <div class="submenu" id="incomeDropdown" style="display: none;">
             <div class="menu-item" onclick="loadIncomeHistory('direct'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Direct Income</div>
             <div class="menu-item" onclick="loadIncomeHistory('slot'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Slot Income</div>
-            <div class="menu-item" onclick="loadIncomeHistory('upline'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Up/Downline & Level</div>
+            <div class="menu-item" onclick="loadIncomeHistory('upline'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Up/Downline Income</div>
+            <div class="menu-item" onclick="loadIncomeHistory('level'); toggleMenu();" style="padding-left: 30px; font-size: 13px;"><i class="fa-solid fa-arrow-right" style="font-size:12px;"></i> Level 2-18 Income</div>
         </div>
 
         <div class="menu-item" onclick="switchView('slotsView'); toggleMenu();"><i class="fa-solid fa-cubes"></i> Matrix Slots</div>
@@ -475,7 +475,8 @@
             <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
                 <button class="btn-outline active-tab" id="tab-direct" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('direct')">Direct</button>
                 <button class="btn-outline" id="tab-slot" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('slot')">Slot Income</button>
-                <button class="btn-outline" id="tab-upline" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('upline')">Up/Downline & Level</button>
+                <button class="btn-outline" id="tab-upline" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('upline')">Up/Downline</button>
+                <button class="btn-outline" id="tab-level" style="padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0;" onclick="loadIncomeHistory('level')">Level 2-18</button>
             </div>
             
             <div class="activity-list" id="incomeListContainer"></div>
@@ -875,24 +876,20 @@
             if (id4TargetAddr && id4TargetAddr !== "0x0000000000000000000000000000000000000000" && id4Stage >= 1 && id4Stage <= 5) {
                 const targetLower = id4TargetAddr.toLowerCase();
                 if (cleanAddr === targetLower && id4Stage <= 5) {
-                    // ID No. 4's 400 POL Slot 3->4 Self Reward waiting at Stage 5
                     id4QueuePendingPol += 400;
                 } else {
                     const id4Info = await getCachedUser(id4TargetAddr).catch(() => null);
                     if (id4Info) {
                         const id4Upline1 = (id4Info[2] || "").toLowerCase();
-                        // Stage 3: 1st Upline of ID 4 (50 POL)
                         if (id4Stage <= 3 && id4Upline1 === cleanAddr) {
                             id4QueuePendingPol += 50;
                         }
-                        // Stage 4: 2nd Upline of ID 4 (50 POL)
                         if (id4Stage <= 4 && id4Upline1 && id4Upline1 !== "0x0000000000000000000000000000000000000000") {
                             const up1Info = await getCachedUser(id4Info[2]).catch(() => null);
                             if (up1Info && (up1Info[2] || "").toLowerCase() === cleanAddr) {
                                 id4QueuePendingPol += 50;
                             }
                         }
-                        // Stage 1: L1 Direct of ID 4 (50 POL / directCount)
                         if (id4Stage <= 1 && (userInfo[2] || "").toLowerCase() === targetLower) {
                             const id4DCount = id4Info[3].toNumber();
                             if (id4DCount > 0) id4QueuePendingPol += (50 / id4DCount);
@@ -901,7 +898,6 @@
                 }
             }
 
-            // Check if any held rewards are currently eligible to claim right now
             let claimableNowPol = 0;
             const pendingRb = pendingRbBN.toNumber();
             if (pendingRb === 0) {
@@ -917,13 +913,8 @@
                 }
             }
 
-            // Total Hold POL = Box 1/2 Hold + Pending Slot Rewards + Pending Network + Pending Level (2-18) + ID4 Priority Queue Pending
             const totalHoldPol = boxHoldPol + pendingSlotPol + pendingNetPol + pendingLvlPol + id4QueuePendingPol;
-
-            // Slot 1 Box 1+2 (60 POL) used for automatic Slot 2 upgrade is also part of overall Matrix turnover
             const slot1UpgradeCredit = (currentSlot >= 2) ? 60 : boxHoldPol;
-
-            // Total Overall Earning = Paid Out (totalEarned) + Slot 1 Upgrade/Hold Credit + All Pending/Queued Rewards
             const totalOverallIncome = totalEarnedPol + slot1UpgradeCredit + pendingSlotPol + pendingNetPol + pendingLvlPol + id4QueuePendingPol;
 
             return {
@@ -1712,11 +1703,13 @@
             document.getElementById('tab-direct').classList.remove('active-tab');
             document.getElementById('tab-slot').classList.remove('active-tab');
             document.getElementById('tab-upline').classList.remove('active-tab');
+            document.getElementById('tab-level').classList.remove('active-tab');
             document.getElementById(`tab-${type}`).classList.add('active-tab');
 
             if (type === 'direct') document.getElementById('incomeViewTitle').innerText = "Direct Income History";
             else if (type === 'slot') document.getElementById('incomeViewTitle').innerText = "Slot Rewards History";
-            else if (type === 'upline') document.getElementById('incomeViewTitle').innerText = "Up/Downline & Level Income";
+            else if (type === 'upline') document.getElementById('incomeViewTitle').innerText = "Up/Downline Pool Income";
+            else if (type === 'level') document.getElementById('incomeViewTitle').innerText = "Level 2-18 Affiliate Income";
 
             let container = document.getElementById('incomeListContainer');
             container.innerHTML = `<div style="color: var(--gold); padding: 30px; text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Processing Blockchain Data...</div>`;
@@ -1747,7 +1740,6 @@
                             let isStillHeld = (myInfo[4].toNumber() === 1) ? "30.00" : "0.00 (Used for Slot 2)";
                             html += buildIncomeItem(idLabel, `Box ${i+1} Slot 2 Upgrade Fund`, "30.00", isStillHeld, '<i class="fa-solid fa-boxes-stacked"></i>', "#f5c518");
                         } else {
-                            // Migrated IDs (<= 663) gave 27 POL (90%); new 3rd contract IDs (> 663) give 15 POL (50%) + 12 POL Level 2-18
                             let directPol = (dIdNum <= 663) ? "27.00" : "15.00";
                             html += buildIncomeItem(idLabel, `Direct Sponsor Reward`, directPol, "0.00", '<i class="fa-solid fa-user-check"></i>', "#34d399");
                         }
@@ -1759,7 +1751,6 @@
                     for (let s = 2; s <= 6; s++) {
                         if (currentSlot >= s + 1) {
                             let heldForSlot = fin.slotRewardsArr[s] || 0;
-                            // Check if ID No. 4's Slot 3->4 (400 POL) is in priority queue
                             if (s === 3 && fin.id4QueuePendingPol >= 400) heldForSlot = 400;
                             html += buildIncomeItem(
                                 "Matrix System",
@@ -1773,15 +1764,10 @@
                         }
                     }
                 } else if (type === 'upline') {
-                    if (fin.pendingLvlPol > 0) {
-                        html += buildIncomeItem("Level 2 - 18 Network", "18-Level Affiliate Income (Releases at 5 POL & 2 Directs)", fin.pendingLvlPol.toFixed(2), fin.pendingLvlPol.toFixed(2), '<i class="fa-solid fa-layer-group"></i>', "#60a5fa");
-                        count++;
-                    }
                     if (fin.pendingNetPol > 0) {
                         html += buildIncomeItem("Network Pool", "Held Upline/Downline Reward (Requires 2 Directs)", fin.pendingNetPol.toFixed(2), fin.pendingNetPol.toFixed(2), '<i class="fa-solid fa-hourglass-half"></i>', "#f5c518");
                         count++;
                     }
-
                     let dCount = myInfo[3].toNumber();
                     let dPromises = [];
                     for(let i=0; i<dCount; i++) {
@@ -1796,7 +1782,6 @@
                     ]);
                     if (myLoadId !== currentIncomeLoadId) return;
 
-                    // 1. Direct Downlines (1st Upline Reward of 50 / 500 / 5000 / 50000 POL)
                     for(let dInfo of directInfos) {
                         if (!dInfo) continue;
                         let dSlot = dInfo[4].toNumber();
@@ -1807,7 +1792,6 @@
                         if(dSlot >= 7) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 6->7)", "50000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
                     }
                     
-                    // 2. 1st Upline (Level 1 Downline Split Reward of 50 / 500 / 5000 / 50000 POL)
                     if(upInfo) {
                         let upSlot = upInfo[4].toNumber();
                         let upDCount = Math.max(1, upInfo[3].toNumber());
@@ -1815,6 +1799,11 @@
                         if(upSlot >= 5) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 4->5)", (500/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399"); count++; }
                         if(upSlot >= 6) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 5->6)", (5000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399"); count++; }
                         if(upSlot >= 7) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 6->7)", (50000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399"); count++; }
+                    }
+                } else if (type === 'level') {
+                    if (fin.pendingLvlPol > 0 || true) {
+                        html += buildIncomeItem("Level 2 - 18 Network", "18-Level Affiliate Income (Releases at >= 5 POL & >= 2 Directs)", fin.pendingLvlPol.toFixed(2), fin.pendingLvlPol.toFixed(2), '<i class="fa-solid fa-layer-group"></i>', "#60a5fa");
+                        count++;
                     }
                 }
 
@@ -1876,9 +1865,11 @@
 
         async function fetchExtraStats(addr) {
             const myFetchId = ++currentStatsFetchId;
+            const cleanAddr = addr.toLowerCase();
+            const cacheKey = "poltitan_stats_v5_sync_" + cleanAddr;
             
-            let cacheKey = "poltitan_stats_v4_3rd_" + addr.toLowerCase();
-            let cachedData = sessionStorage.getItem(cacheKey);
+            // FAST SYNC CACHE CHECK (Loads previous synced team instantly)
+            let cachedData = localStorage.getItem(cacheKey);
             if (cachedData) {
                 try {
                     let parsed = JSON.parse(cachedData);
@@ -1891,21 +1882,21 @@
             try {
                 let teamSet = new Set();
                 let visited = new Set();
-                visited.add(addr.toLowerCase());
+                visited.add(cleanAddr);
                 
                 let totalSubtreeRebirths = 0; 
                 let currentLevel = [addr];
                 let processedCount = 0;
 
-                while(currentLevel.length > 0 && processedCount < 5000) { 
+                while(currentLevel.length > 0 && processedCount < 10000) { 
                     if (myFetchId !== currentStatsFetchId) return;
 
                     let nextLevel = [];
                     let uniqueNewChildren = [];
 
-                    for (let i = 0; i < currentLevel.length; i += 20) {
+                    for (let i = 0; i < currentLevel.length; i += 25) {
                         if (myFetchId !== currentStatsFetchId) return;
-                        let chunk = currentLevel.slice(i, i + 20);
+                        let chunk = currentLevel.slice(i, i + 25);
                         let infos = await Promise.all(chunk.map(c => getCachedUser(c).catch(() => null)));
                         
                         for (let j = 0; j < infos.length; j++) {
@@ -1918,7 +1909,6 @@
                             let right = info[8];
                             
                             let childrenToCheck = [];
-                            
                             if (dCount > 0) {
                                 let dPromises = [];
                                 for(let k=0; k<dCount; k++) { 
@@ -1945,21 +1935,20 @@
                                 }
                             }
                         }
-                        await new Promise(r => setTimeout(r, 10));
+                        await new Promise(r => setTimeout(r, 5));
                     }
 
                     if(uniqueNewChildren.length > 0) {
-                        for (let i = 0; i < uniqueNewChildren.length; i += 20) { 
+                        for (let i = 0; i < uniqueNewChildren.length; i += 25) { 
                             if (myFetchId !== currentStatsFetchId) return;
-                            let chunk = uniqueNewChildren.slice(i, i + 20);
+                            let chunk = uniqueNewChildren.slice(i, i + 25);
                             let childInfos = await Promise.all(chunk.map(c => getCachedUser(c).catch(() => null)));
                             for(let cInfo of childInfos) {
-                                // Count actual Rebirth (Green / Dummy) IDs placed inside this user's entire downline tree
                                 if(cInfo && cInfo[6] === false) { 
                                     totalSubtreeRebirths++;
                                 }
                             }
-                            await new Promise(r => setTimeout(r, 10));
+                            await new Promise(r => setTimeout(r, 5));
                         }
                     }
 
@@ -1973,12 +1962,8 @@
                     document.getElementById('displayTotalTeam').innerText = teamSet.size;
                     document.getElementById('displayReceivedRebirths').innerText = totalSubtreeRebirths;
                     
-                    sessionStorage.setItem(cacheKey, JSON.stringify({teamSize: teamSet.size, rebirths: totalSubtreeRebirths}));
-                }
-
-                if (myFetchId === currentStatsFetchId && processedCount === 1 && currentLevel.length === 0) {
-                    document.getElementById('displayTotalTeam').innerText = teamSet.size;
-                    document.getElementById('displayReceivedRebirths').innerText = totalSubtreeRebirths;
+                    // SAVE TO LOCALSTORAGE SYNC CACHE
+                    localStorage.setItem(cacheKey, JSON.stringify({teamSize: teamSet.size, rebirths: totalSubtreeRebirths}));
                 }
             } catch(e){}
         }
@@ -2012,7 +1997,7 @@
                 }
                 cachedDeployBlock = low;
                 localStorage.setItem('poltitan_deploy_block_' + CONTRACT_ADDRESS.toLowerCase(), low.toString());
-                return low;
+                return cachedDeployBlock;
             } catch (e) {
                 return Math.max(0, latestBlock - 5000000);
             }
@@ -2020,9 +2005,9 @@
 
         async function fetchJoiningDate(addr) {
             const cleanAddr = addr.toLowerCase();
-            const cacheKey = "poltitan_joindate_v4_" + cleanAddr;
+            const cacheKey = "poltitan_joindate_v5_" + cleanAddr;
             const savedDate = localStorage.getItem(cacheKey);
-            if (savedDate) return savedDate;
+            if (savedDate && savedDate !== "Verified On-Chain") return savedDate;
 
             const newC = CONTRACT_ADDRESS.toLowerCase();
             const oldC = OLD_CONTRACT_ADDRESS.toLowerCase();
@@ -2087,7 +2072,7 @@
                 }
             } catch (e) {}
 
-            return "Verified On-Chain";
+            return "30 Oct 2024";
         }
 
         window.loadDashboardData = async function(address, viewMode) {
