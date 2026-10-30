@@ -300,6 +300,37 @@
         </div>
     </div>
 
+    <!-- INCOME SOURCE DETAIL MODAL -->
+    <div class="modal-overlay" id="incomeDetailModal">
+        <div class="inspect-card" style="text-align: left; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.25); position: relative; max-width: 400px; width: 90%;">
+            <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeIncomeDetailModal()"></i>
+            <h3 style="color: var(--gold); margin-bottom: 15px; font-size: 16px;"><i class="fa-solid fa-list-check"></i> Income Source Details</h3>
+            <div id="incomeDetailLoading" style="text-align: center; color: var(--gold); padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching details...</div>
+            <div id="incomeDetailContent" style="max-height: 250px; overflow-y: auto; font-size: 12px; display: none;"></div>
+            <button class="btn-gold" onclick="closeIncomeDetailModal()" style="margin-top: 15px; padding: 10px; font-size: 13px;">Close</button>
+        </div>
+    </div>
+
+    <!-- CLAIM ELIGIBILITY GUIDELINE MODAL -->
+    <div class="modal-overlay" id="claimGuideModal">
+        <div class="inspect-card" style="text-align: left; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); position: relative; max-width: 400px; width: 90%;">
+            <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeClaimGuideModal()"></i>
+            <h3 style="color: #34d399; margin-bottom: 12px; font-size: 16px;"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Fund Guidelines & Terms</h3>
+            <div style="font-size: 12px; color: #ccc; line-height: 1.6; margin-bottom: 15px;">
+                <p style="margin-bottom: 8px;"><b>1. How it works:</b> Eligible held funds, slot rewards, network bonuses, and 30 POL registration refunds can be claimed directly to your Polygon wallet through smart contract execution.</p>
+                <p style="margin-bottom: 8px;"><b>2. Eligibility for 30 POL Refund:</b></p>
+                <ul style="padding-left: 15px; margin-bottom: 8px; color: var(--text-gray);">
+                    <li>System must be officially 'Inactive' globally for 180 continuous days (no new global ID registrations).</li>
+                    <li>Claiming user must have exactly 0 POL total earnings from the ecosystem.</li>
+                    <li>Eligible users have a strict 90-day window to claim once inactivity is declared.</li>
+                </ul>
+                <p style="margin-bottom: 8px;"><b>3. Direct Rewards Claim:</b> Unlocked rewards (Net/Level/Slots) can be claimed anytime if minimum direct & balance requirements are fulfilled.</p>
+                <p style="color: var(--gold);">* Note: All transactions are verified securely on-chain with zero admin intervention.</p>
+            </div>
+            <button class="btn-gold" onclick="proceedToClaimAction()" style="padding: 10px; font-size: 13px; background: linear-gradient(135deg, #34d399, #059669); color: #000;">Proceed to Claim Now</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="welcomeModal">
         <div class="inspect-card" style="text-align: center; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeWelcomeModalOnly()"></i>
@@ -458,7 +489,7 @@
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button class="btn-gold" id="claimEligibleBtn" style="display: none; width: auto; padding: 10px 14px; font-size: 12px; margin: 0; background: linear-gradient(135deg, #34d399, #059669); color: #000;" onclick="claimEligiblePOL()"><i class="fa-solid fa-unlock"></i> Claim Eligible POL</button>
-                        <button class="btn-gold" id="claimRefundBtn" style="width: auto; padding: 10px 15px; font-size: 12px; margin: 0;" onclick="claimMyRefund()"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund</button>
+                        <button class="btn-gold" id="claimRefundBtn" style="width: auto; padding: 10px 15px; font-size: 12px; margin: 0;" onclick="openClaimGuideModal()"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Refund</button>
                     </div>
                 </div>
                 <div id="holdBreakdownNote" style="font-size: 11px; color: var(--text-gray); margin-top: 8px; line-height: 1.4;"></div>
@@ -995,6 +1026,81 @@
             document.getElementById('alertModalTitle').innerText = title;
             document.getElementById('alertModalBody').innerText = message;
             document.getElementById('customAlertModal').style.display = 'flex';
+        }
+
+        // CLAIM FUND GUIDELINE MODAL HANDLERS
+        window.openClaimGuideModal = function() {
+            if(isViewOnly) {
+                showCustomAlertModal("Notice", "Action not allowed in view mode!");
+                return;
+            }
+            document.getElementById('claimGuideModal').style.display = 'flex';
+        }
+        window.closeClaimGuideModal = function() {
+            document.getElementById('claimGuideModal').style.display = 'none';
+        }
+        window.proceedToClaimAction = async function() {
+            closeClaimGuideModal();
+            await claimMyRefund();
+        }
+
+        // INCOME SOURCE DETAIL MODAL HANDLERS (Real Blockchain History Breakdown)
+        window.openIncomeDetailModal = async function(category) {
+            const modal = document.getElementById('incomeDetailModal');
+            const loading = document.getElementById('incomeDetailLoading');
+            const content = document.getElementById('incomeDetailContent');
+            
+            modal.style.display = 'flex';
+            loading.style.display = 'block';
+            content.style.display = 'none';
+
+            try {
+                let myInfo = await getCachedUser(userAddress);
+                let apiUrl = `https://polygon.blockscout.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=50&sort=desc`;
+                let res = await fetch(apiUrl);
+                let data = await res.json();
+
+                let html = `<div style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px; color: var(--gold); font-weight: bold;">Category: ${category.toUpperCase()}</div>`;
+                let foundItems = 0;
+
+                if(data.status === "1" && data.result) {
+                    let serial = 1;
+                    for(let tx of data.result) {
+                        let valPol = parseFloat(tx.value / 1e18);
+                        if(valPol > 0 || tx.to.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()) {
+                            let txDate = new Date(tx.timeStamp * 1000).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+                            let fromShort = tx.from.substring(0, 6) + "..." + tx.from.substring(38);
+                            
+                            html += `
+                            <div style="background: #07080f; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="display: flex; justify-content: space-between; color: var(--gold);">
+                                    <span>#${serial++} • ${txDate}</span>
+                                    <span><b>${valPol > 0 ? valPol.toFixed(2) + ' POL' : 'Contract Call'}</b></span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-gray); margin-top: 4px; word-break: break-all;">
+                                    From Wallet: <span style="color:#60a5fa;">${fromShort}</span><br>
+                                    TxHash: <a href="https://polygonscan.com/tx/${tx.hash}" target="_blank" style="color:#34d399;">${tx.hash.substring(0,10)}...</a>
+                                </div>
+                            </div>`;
+                            foundItems++;
+                            if(foundItems >= 15) break;
+                        }
+                    }
+                }
+
+                if(foundItems === 0) {
+                    html += `<p style="color: var(--text-gray); text-align: center; padding: 15px;">No transactions found on blockchain for this category yet.</p>`;
+                }
+
+                content.innerHTML = html;
+                loading.style.display = 'none';
+                content.style.display = 'block';
+            } catch (err) {
+                loading.innerHTML = `<span style="color: #ff4d4d;">Failed to fetch live blockchain history.</span>`;
+            }
+        }
+        window.closeIncomeDetailModal = function() {
+            document.getElementById('incomeDetailModal').style.display = 'none';
         }
 
         window.checkReceivedRebirths = function() {
@@ -1738,10 +1844,10 @@
                         
                         if(i === 0 || i === 1) {
                             let isStillHeld = (myInfo[4].toNumber() === 1) ? "30.00" : "0.00 (Used for Slot 2)";
-                            html += buildIncomeItem(idLabel, `Box ${i+1} Slot 2 Upgrade Fund`, "30.00", isStillHeld, '<i class="fa-solid fa-boxes-stacked"></i>', "#f5c518");
+                            html += buildIncomeItem(idLabel, `Box ${i+1} Slot 2 Upgrade Fund`, "30.00", isStillHeld, '<i class="fa-solid fa-boxes-stacked"></i>', "#f5c518", "direct");
                         } else {
                             let directPol = (dIdNum <= 663) ? "27.00" : "15.00";
-                            html += buildIncomeItem(idLabel, `Direct Sponsor Reward`, directPol, "0.00", '<i class="fa-solid fa-user-check"></i>', "#34d399");
+                            html += buildIncomeItem(idLabel, `Direct Sponsor Reward`, directPol, "0.00", '<i class="fa-solid fa-user-check"></i>', "#34d399", "direct");
                         }
                         count++;
                     }
@@ -1758,14 +1864,15 @@
                                 slotAmounts[s].toFixed(2),
                                 heldForSlot.toFixed(2),
                                 '<i class="fa-solid fa-cubes"></i>',
-                                "#f5c518"
+                                "#f5c518",
+                                "slot"
                             );
                             count++;
                         }
                     }
                 } else if (type === 'upline') {
                     if (fin.pendingNetPol > 0) {
-                        html += buildIncomeItem("Network Pool", "Held Upline/Downline Reward (Requires 2 Directs)", fin.pendingNetPol.toFixed(2), fin.pendingNetPol.toFixed(2), '<i class="fa-solid fa-hourglass-half"></i>', "#f5c518");
+                        html += buildIncomeItem("Network Pool", "Held Upline/Downline Reward (Requires 2 Directs)", fin.pendingNetPol.toFixed(2), fin.pendingNetPol.toFixed(2), '<i class="fa-solid fa-hourglass-half"></i>', "#f5c518", "upline");
                         count++;
                     }
                     let dCount = myInfo[3].toNumber();
@@ -1786,23 +1893,23 @@
                         if (!dInfo) continue;
                         let dSlot = dInfo[4].toNumber();
                         let dId = dInfo[0].toNumber();
-                        if(dSlot >= 4) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 3->4)", "50.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 5) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 4->5)", "500.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 6) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 5->6)", "5000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
-                        if(dSlot >= 7) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 6->7)", "50000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518"); count++; }
+                        if(dSlot >= 4) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 3->4)", "50.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518", "upline"); count++; }
+                        if(dSlot >= 5) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 4->5)", "500.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518", "upline"); count++; }
+                        if(dSlot >= 6) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 5->6)", "5000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518", "upline"); count++; }
+                        if(dSlot >= 7) { html += buildIncomeItem(`Downline ID ${dId}`, "1st Upline Reward (From Downline Slot 6->7)", "50000.00", "0.00", '<i class="fa-solid fa-arrow-up"></i>', "#f5c518", "upline"); count++; }
                     }
                     
                     if(upInfo) {
                         let upSlot = upInfo[4].toNumber();
                         let upDCount = Math.max(1, upInfo[3].toNumber());
-                        if(upSlot >= 4) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 3->4)", (50/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399"); count++; }
-                        if(upSlot >= 5) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 4->5)", (500/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399"); count++; }
-                        if(upSlot >= 6) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 5->6)", (5000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399"); count++; }
-                        if(upSlot >= 7) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 6->7)", (50000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399"); count++; }
+                        if(upSlot >= 4) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 3->4)", (50/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399", "upline"); count++; }
+                        if(upSlot >= 5) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 4->5)", (500/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399", "upline"); count++; }
+                        if(upSlot >= 6) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 5->6)", (5000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399", "upline"); count++; }
+                        if(upSlot >= 7) { html += buildIncomeItem(`Upline ID ${upInfo[0].toNumber()}`, "Level 1 Downline Share (Slot 6->7)", (50000/upDCount).toFixed(2), "0.00", '<i class="fa-solid fa-arrow-down"></i>', "#34d399", "upline"); count++; }
                     }
                 } else if (type === 'level') {
                     if (fin.pendingLvlPol > 0 || true) {
-                        html += buildIncomeItem("Level 2 - 18 Network", "18-Level Affiliate Income (Releases at >= 5 POL & >= 2 Directs)", fin.pendingLvlPol.toFixed(2), fin.pendingLvlPol.toFixed(2), '<i class="fa-solid fa-layer-group"></i>', "#60a5fa");
+                        html += buildIncomeItem("Level 2 - 18 Network", "18-Level Affiliate Income (Releases at >= 5 POL & >= 2 Directs)", fin.pendingLvlPol.toFixed(2), fin.pendingLvlPol.toFixed(2), '<i class="fa-solid fa-layer-group"></i>', "#60a5fa", "level");
                         count++;
                     }
                 }
@@ -1818,13 +1925,13 @@
             }
         }
 
-        function buildIncomeItem(idLabel, reason, amount, hold, icon, iconColor) {
+        function buildIncomeItem(idLabel, reason, amount, hold, icon, iconColor, cat) {
             return `
-            <div class="activity-item">
+            <div class="activity-item" onclick="openIncomeDetailModal('${cat}')">
                 <div class="act-left">
                     <div class="act-icon" style="color:${iconColor}; background:rgba(255,255,255,0.05);">${icon}</div>
                     <div class="act-details">
-                        <h4>From ${idLabel}</h4>
+                        <h4>From ${idLabel} <i class="fa-solid fa-chevron-right" style="font-size:9px; color:var(--gold);"></i></h4>
                         <p style="color:${iconColor}; font-size: 11px;">${reason}</p>
                     </div>
                 </div>
@@ -2490,7 +2597,7 @@
             window.toggleMenu(); 
             document.getElementById('menuBtn').style.display = "none"; 
             document.getElementById('headerWallet').innerHTML = `<i class="fa-solid fa-wallet"></i> Connect`; 
-            document.getElementById('masterConnectBtn').innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet'; 
+            document.getElementById('masterConnectBtn').innerHTML = `<i class="fa-solid fa-wallet"></i> Login / Register Wallet`; 
             window.switchView('authView'); 
         }
     </script>
