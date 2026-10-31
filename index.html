@@ -300,32 +300,32 @@
         </div>
     </div>
 
-    <!-- INCOME SOURCE DETAIL MODAL (List with ID, Date, Serial, Hold info) -->
+    <!-- INCOME SOURCE DETAIL MODAL -->
     <div class="modal-overlay" id="incomeDetailModal">
-        <div class="inspect-card" style="text-align: left; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.25); position: relative; max-width: 420px; width: 92%;">
+        <div class="inspect-card" style="text-align: left; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.25); position: relative; max-width: 400px; width: 90%;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeIncomeDetailModal()"></i>
-            <h3 style="color: var(--gold); margin-bottom: 15px; font-size: 16px;"><i class="fa-solid fa-list-check"></i> Income Source Breakdown</h3>
+            <h3 style="color: var(--gold); margin-bottom: 15px; font-size: 16px;"><i class="fa-solid fa-list-check"></i> Income Source Details</h3>
             <div id="incomeDetailLoading" style="text-align: center; color: var(--gold); padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching details...</div>
-            <div id="incomeDetailContent" style="max-height: 280px; overflow-y: auto; font-size: 12px; display: none;"></div>
+            <div id="incomeDetailContent" style="max-height: 250px; overflow-y: auto; font-size: 12px; display: none;"></div>
             <button class="btn-gold" onclick="closeIncomeDetailModal()" style="margin-top: 15px; padding: 10px; font-size: 13px;">Close</button>
         </div>
     </div>
 
-    <!-- CLAIM ELIGIBILITY & TERMS MODAL -->
+    <!-- CLAIM ELIGIBILITY GUIDELINE MODAL -->
     <div class="modal-overlay" id="claimGuideModal">
-        <div class="inspect-card" style="text-align: left; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); position: relative; max-width: 420px; width: 92%;">
+        <div class="inspect-card" style="text-align: left; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); position: relative; max-width: 400px; width: 90%;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeClaimGuideModal()"></i>
-            <h3 style="color: #34d399; margin-bottom: 12px; font-size: 16px;"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Fund Terms & Guidelines</h3>
+            <h3 style="color: #34d399; margin-bottom: 12px; font-size: 16px;"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Fund Guidelines & Terms</h3>
             <div style="font-size: 12px; color: #ccc; line-height: 1.6; margin-bottom: 15px;">
-                <p style="margin-bottom: 8px;"><b>1. How Claim Works:</b> Eligible held rewards, slot upgrade funds, and registration deposits can be claimed directly to your Polygon wallet securely via smart contract.</p>
-                <p style="margin-bottom: 8px;"><b>2. Terms & Conditions for 30 POL Refund:</b></p>
+                <p style="margin-bottom: 8px;"><b>1. How it works:</b> Eligible held funds, slot rewards, network bonuses, and 30 POL registration refunds can be claimed directly to your Polygon wallet through smart contract execution.</p>
+                <p style="margin-bottom: 8px;"><b>2. Eligibility for 30 POL Refund:</b></p>
                 <ul style="padding-left: 15px; margin-bottom: 8px; color: var(--text-gray);">
-                    <li><b>System Inactivity:</b> The global ecosystem must be inactive (zero new registrations globally) for a continuous period of 180 days.</li>
-                    <li><b>Zero Earnings:</b> The claiming wallet must have exactly 0 POL total earnings from the system.</li>
-                    <li><b>Claim Window:</b> Eligible users must submit their claim within a strict 90-day window once inactivity is officially declared.</li>
+                    <li>System must be officially 'Inactive' globally for 180 continuous days (no new global ID registrations).</li>
+                    <li>Claiming user must have exactly 0 POL total earnings from the ecosystem.</li>
+                    <li>Eligible users have a strict 90-day window to claim once inactivity is declared.</li>
                 </ul>
-                <p style="margin-bottom: 8px;"><b>3. Direct Rewards Claim:</b> Unlocked rewards (Net/Level/Slots) can be claimed anytime once direct partner and balance requirements are fulfilled.</p>
-                <p style="color: var(--gold);">* Note: All claims are verified on-chain with zero admin control.</p>
+                <p style="margin-bottom: 8px;"><b>3. Direct Rewards Claim:</b> Unlocked rewards (Net/Level/Slots) can be claimed anytime if minimum direct & balance requirements are fulfilled.</p>
+                <p style="color: var(--gold);">* Note: All transactions are verified securely on-chain with zero admin intervention.</p>
             </div>
             <button class="btn-gold" onclick="proceedToClaimAction()" style="padding: 10px; font-size: 13px; background: linear-gradient(135deg, #34d399, #059669); color: #000;">Proceed to Claim Now</button>
         </div>
