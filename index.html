@@ -300,32 +300,32 @@
         </div>
     </div>
 
-    <!-- INCOME SOURCE DETAIL MODAL -->
+    <!-- INCOME SOURCE DETAIL MODAL (List with ID, Date, Serial, Hold info) -->
     <div class="modal-overlay" id="incomeDetailModal">
-        <div class="inspect-card" style="text-align: left; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.25); position: relative; max-width: 400px; width: 90%;">
+        <div class="inspect-card" style="text-align: left; border: 2px solid var(--gold); box-shadow: 0 10px 40px rgba(245, 197, 24, 0.25); position: relative; max-width: 420px; width: 92%;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeIncomeDetailModal()"></i>
-            <h3 style="color: var(--gold); margin-bottom: 15px; font-size: 16px;"><i class="fa-solid fa-list-check"></i> Income Source Details</h3>
+            <h3 style="color: var(--gold); margin-bottom: 15px; font-size: 16px;"><i class="fa-solid fa-list-check"></i> Income Source Breakdown</h3>
             <div id="incomeDetailLoading" style="text-align: center; color: var(--gold); padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching details...</div>
-            <div id="incomeDetailContent" style="max-height: 250px; overflow-y: auto; font-size: 12px; display: none;"></div>
+            <div id="incomeDetailContent" style="max-height: 280px; overflow-y: auto; font-size: 12px; display: none;"></div>
             <button class="btn-gold" onclick="closeIncomeDetailModal()" style="margin-top: 15px; padding: 10px; font-size: 13px;">Close</button>
         </div>
     </div>
 
-    <!-- CLAIM ELIGIBILITY GUIDELINE MODAL -->
+    <!-- CLAIM ELIGIBILITY & TERMS MODAL -->
     <div class="modal-overlay" id="claimGuideModal">
-        <div class="inspect-card" style="text-align: left; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); position: relative; max-width: 400px; width: 90%;">
+        <div class="inspect-card" style="text-align: left; border: 2px solid #10b981; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); position: relative; max-width: 420px; width: 92%;">
             <i class="fa-solid fa-times" style="position: absolute; top: 15px; right: 15px; color: #fff; cursor: pointer; font-size: 20px;" onclick="closeClaimGuideModal()"></i>
-            <h3 style="color: #34d399; margin-bottom: 12px; font-size: 16px;"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Fund Guidelines & Terms</h3>
+            <h3 style="color: #34d399; margin-bottom: 12px; font-size: 16px;"><i class="fa-solid fa-hand-holding-dollar"></i> Claim Fund Terms & Guidelines</h3>
             <div style="font-size: 12px; color: #ccc; line-height: 1.6; margin-bottom: 15px;">
-                <p style="margin-bottom: 8px;"><b>1. How it works:</b> Eligible held funds, slot rewards, network bonuses, and 30 POL registration refunds can be claimed directly to your Polygon wallet through smart contract execution.</p>
-                <p style="margin-bottom: 8px;"><b>2. Eligibility for 30 POL Refund:</b></p>
+                <p style="margin-bottom: 8px;"><b>1. How Claim Works:</b> Eligible held rewards, slot upgrade funds, and registration deposits can be claimed directly to your Polygon wallet securely via smart contract.</p>
+                <p style="margin-bottom: 8px;"><b>2. Terms & Conditions for 30 POL Refund:</b></p>
                 <ul style="padding-left: 15px; margin-bottom: 8px; color: var(--text-gray);">
-                    <li>System must be officially 'Inactive' globally for 180 continuous days (no new global ID registrations).</li>
-                    <li>Claiming user must have exactly 0 POL total earnings from the ecosystem.</li>
-                    <li>Eligible users have a strict 90-day window to claim once inactivity is declared.</li>
+                    <li><b>System Inactivity:</b> The global ecosystem must be inactive (zero new registrations globally) for a continuous period of 180 days.</li>
+                    <li><b>Zero Earnings:</b> The claiming wallet must have exactly 0 POL total earnings from the system.</li>
+                    <li><b>Claim Window:</b> Eligible users must submit their claim within a strict 90-day window once inactivity is officially declared.</li>
                 </ul>
-                <p style="margin-bottom: 8px;"><b>3. Direct Rewards Claim:</b> Unlocked rewards (Net/Level/Slots) can be claimed anytime if minimum direct & balance requirements are fulfilled.</p>
-                <p style="color: var(--gold);">* Note: All transactions are verified securely on-chain with zero admin intervention.</p>
+                <p style="margin-bottom: 8px;"><b>3. Direct Rewards Claim:</b> Unlocked rewards (Net/Level/Slots) can be claimed anytime once direct partner and balance requirements are fulfilled.</p>
+                <p style="color: var(--gold);">* Note: All claims are verified on-chain with zero admin control.</p>
             </div>
             <button class="btn-gold" onclick="proceedToClaimAction()" style="padding: 10px; font-size: 13px; background: linear-gradient(135deg, #34d399, #059669); color: #000;">Proceed to Claim Now</button>
         </div>
@@ -1056,13 +1056,23 @@
 
             try {
                 let myInfo = await getCachedUser(userAddress);
+                let fin = await fetchExactFinancials(userAddress, myInfo);
                 let apiUrl = `https://polygon.blockscout.com/api?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&page=1&offset=50&sort=desc`;
                 let res = await fetch(apiUrl);
                 let data = await res.json();
 
                 let html = `<div style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px; color: var(--gold); font-weight: bold;">Category: ${category.toUpperCase()}</div>`;
-                let foundItems = 0;
+                
+                if(category === 'level') {
+                    html += `
+                    <div style="background: #07080f; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <p style="color: #60a5fa; font-weight: bold; margin-bottom: 4px;">Level 2-18 Hold Status:</p>
+                        <p style="color: #fff; font-size: 11px;">Current Pending Level Income Hold: <b>${fin.pendingLvlPol.toFixed(2)} POL</b></p>
+                        <p style="color: var(--text-gray); font-size: 10px; margin-top: 2px;">* Releases automatically when direct count >= 2 & accumulated balance >= 5 POL.</p>
+                    </div>`;
+                }
 
+                let foundItems = 0;
                 if(data.status === "1" && data.result) {
                     let serial = 1;
                     for(let tx of data.result) {
@@ -1088,7 +1098,7 @@
                     }
                 }
 
-                if(foundItems === 0) {
+                if(foundItems === 0 && category !== 'level') {
                     html += `<p style="color: var(--text-gray); text-align: center; padding: 15px;">No transactions found on blockchain for this category yet.</p>`;
                 }
 
@@ -1973,7 +1983,7 @@
         async function fetchExtraStats(addr) {
             const myFetchId = ++currentStatsFetchId;
             const cleanAddr = addr.toLowerCase();
-            const cacheKey = "poltitan_stats_v5_sync_" + cleanAddr;
+            const cacheKey = "poltitan_stats_v6_sync_" + cleanAddr;
             
             // FAST SYNC CACHE CHECK (Loads previous synced team instantly)
             let cachedData = localStorage.getItem(cacheKey);
@@ -2001,9 +2011,9 @@
                     let nextLevel = [];
                     let uniqueNewChildren = [];
 
-                    for (let i = 0; i < currentLevel.length; i += 25) {
+                    for (let i = 0; i < currentLevel.length; i += 30) {
                         if (myFetchId !== currentStatsFetchId) return;
-                        let chunk = currentLevel.slice(i, i + 25);
+                        let chunk = currentLevel.slice(i, i + 30);
                         let infos = await Promise.all(chunk.map(c => getCachedUser(c).catch(() => null)));
                         
                         for (let j = 0; j < infos.length; j++) {
@@ -2042,20 +2052,20 @@
                                 }
                             }
                         }
-                        await new Promise(r => setTimeout(r, 5));
+                        await new Promise(r => setTimeout(r, 2));
                     }
 
                     if(uniqueNewChildren.length > 0) {
-                        for (let i = 0; i < uniqueNewChildren.length; i += 25) { 
+                        for (let i = 0; i < uniqueNewChildren.length; i += 30) { 
                             if (myFetchId !== currentStatsFetchId) return;
-                            let chunk = uniqueNewChildren.slice(i, i + 25);
+                            let chunk = uniqueNewChildren.slice(i, i + 30);
                             let childInfos = await Promise.all(chunk.map(c => getCachedUser(c).catch(() => null)));
                             for(let cInfo of childInfos) {
                                 if(cInfo && cInfo[6] === false) { 
                                     totalSubtreeRebirths++;
                                 }
                             }
-                            await new Promise(r => setTimeout(r, 5));
+                            await new Promise(r => setTimeout(r, 2));
                         }
                     }
 
@@ -2112,9 +2122,9 @@
 
         async function fetchJoiningDate(addr) {
             const cleanAddr = addr.toLowerCase();
-            const cacheKey = "poltitan_joindate_v5_" + cleanAddr;
+            const cacheKey = "poltitan_joindate_v6_" + cleanAddr;
             const savedDate = localStorage.getItem(cacheKey);
-            if (savedDate && savedDate !== "Verified On-Chain") return savedDate;
+            if (savedDate && savedDate !== "30 Oct 2024" && savedDate !== "Verified On-Chain") return savedDate;
 
             const newC = CONTRACT_ADDRESS.toLowerCase();
             const oldC = OLD_CONTRACT_ADDRESS.toLowerCase();
