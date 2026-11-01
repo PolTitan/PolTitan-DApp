@@ -441,7 +441,7 @@
                     <div class="team-box" onclick="resetHistoryAndLoadTree(userAddress, 0)">
                         <div class="icon" style="color: #60a5fa; background: rgba(96, 165, 250, 0.15);"><i class="fa-solid fa-users"></i></div>
                         <div class="data">
-                            <h4 id="displayTotalTeam"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
+                            <h4 id="displayTotalTeam">--</h4>
                             <p>Total Team</p>
                         </div>
                     </div>
@@ -650,7 +650,7 @@
         </div>
     </div>
 
-    <!-- GLOBAL FOOTER -->
+    <!-- GLOBAL FOOTER (Legal & Help shifted below Live Ecosystem) -->
     <footer class="site-footer">
         <div class="footer-inner">
             <!-- Brand Top Section -->
@@ -687,19 +687,9 @@
                             <li onclick="openInquiryModal()">Contact Us</li>
                         </ul>
                     </div>
-
-                    <div class="footer-col-group">
-                        <h4 class="footer-col-title">LEGAL &amp; HELP</h4>
-                        <ul class="footer-link-list">
-                            <li onclick="switchView('aboutView')">Terms &amp; Conditions</li>
-                            <li onclick="switchView('aboutView')">Privacy Policy</li>
-                            <li onclick="switchView('aboutView')">180 Days Refund Policy</li>
-                            <li onclick="openInquiryModal()">Help / FAQs</li>
-                        </ul>
-                    </div>
                 </div>
 
-                <!-- Right Column -->
+                <!-- Right Column (Live Ecosystem + Legal & Help shifted here) -->
                 <div>
                     <div class="footer-col-group">
                         <h4 class="footer-col-title">LIVE ECOSYSTEM</h4>
@@ -708,6 +698,16 @@
                             <li onclick="if(userAddress) switchView('slotsView'); else switchView('authView');"><span class="green-dot"></span> Auto-Upgrade Slots</li>
                             <li onclick="if(userAddress) openTeamSearchModal(); else switchView('authView');"><span class="green-dot"></span> Team ID Search</li>
                             <li onclick="toggleChat()"><span class="green-dot"></span> AI Assistant Bot</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col-group">
+                        <h4 class="footer-col-title">LEGAL &amp; HELP</h4>
+                        <ul class="footer-link-list">
+                            <li onclick="switchView('aboutView')">Terms &amp; Conditions</li>
+                            <li onclick="switchView('aboutView')">Privacy Policy</li>
+                            <li onclick="switchView('aboutView')">180 Days Refund Policy</li>
+                            <li onclick="openInquiryModal()">Help / FAQs</li>
                         </ul>
                     </div>
                 </div>
@@ -1044,7 +1044,7 @@
             await claimMyRefund();
         }
 
-        // INCOME SOURCE DETAIL MODAL HANDLERS (Real Blockchain History Breakdown)
+        // INCOME SOURCE DETAIL MODAL HANDLERS
         window.openIncomeDetailModal = async function(category) {
             const modal = document.getElementById('incomeDetailModal');
             const loading = document.getElementById('incomeDetailLoading');
@@ -1980,23 +1980,10 @@
             container.innerHTML = html;
         }
 
-        async function fetchExtraStats(addr) {
+        async function fetchExtraStats(addr, initialTeamSize) {
             const myFetchId = ++currentStatsFetchId;
             const cleanAddr = addr.toLowerCase();
             const cacheKey = "poltitan_stats_v6_sync_" + cleanAddr;
-            
-            // FAST SYNC CACHE CHECK (Loads previous synced team instantly)
-            let cachedData = localStorage.getItem(cacheKey);
-            let cachedTeamSize = 0;
-            if (cachedData) {
-                try {
-                    let parsed = JSON.parse(cachedData);
-                    cachedTeamSize = parsed.teamSize || 0;
-                    document.getElementById('displayTotalTeam').innerText = cachedTeamSize;
-                    document.getElementById('displayReceivedRebirths').innerText = parsed.rebirths;
-                    myReceivedRebirthsCount = parsed.rebirths;
-                } catch(e){}
-            }
 
             try {
                 let teamSet = new Set();
@@ -2078,13 +2065,12 @@
                     
                     myReceivedRebirthsCount = totalSubtreeRebirths;
                     
-                    // Display max of cached and scanned team size so it never drops or resets to 1
-                    let displaySize = Math.max(cachedTeamSize, teamSet.size);
-                    document.getElementById('displayTotalTeam').innerText = displaySize;
+                    let finalSize = typeof initialTeamSize === 'number' ? Math.max(initialTeamSize, teamSet.size) : teamSet.size;
+                    document.getElementById('displayTotalTeam').innerText = finalSize;
                     document.getElementById('displayReceivedRebirths').innerText = totalSubtreeRebirths;
                     
                     // SAVE TO LOCALSTORAGE SYNC CACHE
-                    localStorage.setItem(cacheKey, JSON.stringify({teamSize: displaySize, rebirths: totalSubtreeRebirths}));
+                    localStorage.setItem(cacheKey, JSON.stringify({teamSize: finalSize, rebirths: totalSubtreeRebirths}));
                 }
             } catch(e){}
         }
@@ -2107,23 +2093,19 @@
             const oldC = OLD_CONTRACT_ADDRESS.toLowerCase();
 
             try {
-                // Use Blockscout v2 transactions API which reliably returns accurate timestamps
                 const res = await fetch(`https://polygon.blockscout.com/api/v2/addresses/${cleanAddr}/transactions?limit=50`);
                 const data = await res.json();
                 let earliestTs = Infinity;
 
                 if (data && data.items && data.items.length > 0) {
                     for (let tx of data.items) {
-                        const toAddr = (tx.to && tx.to.hash) ? tx.to.hash.toLowerCase() : "";
-                        const fromAddr = (tx.from && tx.from.hash) ? tx.from.hash.toLowerCase() : "";
-                        if (tx.timestamp && (toAddr === newC || fromAddr === newC || toAddr === oldC || fromAddr === oldC || cleanAddr === fromAddr)) {
+                        if (tx.timestamp) {
                             let ts = new Date(tx.timestamp).getTime() / 1000;
                             if (ts > 0 && ts < earliestTs) earliestTs = ts;
                         }
                     }
                 }
 
-                // Fallback to v1 txlist if needed
                 if (earliestTs === Infinity) {
                     let v1Res = await fetch(`https://polygon.blockscout.com/api?module=account&action=txlist&address=${cleanAddr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`);
                     let v1Data = await v1Res.json();
@@ -2142,7 +2124,7 @@
                 }
             } catch (e) {}
 
-            return "30 Oct 2024";
+            return "15 Jan 2025";
         }
 
         window.loadDashboardData = async function(address, viewMode) {
@@ -2206,15 +2188,17 @@
                     userCurrentSlotNum = currentSlot;
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
 
-                    // INSTANT TEAM CACHE LOAD (Prevents flickering/resetting to 1)
+                    // INSTANT TEAM CACHE LOAD (Prevents resetting/counting from 1)
                     const cleanAddr = address.toLowerCase();
                     const cachedStats = localStorage.getItem("poltitan_stats_v6_sync_" + cleanAddr);
+                    let initialTeamSize = 0;
                     if (cachedStats) {
                         try {
                             let parsed = JSON.parse(cachedStats);
-                            document.getElementById('displayTotalTeam').innerText = parsed.teamSize;
-                            document.getElementById('displayReceivedRebirths').innerText = parsed.rebirths;
-                            myReceivedRebirthsCount = parsed.rebirths;
+                            initialTeamSize = parsed.teamSize || 0;
+                            myReceivedRebirthsCount = parsed.rebirths || 0;
+                            document.getElementById('displayTotalTeam').innerText = initialTeamSize;
+                            document.getElementById('displayReceivedRebirths').innerText = myReceivedRebirthsCount;
                         } catch(e) {
                             document.getElementById('displayTotalTeam').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i>';
                         }
@@ -2271,7 +2255,7 @@
                         }
                     });
 
-                    fetchExtraStats(address); 
+                    fetchExtraStats(address, initialTeamSize); 
 
                     let slot2TeamCount = userInfo[9].toNumber();
                     let displaySlotLimit = userCurrentSlotNum;
