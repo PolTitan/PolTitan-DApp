@@ -441,7 +441,7 @@
                     <div class="team-box" onclick="resetHistoryAndLoadTree(userAddress, 0)">
                         <div class="icon" style="color: #60a5fa; background: rgba(96, 165, 250, 0.15);"><i class="fa-solid fa-users"></i></div>
                         <div class="data">
-                            <h4 id="displayTotalTeam">--</h4>
+                            <h4 id="displayTotalTeam"><i class="fa-solid fa-spinner fa-spin" style="font-size: 14px;"></i></h4>
                             <p>Total Team</p>
                         </div>
                     </div>
@@ -1987,10 +1987,12 @@
             
             // FAST SYNC CACHE CHECK (Loads previous synced team instantly)
             let cachedData = localStorage.getItem(cacheKey);
+            let cachedTeamSize = 0;
             if (cachedData) {
                 try {
                     let parsed = JSON.parse(cachedData);
-                    document.getElementById('displayTotalTeam').innerText = parsed.teamSize;
+                    cachedTeamSize = parsed.teamSize || 0;
+                    document.getElementById('displayTotalTeam').innerText = cachedTeamSize;
                     document.getElementById('displayReceivedRebirths').innerText = parsed.rebirths;
                     myReceivedRebirthsCount = parsed.rebirths;
                 } catch(e){}
@@ -2076,11 +2078,13 @@
                     
                     myReceivedRebirthsCount = totalSubtreeRebirths;
                     
-                    document.getElementById('displayTotalTeam').innerText = teamSet.size;
+                    // Display max of cached and scanned team size so it never drops or resets to 1
+                    let displaySize = Math.max(cachedTeamSize, teamSet.size);
+                    document.getElementById('displayTotalTeam').innerText = displaySize;
                     document.getElementById('displayReceivedRebirths').innerText = totalSubtreeRebirths;
                     
                     // SAVE TO LOCALSTORAGE SYNC CACHE
-                    localStorage.setItem(cacheKey, JSON.stringify({teamSize: teamSet.size, rebirths: totalSubtreeRebirths}));
+                    localStorage.setItem(cacheKey, JSON.stringify({teamSize: displaySize, rebirths: totalSubtreeRebirths}));
                 }
             } catch(e){}
         }
@@ -2093,36 +2097,9 @@
             return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
-        async function getContractDeployBlock(latestBlock) {
-            if (cachedDeployBlock) return cachedDeployBlock;
-            const saved = localStorage.getItem('poltitan_deploy_block_' + CONTRACT_ADDRESS.toLowerCase());
-            if (saved) {
-                cachedDeployBlock = parseInt(saved);
-                return cachedDeployBlock;
-            }
-            try {
-                let low = Math.max(0, latestBlock - 20000000);
-                let high = latestBlock;
-                while (low < high) {
-                    let mid = Math.floor((low + high) / 2);
-                    let code = await fastReadProvider.getCode(CONTRACT_ADDRESS, mid);
-                    if (code && code !== "0x") {
-                        high = mid;
-                    } else {
-                        low = mid + 1;
-                    }
-                }
-                cachedDeployBlock = low;
-                localStorage.setItem('poltitan_deploy_block_' + CONTRACT_ADDRESS.toLowerCase(), low.toString());
-                return cachedDeployBlock;
-            } catch (e) {
-                return Math.max(0, latestBlock - 5000000);
-            }
-        }
-
         async function fetchJoiningDate(addr) {
             const cleanAddr = addr.toLowerCase();
-            const cacheKey = "poltitan_joindate_v6_" + cleanAddr;
+            const cacheKey = "poltitan_joindate_v7_" + cleanAddr;
             const savedDate = localStorage.getItem(cacheKey);
             if (savedDate && savedDate !== "30 Oct 2024" && savedDate !== "Verified On-Chain") return savedDate;
 
@@ -2130,29 +2107,28 @@
             const oldC = OLD_CONTRACT_ADDRESS.toLowerCase();
 
             try {
-                const [txRes, intRes] = await Promise.all([
-                    fetch(`https://polygon.blockscout.com/api?module=account&action=txlist&address=${cleanAddr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`).then(r => r.json()).catch(() => null),
-                    fetch(`https://polygon.blockscout.com/api?module=account&action=txlistinternal&address=${cleanAddr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`).then(r => r.json()).catch(() => null)
-                ]);
-
+                // Use Blockscout v2 transactions API which reliably returns accurate timestamps
+                const res = await fetch(`https://polygon.blockscout.com/api/v2/addresses/${cleanAddr}/transactions?limit=50`);
+                const data = await res.json();
                 let earliestTs = Infinity;
 
-                if (txRes && txRes.status === "1" && Array.isArray(txRes.result)) {
-                    for (let tx of txRes.result) {
-                        const toAddr = (tx.to || "").toLowerCase();
-                        const fromAddr = (tx.from || "").toLowerCase();
-                        if (tx.isError === "0" && (toAddr === newC || fromAddr === newC || toAddr === oldC || fromAddr === oldC)) {
-                            let ts = parseInt(tx.timeStamp);
+                if (data && data.items && data.items.length > 0) {
+                    for (let tx of data.items) {
+                        const toAddr = (tx.to && tx.to.hash) ? tx.to.hash.toLowerCase() : "";
+                        const fromAddr = (tx.from && tx.from.hash) ? tx.from.hash.toLowerCase() : "";
+                        if (tx.timestamp && (toAddr === newC || fromAddr === newC || toAddr === oldC || fromAddr === oldC || cleanAddr === fromAddr)) {
+                            let ts = new Date(tx.timestamp).getTime() / 1000;
                             if (ts > 0 && ts < earliestTs) earliestTs = ts;
                         }
                     }
                 }
 
-                if (intRes && intRes.status === "1" && Array.isArray(intRes.result)) {
-                    for (let tx of intRes.result) {
-                        const toAddr = (tx.to || "").toLowerCase();
-                        const fromAddr = (tx.from || "").toLowerCase();
-                        if (toAddr === newC || fromAddr === newC || toAddr === oldC || fromAddr === oldC) {
+                // Fallback to v1 txlist if needed
+                if (earliestTs === Infinity) {
+                    let v1Res = await fetch(`https://polygon.blockscout.com/api?module=account&action=txlist&address=${cleanAddr}&startblock=0&endblock=99999999&page=1&offset=50&sort=asc`);
+                    let v1Data = await v1Res.json();
+                    if (v1Data && v1Data.status === "1" && Array.isArray(v1Data.result) && v1Data.result.length > 0) {
+                        for (let tx of v1Data.result) {
                             let ts = parseInt(tx.timeStamp);
                             if (ts > 0 && ts < earliestTs) earliestTs = ts;
                         }
@@ -2161,29 +2137,6 @@
 
                 if (earliestTs !== Infinity) {
                     const formatted = formatBlockchainTimestamp(earliestTs);
-                    localStorage.setItem(cacheKey, formatted);
-                    return formatted;
-                }
-            } catch (e) {}
-
-            try {
-                const latestBlock = await fastReadProvider.getBlockNumber();
-                let low = await getContractDeployBlock(latestBlock);
-                let high = latestBlock;
-
-                while (low < high) {
-                    let mid = Math.floor((low + high) / 2);
-                    let uInfo = await fastReadContract.users(cleanAddr, { blockTag: mid });
-                    if (uInfo && uInfo[0].toNumber() > 0) {
-                        high = mid;
-                    } else {
-                        low = mid + 1;
-                    }
-                }
-
-                const regBlock = await fastReadProvider.getBlock(low);
-                if (regBlock && regBlock.timestamp) {
-                    const formatted = formatBlockchainTimestamp(regBlock.timestamp);
                     localStorage.setItem(cacheKey, formatted);
                     return formatted;
                 }
@@ -2253,7 +2206,7 @@
                     userCurrentSlotNum = currentSlot;
                     document.getElementById('displayCurrentSlot').innerText = userCurrentSlotNum;
 
-                    // INSTANT TEAM CACHE DISPLAY (Fixes the 688 flashing/resetting issue)
+                    // INSTANT TEAM CACHE LOAD (Prevents flickering/resetting to 1)
                     const cleanAddr = address.toLowerCase();
                     const cachedStats = localStorage.getItem("poltitan_stats_v6_sync_" + cleanAddr);
                     if (cachedStats) {
