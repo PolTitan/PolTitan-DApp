@@ -46,6 +46,13 @@
         .wallet-badge { background: var(--box-bg); border: 1px solid var(--gold); padding: 6px 14px; border-radius: 8px; font-size: 12px; color: var(--gold); cursor: pointer; font-weight: 600; box-shadow: inset 0 1px 3px rgba(255,255,255,0.1); }
         .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; display: none; filter: drop-shadow(0 0 5px rgba(245,197,24,0.3)); }
 
+        /* SOCIAL BAR */
+        .social-links-bar { display: flex; gap: 10px; justify-content: center; margin: 12px 15px 0 15px; }
+        .social-btn { flex: 1; padding: 10px; border-radius: 10px; text-decoration: none; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: 0.2s; }
+        .whatsapp-btn { background: #25d366; color: #000; border: 1px solid #1ebe5d; }
+        .telegram-btn { background: #229ed9; color: #fff; border: 1px solid #1a88bd; }
+        .social-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
         /* SIDE MENU */
         .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: #0c0d14; border-right: 1px solid var(--border-color); transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), left 0.28s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; padding: 20px; box-shadow: 10px 0 30px rgba(0,0,0,0.9); overflow-y: auto; will-change: left; }
         .side-menu.active { left: 0; }
@@ -177,13 +184,13 @@
         .tree li a.empty-node:hover { transform: none; border-color: #444; background: transparent; box-shadow: none; }
         .tree li a.empty-node i { color: #444; }
 
-        /* GLOBAL POOL TICKER ANIMATION & STYLING */
+        /* GLOBAL POOL TICKER ANIMATION & SINGLE-LINE STYLING */
         @keyframes slideUpTicker {
             0% { transform: translateY(0%); }
             100% { transform: translateY(-50%); }
         }
         .ticker-scrolling {
-            animation: slideUpTicker 28s linear infinite;
+            animation: slideUpTicker 32s linear infinite;
             will-change: transform;
         }
         .ticker-paused {
@@ -194,18 +201,18 @@
             background: linear-gradient(145deg, #0d0f18, #07080d);
             border: 1px solid rgba(245, 197, 24, 0.22);
             border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
             text-align: left;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
         }
         .gp-slot-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             padding-bottom: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         .gp-slot-title {
             color: var(--gold);
@@ -220,33 +227,29 @@
             background: rgba(16, 185, 129, 0.12);
             border: 1px solid rgba(16, 185, 129, 0.4);
             border-radius: 8px;
-            padding: 8px 10px;
-            margin-bottom: 8px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .gp-queue-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-        .gp-queue-item {
+        .gp-queue-single-line {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 6px;
-            padding: 5px 8px;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
+            font-size: 12px;
         }
         .gp-na-badge {
             display: inline-block;
             background: rgba(244, 63, 94, 0.15);
             color: #fb7185;
             border: 1px solid rgba(244, 63, 94, 0.35);
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 8px;
             font-weight: 700;
             font-size: 11px;
@@ -308,6 +311,16 @@
         </div>
         <div class="wallet-badge" id="headerWallet" onclick="event.stopPropagation();"><i class="fa-solid fa-wallet"></i> Connect</div>
     </header>
+
+    <!-- SOCIAL MEDIA QUICK JOIN BUTTONS -->
+    <div class="social-links-bar">
+        <a href="https://chat.whatsapp.com/HoOHcdEbPEP9ghSDK2JjiN" target="_blank" class="social-btn whatsapp-btn">
+            <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> WhatsApp Group
+        </a>
+        <a href="https://t.me/+UJWulA6Hw5fFzGZZ" target="_blank" class="social-btn telegram-btn">
+            <i class="fa-brands fa-telegram" style="font-size:16px;"></i> Telegram Channel
+        </a>
+    </div>
 
     <!-- SIDE MENU -->
     <div class="side-menu" id="sideMenu">
@@ -726,7 +739,7 @@
         </div>
     </div>
 
-    <!-- GLOBAL POOL TICKER SLIDER (Slots 3 to 7 + Active & Upcoming Queue with Tap to Pause) -->
+    <!-- GLOBAL POOL TICKER SLIDER (Single-Line Clean Layout with Touch Pause) -->
     <div style="max-width: 500px; width: 100%; margin: 20px auto 0 auto; padding: 0 15px;">
         <div class="vip-card" style="margin-bottom: 0; padding: 16px; border: 1px solid var(--gold); background: linear-gradient(145deg, #111320, #07080f); box-shadow: 0 8px 30px rgba(0,0,0,0.85);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(245,197,24,0.2); padding-bottom: 8px;">
@@ -737,9 +750,9 @@
                     <i class="fa-solid fa-pause" style="margin-right: 4px;"></i> Tap to Pause
                 </span>
             </div>
-            <div id="tickerViewport" style="height: 270px; overflow: hidden; position: relative; font-size: 12px; color: #fff; border-radius: 12px; background: #05060a; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);" onclick="toggleTickerPause(event)">
+            <div id="tickerViewport" style="height: 320px; overflow: hidden; position: relative; font-size: 12px; color: #fff; border-radius: 12px; background: #05060a; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; box-shadow: inset 0 2px 12px rgba(0,0,0,0.8);" onclick="toggleTickerPause(event)">
                 <div id="sliderInnerContainer" class="ticker-scrolling" style="position: absolute; width: 100%; padding: 12px;">
-                    <div style="text-align: center; color: var(--gold); padding: 90px 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Syncing Live Global Pool Queues from Blockchain...</div>
+                    <div style="text-align: center; color: var(--gold); padding: 110px 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Syncing Live Global Pool Queues from Blockchain...</div>
                 </div>
             </div>
             <div style="font-size: 10px; color: var(--text-gray); margin-top: 8px; text-align: center;">
@@ -1126,7 +1139,7 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        // TICKER PAUSE/RESUME TOGGLE (Works on Mobile Touch & Desktop Click)
+        // TICKER PAUSE/RESUME TOGGLE
         let isTickerPaused = false;
         window.toggleTickerPause = function(e) {
             if (e) e.stopPropagation();
@@ -2256,9 +2269,7 @@
             return "15 Jan 2025";
         }
 
-        // =========================================================================
-        // 100% REAL ON-CHAIN GLOBAL POOL TRACKER (SLOTS 3 TO 7, NO DUPLICATE IDS)
-        // =========================================================================
+        // 100% REAL ON-CHAIN GLOBAL POOL TRACKER (SLOTS 3 TO 7, NO DUPLICATE IDs, CLEAN SINGLE-LINE DESIGN)
         async function fetchAllSlotQueueEntries(slotNum) {
             let entries = [];
             const BATCH = 20;
@@ -2297,7 +2308,7 @@
         }
 
         async function loadGlobalPoolSliderData() {
-            const cacheKey = "poltitan_global_slider_cache_v5";
+            const cacheKey = "poltitan_global_slider_cache_v6_singleline";
             let cached = localStorage.getItem(cacheKey);
             if (cached) {
                 try {
@@ -2306,7 +2317,6 @@
             }
 
             try {
-                // Fetch real blockchain queues for Slots 3, 4, 5, 6, 7 in parallel
                 const [q3, q4, q5, q6, q7] = await Promise.all([
                     fetchAllSlotQueueEntries(3),
                     fetchAllSlotQueueEntries(4),
@@ -2318,8 +2328,7 @@
                 const rawQueues = { 3: q3, 4: q4, 5: q5, 6: q6, 7: q7 };
                 const reqNodesMap = { 3: 8, 4: 16, 5: 32, 6: 64, 7: 128 };
 
-                // Filter out IDs that have already upgraded to the next slot!
-                // If an ID is in Slot 4, it will NOT be shown in Slot 3's active list.
+                // Exclude IDs that have already upgraded to higher slots
                 const activeSlotLists = {};
                 for (let s = 3; s <= 7; s++) {
                     const nextSlotSet = new Set((rawQueues[s + 1] || []).map(x => x.id));
@@ -2340,14 +2349,13 @@
 
                     if (activeList.length === 0) {
                         cardHtml += `
-                            <div style="text-align:center; padding: 8px 0;">
+                            <div style="text-align:center; padding: 10px 0;">
                                 <span class="gp-na-badge"><i class="fa-solid fa-ban" style="margin-right:4px;"></i> Not Available</span>
                             </div>
                         </div>`;
                         return cardHtml;
                     }
 
-                    // First active ID in this slot is the one currently being filled!
                     const fillingNow = activeList[0];
                     const lastEntered = activeList[activeList.length - 1];
                     const filledSpots = Math.max(0, Math.min(reqNodes, totalRaw - 1 - (fillingNow.queueIndex * reqNodes)));
@@ -2368,32 +2376,31 @@
                             </div>
                         </div>`;
 
-                    // Show all active IDs currently in this slot
-                    cardHtml += `<div style="font-size:10px; color:var(--gold); font-weight:700; margin-bottom:5px; text-transform:uppercase;">
-                        ${slotNum === 3 ? `ID No. ${fillingNow.id} & Upcoming Slot 3 Queue (8-ID Pool Line):` : `Active IDs in Global Slot ${slotNum} Only:`}
+                    cardHtml += `<div style="font-size:10px; color:var(--gold); font-weight:700; margin-bottom:6px; text-transform:uppercase;">
+                        ${slotNum === 3 ? `Slot 3 & Upcoming Queue (Next 8-ID Line):` : `Active Lineup (Global Slot ${slotNum}):`}
                     </div>`;
-                    cardHtml += `<div class="gp-queue-grid">`;
+
                     activeList.forEach((item, idx) => {
                         const isFirst = (idx === 0);
                         const statusColor = isFirst ? "#34d399" : "#60a5fa";
-                        const labelTag = isFirst ? "Filling" : "Next";
+                        const labelTag = isFirst ? "Filling Now" : "Next in Queue";
                         cardHtml += `
-                            <div class="gp-queue-item" style="${isFirst ? 'border-color:rgba(52,211,153,0.4); background:rgba(52,211,153,0.08);' : ''}">
-                                <span style="color:var(--text-gray);">Sl. ${idx + 1}</span>
-                                <span style="color:${statusColor}; font-weight:700;">ID ${item.id} <small style="font-size:9px; opacity:0.85;">(${labelTag})</small></span>
+                            <div class="gp-queue-single-line" style="${isFirst ? 'border-color:rgba(52,211,153,0.4); background:rgba(52,211,153,0.08);' : ''}">
+                                <span style="color:var(--text-gray); font-weight:600;">Serial No. ${idx + 1}</span>
+                                <span style="color:${statusColor}; font-weight:800;">ID No. ${item.id} <small style="font-size:10px; font-weight:600; opacity:0.85;">(${labelTag})</small></span>
                             </div>`;
                     });
-                    cardHtml += `</div></div>`;
+
+                    cardHtml += `</div>`;
                     return cardHtml;
                 }
 
-                // Order: Global Slot 3 -> Global Slot 4 -> Global Slot 5 -> Global Slot 6 -> Global Slot 7
                 let singlePassHtml = "";
                 for (let s = 3; s <= 7; s++) {
                     singlePassHtml += buildSlotSectionHtml(s);
                 }
 
-                let fullHtml = singlePassHtml + singlePassHtml;
+                let fullHtml = singlePassHtml + "<br><br>" + singlePassHtml;
                 document.getElementById('sliderInnerContainer').innerHTML = fullHtml;
                 localStorage.setItem(cacheKey, JSON.stringify(fullHtml));
             } catch(e) {}
