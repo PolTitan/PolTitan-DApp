@@ -177,6 +177,15 @@
         .tree li a.empty-node:hover { transform: none; border-color: #444; background: transparent; box-shadow: none; }
         .tree li a.empty-node i { color: #444; }
 
+        /* GLOBAL POOL TICKER ANIMATION */
+        @keyframes slideUpTicker {
+            0% { transform: translateY(0%); }
+            100% { transform: translateY(-50%); }
+        }
+        #sliderInnerContainer:hover {
+            animation-play-state: paused;
+        }
+
         /* RICH FOOTER DESIGN */
         .site-footer { background: #07080f; border-top: 1px solid var(--border-color); padding: 35px 20px 25px 20px; color: var(--text-gray); width: 100%; margin-top: 30px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
         .footer-inner { max-width: 500px; margin: 0 auto; text-align: left; }
@@ -647,6 +656,20 @@
             <button class="chat-menu-btn" onclick="chatAction('current_slot')"><i class="fa-solid fa-cubes" style="margin-right:8px;"></i> My Current Slot</button>
             <button class="chat-menu-btn" onclick="chatAction('rebirth_details')"><i class="fa-solid fa-recycle" style="margin-right:8px;"></i> Check Rebirth Details</button>
             <button class="chat-menu-btn" onclick="chatAction('total_earnings')"><i class="fa-solid fa-sack-dollar" style="margin-right:8px;"></i> Total Earnings Check</button>
+        </div>
+    </div>
+
+    <!-- GLOBAL POOL TICKER SLIDER (Just above footer) -->
+    <div style="max-width: 500px; width: 100%; margin: 20px auto 0 auto; padding: 0 15px;">
+        <div class="vip-card" style="margin-bottom: 0; padding: 15px; border: 1px solid var(--border-color); background: #0c0d14;">
+            <h4 style="color: var(--gold); margin-bottom: 10px; font-size: 13px; text-transform: uppercase; text-align: center; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-ranking-star" style="margin-right: 6px;"></i> Global Pool Queues Ticker
+            </h4>
+            <div style="height: 120px; overflow: hidden; position: relative; font-size: 12px; color: #fff;">
+                <div id="sliderInnerContainer" style="position: absolute; width: 100%; animation: slideUpTicker 15s linear infinite;">
+                    <div style="text-align: center; color: var(--gold); padding: 35px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Queue...</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2085,7 +2108,7 @@
 
         async function fetchJoiningDate(addr) {
             const cleanAddr = addr.toLowerCase();
-            const cacheKey = "poltitan_joindate_v7_" + cleanAddr;
+            const cacheKey = "poltitan_joindate_v8_" + cleanAddr;
             const savedDate = localStorage.getItem(cacheKey);
             if (savedDate && savedDate !== "30 Oct 2024" && savedDate !== "Verified On-Chain") return savedDate;
 
@@ -2256,6 +2279,7 @@
                     });
 
                     fetchExtraStats(address, initialTeamSize); 
+                    loadGlobalPoolSliderData();
 
                     let slot2TeamCount = userInfo[9].toNumber();
                     let displaySlotLimit = userCurrentSlotNum;
