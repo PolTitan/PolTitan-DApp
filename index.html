@@ -659,14 +659,14 @@
         </div>
     </div>
 
-    <!-- GLOBAL POOL TICKER SLIDER (Just above footer) -->
+    <!-- GLOBAL POOL TICKER SLIDER (Slots 3 to 7 + Upcoming Slot 3) -->
     <div style="max-width: 500px; width: 100%; margin: 20px auto 0 auto; padding: 0 15px;">
         <div class="vip-card" style="margin-bottom: 0; padding: 15px; border: 1px solid var(--border-color); background: #0c0d14;">
             <h4 style="color: var(--gold); margin-bottom: 10px; font-size: 13px; text-transform: uppercase; text-align: center; letter-spacing: 0.5px;">
                 <i class="fa-solid fa-ranking-star" style="margin-right: 6px;"></i> Global Pool Queues Ticker
             </h4>
             <div style="height: 120px; overflow: hidden; position: relative; font-size: 12px; color: #fff;">
-                <div id="sliderInnerContainer" style="position: absolute; width: 100%; animation: slideUpTicker 15s linear infinite;">
+                <div id="sliderInnerContainer" style="position: absolute; width: 100%; animation: slideUpTicker 18s linear infinite;">
                     <div style="text-align: center; color: var(--gold); padding: 35px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Queue...</div>
                 </div>
             </div>
@@ -2150,6 +2150,59 @@
             return "15 Jan 2025";
         }
 
+        // LOAD GLOBAL POOL TICKER SLIDER DATA (Slots 3 to 7 + Upcoming Slot 3)
+        async function loadGlobalPoolSliderData() {
+            const cacheKey = "poltitan_global_slider_cache_v2";
+            let cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                try {
+                    document.getElementById('sliderInnerContainer').innerHTML = JSON.parse(cached);
+                } catch(e) {}
+            }
+
+            try {
+                let newHtml = "";
+                for (let s = 3; s <= 7; s++) {
+                    newHtml += `<div style="color:var(--gold); font-weight:bold; margin:6px 0 2px 0; text-align:center;">GLOBAL SLOT ${s}</div>`;
+                    let hasQueue = false;
+                    for (let i = 0; i < 3; i++) {
+                        let qAddr = await getCachedSlotQueue(s, i).catch(() => null);
+                        if (qAddr && qAddr !== "0x0000000000000000000000000000000000000000") {
+                            let uInfo = await getCachedUser(qAddr).catch(() => null);
+                            if (uInfo) {
+                                hasQueue = true;
+                                newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; border-bottom:1px dashed rgba(255,255,255,0.05);"><span>Sl no. ${i+1}</span><span style="color:#34d399; font-weight:bold;">id no. ${uInfo[0].toNumber()}</span></div>`;
+                            }
+                        }
+                    }
+                    if(!hasQueue) {
+                        newHtml += `<div style="text-align:center; color:var(--text-gray); padding:2px;">Sl no. 1 &nbsp;&nbsp; id no. --</div>`;
+                    }
+                }
+
+                // Upcoming Global Slot No. 3 (Next 8 entries queue)
+                newHtml += `<div style="color:var(--gold); font-weight:bold; margin: 8px 0 2px 0; text-align:center;">UPCOMING GLOBAL SLOT NO.3</div>`;
+                let upcomingCount = 0;
+                for (let i = 0; i < 8; i++) {
+                    let qAddr = await getCachedSlotQueue(3, i).catch(() => null);
+                    if (qAddr && qAddr !== "0x0000000000000000000000000000000000000000") {
+                        let uInfo = await getCachedUser(qAddr).catch(() => null);
+                        if (uInfo) {
+                            upcomingCount++;
+                            newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; color:#60a5fa;"><span>Sl. No. ${upcomingCount}</span><span>Id no. ${uInfo[0].toNumber()}</span></div>`;
+                        }
+                    }
+                }
+                if(upcomingCount === 0) {
+                    newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; color:#60a5fa;"><span>Sl. No. 1-8</span><span>Id no. Pending</span></div>`;
+                }
+
+                let fullHtml = newHtml + "<br><br>" + newHtml;
+                document.getElementById('sliderInnerContainer').innerHTML = fullHtml;
+                localStorage.setItem(cacheKey, JSON.stringify(fullHtml));
+            } catch(e) {}
+        }
+
         window.loadDashboardData = async function(address, viewMode) {
             const myDashId = ++currentDashboardFetchId;
             try {
@@ -2436,7 +2489,7 @@
         }
 
         // =========================================================================
-        // LOGIN & REGISTRATION CODE (100% UNTOUCHED AS REQUESTED)
+        // LOGIN & REGISTRATION CODE (100% UNTOUCHED WITH FALLBACK RPC SAFETY)
         // =========================================================================
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
@@ -2500,9 +2553,13 @@
                     try { 
                         userInfo = await contract.users(addr); 
                     } catch(e) { 
-                        showAlert('authAlert', 'Network Error! Please refresh and try again.', true);
-                        masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
-                        return;
+                        try {
+                            userInfo = await fastReadContract.users(addr);
+                        } catch(err2) {
+                            showAlert('authAlert', 'Network Error! Please refresh and try again.', true);
+                            masterConnectBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Login / Register Wallet';
+                            return;
+                        }
                     }
                     
                     if(userInfo && userInfo[0].toNumber() > 0) { 
