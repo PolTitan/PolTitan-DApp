@@ -177,13 +177,80 @@
         .tree li a.empty-node:hover { transform: none; border-color: #444; background: transparent; box-shadow: none; }
         .tree li a.empty-node i { color: #444; }
 
-        /* GLOBAL POOL TICKER ANIMATION */
+        /* GLOBAL POOL TICKER ANIMATION & STYLING */
         @keyframes slideUpTicker {
             0% { transform: translateY(0%); }
             100% { transform: translateY(-50%); }
         }
+        .ticker-scrolling {
+            animation: slideUpTicker 28s linear infinite;
+            will-change: transform;
+        }
         .ticker-paused {
             animation-play-state: paused !important;
+            -webkit-animation-play-state: paused !important;
+        }
+        .gp-slot-card {
+            background: linear-gradient(145deg, #0d0f18, #07080d);
+            border: 1px solid rgba(245, 197, 24, 0.22);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            text-align: left;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .gp-slot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        .gp-slot-title {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .gp-active-box {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .gp-queue-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .gp-queue-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 6px;
+            padding: 5px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+        .gp-na-badge {
+            display: inline-block;
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.5px;
         }
 
         /* RICH FOOTER DESIGN */
@@ -659,19 +726,24 @@
         </div>
     </div>
 
-    <!-- GLOBAL POOL TICKER SLIDER (Slots 3 to 7 + Upcoming Slot 3 with Tap to Pause) -->
+    <!-- GLOBAL POOL TICKER SLIDER (Slots 3 to 7 + Active & Upcoming Queue with Tap to Pause) -->
     <div style="max-width: 500px; width: 100%; margin: 20px auto 0 auto; padding: 0 15px;">
-        <div class="vip-card" style="margin-bottom: 0; padding: 15px; border: 1px solid var(--border-color); background: #0c0d14;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h4 style="color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
-                    <i class="fa-solid fa-ranking-star" style="margin-right: 6px;"></i> Global Pool Queues Ticker
+        <div class="vip-card" style="margin-bottom: 0; padding: 16px; border: 1px solid var(--gold); background: linear-gradient(145deg, #111320, #07080f); box-shadow: 0 8px 30px rgba(0,0,0,0.85);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(245,197,24,0.2); padding-bottom: 8px;">
+                <h4 style="color: var(--gold); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; margin: 0; display: flex; align-items: center; gap: 7px;">
+                    <i class="fa-solid fa-satellite-dish fa-beat-fade" style="color: #34d399;"></i> Live Global Pool Tracker
                 </h4>
-                <span id="tickerStatusBadge" style="font-size: 9px; background: rgba(52,211,153,0.15); color: #34d399; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(52,211,153,0.3); cursor: pointer;" onclick="toggleTickerPause()">Tap to Pause</span>
+                <span id="tickerStatusBadge" style="font-size: 10px; font-weight: 600; background: rgba(52,211,153,0.15); color: #34d399; padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(52,211,153,0.4); cursor: pointer;" onclick="toggleTickerPause(event)">
+                    <i class="fa-solid fa-pause" style="margin-right: 4px;"></i> Tap to Pause
+                </span>
             </div>
-            <div style="height: 140px; overflow: hidden; position: relative; font-size: 12px; color: #fff; border-radius: 8px; background: #05060a; border: 1px solid rgba(255,255,255,0.06); cursor: pointer;" onclick="toggleTickerPause()">
-                <div id="sliderInnerContainer" style="position: absolute; width: 100%; animation: slideUpTicker 22s linear infinite; padding: 10px;">
-                    <div style="text-align: center; color: var(--gold); padding: 45px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Global Queue...</div>
+            <div id="tickerViewport" style="height: 270px; overflow: hidden; position: relative; font-size: 12px; color: #fff; border-radius: 12px; background: #05060a; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);" onclick="toggleTickerPause(event)">
+                <div id="sliderInnerContainer" class="ticker-scrolling" style="position: absolute; width: 100%; padding: 12px;">
+                    <div style="text-align: center; color: var(--gold); padding: 90px 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Syncing Live Global Pool Queues from Blockchain...</div>
                 </div>
+            </div>
+            <div style="font-size: 10px; color: var(--text-gray); margin-top: 8px; text-align: center;">
+                * Touch or click anywhere on the box to pause/resume live scroll
             </div>
         </div>
     </div>
@@ -1054,19 +1126,34 @@
             document.getElementById('customAlertModal').style.display = 'flex';
         }
 
-        // TICKER PAUSE/RESUME TOGGLE
+        // TICKER PAUSE/RESUME TOGGLE (Works on Mobile Touch & Desktop Click)
         let isTickerPaused = false;
-        window.toggleTickerPause = function() {
+        window.toggleTickerPause = function(e) {
+            if (e) e.stopPropagation();
             const inner = document.getElementById('sliderInnerContainer');
             const badge = document.getElementById('tickerStatusBadge');
             if(!inner) return;
             isTickerPaused = !isTickerPaused;
             if(isTickerPaused) {
                 inner.classList.add('ticker-paused');
-                if(badge) { badge.innerText = "Paused (Tap to Play)"; badge.style.color = "#f5c518"; badge.style.borderColor = "rgba(245,197,24,0.4)"; }
+                inner.style.animationPlayState = 'paused';
+                inner.style.webkitAnimationPlayState = 'paused';
+                if(badge) {
+                    badge.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 4px;"></i> Paused (Tap to Play)';
+                    badge.style.color = "#f5c518";
+                    badge.style.background = "rgba(245,197,24,0.15)";
+                    badge.style.borderColor = "rgba(245,197,24,0.4)";
+                }
             } else {
                 inner.classList.remove('ticker-paused');
-                if(badge) { badge.innerText = "Tap to Pause"; badge.style.color = "#34d399"; badge.style.borderColor = "rgba(52,211,153,0.3)"; }
+                inner.style.animationPlayState = 'running';
+                inner.style.webkitAnimationPlayState = 'running';
+                if(badge) {
+                    badge.innerHTML = '<i class="fa-solid fa-pause" style="margin-right: 4px;"></i> Tap to Pause';
+                    badge.style.color = "#34d399";
+                    badge.style.background = "rgba(52,211,153,0.15)";
+                    badge.style.borderColor = "rgba(52,211,153,0.4)";
+                }
             }
         }
 
@@ -2169,9 +2256,48 @@
             return "15 Jan 2025";
         }
 
-        // LOAD GLOBAL POOL TICKER SLIDER DATA (Slots 3 to 7 + Upcoming Slot 3)
+        // =========================================================================
+        // 100% REAL ON-CHAIN GLOBAL POOL TRACKER (SLOTS 3 TO 7, NO DUPLICATE IDS)
+        // =========================================================================
+        async function fetchAllSlotQueueEntries(slotNum) {
+            let entries = [];
+            const BATCH = 20;
+            for (let start = 0; start < 500; start += BATCH) {
+                let promises = [];
+                for (let b = 0; b < BATCH; b++) {
+                    promises.push(getCachedSlotQueue(slotNum, start + b).catch(() => null));
+                }
+                let addrs = await Promise.all(promises);
+                let hitEnd = false;
+                let validAddrs = [];
+                for (let a of addrs) {
+                    if (!a || a === "0x0000000000000000000000000000000000000000") {
+                        hitEnd = true;
+                        break;
+                    }
+                    validAddrs.push(a);
+                }
+                if (validAddrs.length > 0) {
+                    let uInfos = await Promise.all(validAddrs.map(a => getCachedUser(a).catch(() => null)));
+                    for (let k = 0; k < validAddrs.length; k++) {
+                        let u = uInfos[k];
+                        if (u && u[0].toNumber() > 0) {
+                            entries.push({
+                                queueIndex: start + k,
+                                addr: validAddrs[k].toLowerCase(),
+                                id: u[0].toNumber(),
+                                currentSlot: u[4].toNumber()
+                            });
+                        }
+                    }
+                }
+                if (hitEnd) break;
+            }
+            return entries;
+        }
+
         async function loadGlobalPoolSliderData() {
-            const cacheKey = "poltitan_global_slider_cache_v3";
+            const cacheKey = "poltitan_global_slider_cache_v5";
             let cached = localStorage.getItem(cacheKey);
             if (cached) {
                 try {
@@ -2180,43 +2306,94 @@
             }
 
             try {
-                let newHtml = "";
+                // Fetch real blockchain queues for Slots 3, 4, 5, 6, 7 in parallel
+                const [q3, q4, q5, q6, q7] = await Promise.all([
+                    fetchAllSlotQueueEntries(3),
+                    fetchAllSlotQueueEntries(4),
+                    fetchAllSlotQueueEntries(5),
+                    fetchAllSlotQueueEntries(6),
+                    fetchAllSlotQueueEntries(7)
+                ]);
+
+                const rawQueues = { 3: q3, 4: q4, 5: q5, 6: q6, 7: q7 };
+                const reqNodesMap = { 3: 8, 4: 16, 5: 32, 6: 64, 7: 128 };
+
+                // Filter out IDs that have already upgraded to the next slot!
+                // If an ID is in Slot 4, it will NOT be shown in Slot 3's active list.
+                const activeSlotLists = {};
                 for (let s = 3; s <= 7; s++) {
-                    newHtml += `<div style="color:var(--gold); font-weight:bold; margin:6px 0 2px 0; text-align:center;">GLOBAL SLOT ${s}</div>`;
-                    let hasQueue = false;
-                    for (let i = 0; i < 3; i++) {
-                        let qAddr = await getCachedSlotQueue(s, i).catch(() => null);
-                        if (qAddr && qAddr !== "0x0000000000000000000000000000000000000000") {
-                            let uInfo = await getCachedUser(qAddr).catch(() => null);
-                            if (uInfo) {
-                                hasQueue = true;
-                                newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; border-bottom:1px dashed rgba(255,255,255,0.05);"><span>Sl no. ${i+1}</span><span style="color:#34d399; font-weight:bold;">id no. ${uInfo[0].toNumber()}</span></div>`;
-                            }
-                        }
-                    }
-                    if(!hasQueue) {
-                        newHtml += `<div style="text-align:center; color:var(--text-gray); padding:2px;">Sl no. 1 &nbsp;&nbsp; id no. --</div>`;
-                    }
+                    const nextSlotSet = new Set((rawQueues[s + 1] || []).map(x => x.id));
+                    activeSlotLists[s] = (rawQueues[s] || []).filter(item => item.currentSlot === s && !nextSlotSet.has(item.id));
                 }
 
-                // Upcoming Global Slot No. 3 (Next 8 entries queue)
-                newHtml += `<div style="color:var(--gold); font-weight:bold; margin: 8px 0 2px 0; text-align:center;">UPCOMING GLOBAL SLOT NO.3</div>`;
-                let upcomingCount = 0;
-                for (let i = 0; i < 8; i++) {
-                    let qAddr = await getCachedSlotQueue(3, i).catch(() => null);
-                    if (qAddr && qAddr !== "0x0000000000000000000000000000000000000000") {
-                        let uInfo = await getCachedUser(qAddr).catch(() => null);
-                        if (uInfo) {
-                            upcomingCount++;
-                            newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; color:#60a5fa;"><span>Sl. No. ${upcomingCount}</span><span>Id no. ${uInfo[0].toNumber()}</span></div>`;
-                        }
+                function buildSlotSectionHtml(slotNum) {
+                    const activeList = activeSlotLists[slotNum] || [];
+                    const totalRaw = (rawQueues[slotNum] || []).length;
+                    const reqNodes = reqNodesMap[slotNum];
+
+                    let cardHtml = `<div class="gp-slot-card">`;
+                    cardHtml += `
+                        <div class="gp-slot-header">
+                            <span class="gp-slot-title"><i class="fa-solid fa-globe"></i> GLOBAL SLOT ${slotNum}</span>
+                            <span style="font-size:10px; color:var(--text-gray);">Pool Size: ${reqNodes} IDs</span>
+                        </div>`;
+
+                    if (activeList.length === 0) {
+                        cardHtml += `
+                            <div style="text-align:center; padding: 8px 0;">
+                                <span class="gp-na-badge"><i class="fa-solid fa-ban" style="margin-right:4px;"></i> Not Available</span>
+                            </div>
+                        </div>`;
+                        return cardHtml;
                     }
-                }
-                if(upcomingCount === 0) {
-                    newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; color:#60a5fa;"><span>Sl. No. 1-8</span><span>Id no. Pending</span></div>`;
+
+                    // First active ID in this slot is the one currently being filled!
+                    const fillingNow = activeList[0];
+                    const lastEntered = activeList[activeList.length - 1];
+                    const filledSpots = Math.max(0, Math.min(reqNodes, totalRaw - 1 - (fillingNow.queueIndex * reqNodes)));
+
+                    cardHtml += `
+                        <div class="gp-active-box">
+                            <div>
+                                <div style="font-size:10px; color:#34d399; font-weight:700; text-transform:uppercase;">
+                                    <i class="fa-solid fa-bolt"></i> Active Filling Now (Slot ${slotNum})
+                                </div>
+                                <div style="font-size:14px; font-weight:800; color:#fff; margin-top:2px;">
+                                    ID No. ${fillingNow.id} <span style="font-size:11px; color:var(--gold); font-weight:600;">(${filledSpots}/${reqNodes} Filled)</span>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <span style="font-size:9px; color:var(--text-gray); display:block;">Last Entered</span>
+                                <span style="font-size:12px; color:#60a5fa; font-weight:700;">ID No. ${lastEntered.id}</span>
+                            </div>
+                        </div>`;
+
+                    // Show all active IDs currently in this slot
+                    cardHtml += `<div style="font-size:10px; color:var(--gold); font-weight:700; margin-bottom:5px; text-transform:uppercase;">
+                        ${slotNum === 3 ? `ID No. ${fillingNow.id} & Upcoming Slot 3 Queue (8-ID Pool Line):` : `Active IDs in Global Slot ${slotNum} Only:`}
+                    </div>`;
+                    cardHtml += `<div class="gp-queue-grid">`;
+                    activeList.forEach((item, idx) => {
+                        const isFirst = (idx === 0);
+                        const statusColor = isFirst ? "#34d399" : "#60a5fa";
+                        const labelTag = isFirst ? "Filling" : "Next";
+                        cardHtml += `
+                            <div class="gp-queue-item" style="${isFirst ? 'border-color:rgba(52,211,153,0.4); background:rgba(52,211,153,0.08);' : ''}">
+                                <span style="color:var(--text-gray);">Sl. ${idx + 1}</span>
+                                <span style="color:${statusColor}; font-weight:700;">ID ${item.id} <small style="font-size:9px; opacity:0.85;">(${labelTag})</small></span>
+                            </div>`;
+                    });
+                    cardHtml += `</div></div>`;
+                    return cardHtml;
                 }
 
-                let fullHtml = newHtml + "<br><br>" + newHtml;
+                // Order: Global Slot 3 -> Global Slot 4 -> Global Slot 5 -> Global Slot 6 -> Global Slot 7
+                let singlePassHtml = "";
+                for (let s = 3; s <= 7; s++) {
+                    singlePassHtml += buildSlotSectionHtml(s);
+                }
+
+                let fullHtml = singlePassHtml + singlePassHtml;
                 document.getElementById('sliderInnerContainer').innerHTML = fullHtml;
                 localStorage.setItem(cacheKey, JSON.stringify(fullHtml));
             } catch(e) {}
@@ -2518,6 +2695,7 @@
 
         window.addEventListener('load', async () => {
             ensureVideosSmooth();
+            loadGlobalPoolSliderData();
             let savedSession = localStorage.getItem('poltitan_saved_session');
             if (window.ethereum) {
                 setTimeout(async () => {
