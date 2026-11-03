@@ -88,6 +88,8 @@
             gap: 10px;
         }
         .brand-title i { color: var(--gold); }
+        
+        .header-actions { display: flex; gap: 10px; align-items: center; }
         .admin-badge {
             background: rgba(245, 197, 24, 0.15);
             border: 1px solid var(--gold);
@@ -98,6 +100,17 @@
             font-weight: 700;
             cursor: pointer;
         }
+        .logout-badge {
+            background: rgba(251, 113, 133, 0.15);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .logout-badge:hover { background: var(--red); color: #000; }
 
         .container { max-width: 1050px; margin: 0 auto; padding: 15px; }
 
@@ -291,8 +304,8 @@
     <div id="loginOverlay">
         <div class="login-box">
             <h2><i class="fa-solid fa-lock" style="color:var(--gold);"></i> Admin Login</h2>
-            <input type="text" id="loginUser" class="login-input" placeholder="Username" required>
-            <input type="password" id="loginPass" class="login-input" placeholder="Password" required>
+            <input type="text" id="loginUser" class="login-input" placeholder="Username" required autocomplete="off">
+            <input type="password" id="loginPass" class="login-input" placeholder="Password" required autocomplete="new-password">
             <button class="btn-gold" style="width:100%;" onclick="verifyAdminLogin()">Login to Panel</button>
             <p id="loginError" style="color:var(--red); font-size:11px; margin-top:10px; display:none;"></p>
         </div>
@@ -303,8 +316,13 @@
             <i class="fa-solid fa-shield-halved"></i>
             <span>POLTITAN <span style="color:var(--gold);">ADMIN PANEL</span></span>
         </div>
-        <div class="admin-badge" onclick="refreshAllAdminData()">
-            <i class="fa-solid fa-rotate" id="syncIcon"></i> Refresh Live Data
+        <div class="header-actions">
+            <div class="admin-badge" onclick="refreshAllAdminData()">
+                <i class="fa-solid fa-rotate" id="syncIcon"></i> Refresh
+            </div>
+            <div class="logout-badge" onclick="adminLogout()">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </div>
         </div>
     </header>
 
@@ -505,6 +523,8 @@
             if (u === ADMIN_USER && p === ADMIN_PASS) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 localStorage.setItem('poltitan_admin_logged', 'true');
+                document.getElementById('loginUser').value = '';
+                document.getElementById('loginPass').value = '';
                 refreshAllAdminData();
                 inspectByIdOrAddress("1");
             } else {
@@ -513,11 +533,21 @@
             }
         }
 
+        function adminLogout() {
+            localStorage.removeItem('poltitan_admin_logged');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginOverlay').style.display = 'flex';
+        }
+
         window.addEventListener('load', () => {
             if (localStorage.getItem('poltitan_admin_logged') === 'true') {
                 document.getElementById('loginOverlay').style.display = 'none';
                 refreshAllAdminData();
                 inspectByIdOrAddress("1");
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
             }
         });
 
@@ -876,7 +906,7 @@
 
                         html += `
                             <tr>
-                                <td>${dt}</td>
+                                1<td>${dt}</td>
                                 <td><span class="chip" onclick="switchAdminTab('tabInspector', document.querySelectorAll('.tab-btn')[0]); inspectByIdOrAddress('${tx.from}');">${tx.from.substring(0, 8)}...${tx.from.substring(36)}</span></td>
                                 <td style="color:var(--gold); font-weight:600;">${action}</td>
                                 <td>${valPol} POL</td>
