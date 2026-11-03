@@ -659,7 +659,7 @@
         </div>
     </div>
 
-    <!-- GLOBAL POOL TICKER SLIDER (Click/Tap to Pause/Resume) -->
+    <!-- GLOBAL POOL TICKER SLIDER (Slots 3 to 7 + Upcoming Slot 3 with Tap to Pause) -->
     <div style="max-width: 500px; width: 100%; margin: 20px auto 0 auto; padding: 0 15px;">
         <div class="vip-card" style="margin-bottom: 0; padding: 15px; border: 1px solid var(--border-color); background: #0c0d14;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -2167,6 +2167,59 @@
             } catch (e) {}
 
             return "15 Jan 2025";
+        }
+
+        // LOAD GLOBAL POOL TICKER SLIDER DATA (Slots 3 to 7 + Upcoming Slot 3)
+        async function loadGlobalPoolSliderData() {
+            const cacheKey = "poltitan_global_slider_cache_v3";
+            let cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                try {
+                    document.getElementById('sliderInnerContainer').innerHTML = JSON.parse(cached);
+                } catch(e) {}
+            }
+
+            try {
+                let newHtml = "";
+                for (let s = 3; s <= 7; s++) {
+                    newHtml += `<div style="color:var(--gold); font-weight:bold; margin:6px 0 2px 0; text-align:center;">GLOBAL SLOT ${s}</div>`;
+                    let hasQueue = false;
+                    for (let i = 0; i < 3; i++) {
+                        let qAddr = await getCachedSlotQueue(s, i).catch(() => null);
+                        if (qAddr && qAddr !== "0x0000000000000000000000000000000000000000") {
+                            let uInfo = await getCachedUser(qAddr).catch(() => null);
+                            if (uInfo) {
+                                hasQueue = true;
+                                newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; border-bottom:1px dashed rgba(255,255,255,0.05);"><span>Sl no. ${i+1}</span><span style="color:#34d399; font-weight:bold;">id no. ${uInfo[0].toNumber()}</span></div>`;
+                            }
+                        }
+                    }
+                    if(!hasQueue) {
+                        newHtml += `<div style="text-align:center; color:var(--text-gray); padding:2px;">Sl no. 1 &nbsp;&nbsp; id no. --</div>`;
+                    }
+                }
+
+                // Upcoming Global Slot No. 3 (Next 8 entries queue)
+                newHtml += `<div style="color:var(--gold); font-weight:bold; margin: 8px 0 2px 0; text-align:center;">UPCOMING GLOBAL SLOT NO.3</div>`;
+                let upcomingCount = 0;
+                for (let i = 0; i < 8; i++) {
+                    let qAddr = await getCachedSlotQueue(3, i).catch(() => null);
+                    if (qAddr && qAddr !== "0x0000000000000000000000000000000000000000") {
+                        let uInfo = await getCachedUser(qAddr).catch(() => null);
+                        if (uInfo) {
+                            upcomingCount++;
+                            newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; color:#60a5fa;"><span>Sl. No. ${upcomingCount}</span><span>Id no. ${uInfo[0].toNumber()}</span></div>`;
+                        }
+                    }
+                }
+                if(upcomingCount === 0) {
+                    newHtml += `<div style="display:flex; justify-content:space-between; padding:2px 15px; color:#60a5fa;"><span>Sl. No. 1-8</span><span>Id no. Pending</span></div>`;
+                }
+
+                let fullHtml = newHtml + "<br><br>" + newHtml;
+                document.getElementById('sliderInnerContainer').innerHTML = fullHtml;
+                localStorage.setItem(cacheKey, JSON.stringify(fullHtml));
+            } catch(e) {}
         }
 
         window.loadDashboardData = async function(address, viewMode) {
