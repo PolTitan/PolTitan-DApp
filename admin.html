@@ -23,20 +23,21 @@
             --red: #fb7185;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body {
             background-color: var(--bg-black);
             color: #fff;
             min-height: 100vh;
             background-image: radial-gradient(circle at 50% 0%, rgba(245, 197, 24, 0.08) 0%, transparent 60%);
             padding-bottom: 40px;
+            overflow-x: hidden;
         }
 
         /* LOGIN OVERLAY */
         #loginOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 6, 10, 0.95);
+            background: rgba(5, 6, 10, 0.96);
             backdrop-filter: blur(10px);
             z-index: 9999;
             display: flex;
@@ -51,7 +52,7 @@
             width: 90%;
             max-width: 360px;
             text-align: center;
-            box-shadow: 0 15px 40px rgba(245, 197, 24, 0.2);
+            box-shadow: 0 15px 40px rgba(245, 197, 24, 0.25);
         }
         .login-box h2 { color: var(--gold); margin-bottom: 20px; font-size: 22px; }
         .login-input {
@@ -66,10 +67,11 @@
             margin-bottom: 15px;
         }
 
+        /* HEADER */
         header {
             background: rgba(18, 19, 28, 0.95);
             backdrop-filter: blur(10px);
-            padding: 14px 20px;
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -79,22 +81,34 @@
             z-index: 100;
             box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .menu-btn {
+            font-size: 22px;
+            color: var(--gold);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #0c0d14;
+        }
         .brand-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        .brand-title i { color: var(--gold); }
-        
-        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
         .admin-badge {
             background: rgba(245, 197, 24, 0.15);
             border: 1px solid var(--gold);
             color: var(--gold);
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
@@ -104,15 +118,78 @@
             background: rgba(251, 113, 133, 0.15);
             border: 1px solid var(--red);
             color: var(--red);
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
         }
-        .logout-badge:hover { background: var(--red); color: #000; }
+
+        /* SIDE MENU DRAWER */
+        .menu-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 998;
+            display: none;
+        }
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: #0c0d14;
+            border-right: 1px solid var(--border-color);
+            transition: left 0.28s ease;
+            z-index: 1000;
+            padding: 20px;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.9);
+            overflow-y: auto;
+        }
+        .side-menu.active { left: 0; }
+        .close-menu {
+            text-align: right;
+            font-size: 22px;
+            color: var(--gold);
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .menu-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+        .menu-header h2 { color: var(--gold); font-size: 18px; }
+        .menu-header p { color: var(--text-gray); font-size: 11px; margin-top: 4px; }
+
+        .menu-item {
+            padding: 13px 12px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            border: 1px solid transparent;
+        }
+        .menu-item i { color: var(--gold); font-size: 16px; width: 22px; text-align: center; }
+        .menu-item:hover, .menu-item.active-menu {
+            background: rgba(245, 197, 24, 0.14);
+            color: var(--gold);
+            border-color: var(--border-color);
+        }
 
         .container { max-width: 1050px; margin: 0 auto; padding: 15px; }
+
+        /* VIEW SECTIONS */
+        .admin-view { display: none; }
+        .admin-view.active { display: block; }
 
         /* TOP STATS GRID */
         .stats-grid {
@@ -125,11 +202,14 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 14px;
-            padding: 16px;
+            padding: 18px;
             box-shadow: 0 6px 20px rgba(0,0,0,0.6);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
         }
+        .stat-card:hover { border-color: var(--gold); transform: translateY(-2px); }
         .stat-card .label { font-size: 11px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-card .val { font-size: 24px; font-weight: 800; color: var(--gold); margin-top: 6px; }
         .stat-card .sub { font-size: 11px; color: var(--green); margin-top: 4px; }
@@ -139,33 +219,6 @@
             bottom: -5px;
             font-size: 52px;
             color: rgba(245, 197, 24, 0.06);
-        }
-
-        /* TABS */
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            margin-bottom: 18px;
-        }
-        .tab-btn {
-            background: #0d0e17;
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.2s;
-        }
-        .tab-btn.active {
-            background: var(--gold-metallic);
-            color: #000;
-            font-weight: 800;
-            border-color: var(--gold);
         }
 
         /* CARDS & SEARCH */
@@ -185,6 +238,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.07);
             padding-bottom: 10px;
         }
@@ -221,10 +276,10 @@
             background: rgba(245, 197, 24, 0.15);
             color: var(--gold);
             border: 1px solid var(--gold);
-            padding: 5px 10px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
         }
         .btn-sm:hover { background: var(--gold); color: #000; }
@@ -272,30 +327,72 @@
             white-space: nowrap;
         }
         td {
-            padding: 10px;
+            padding: 11px 10px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             color: #e5e7eb;
             white-space: nowrap;
         }
-        tr:hover td { background: rgba(245, 197, 24, 0.04); }
+        tr.clickable-row { cursor: pointer; transition: 0.15s; }
+        tr.clickable-row:hover td { background: rgba(245, 197, 24, 0.08); }
 
         .badge-real { background: rgba(245, 197, 24, 0.15); color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
         .badge-rb { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid var(--green); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
-
-        .tab-section { display: none; }
-        .tab-section.active { display: block; }
+        .badge-claim { background: rgba(251, 113, 133, 0.15); color: var(--red); border: 1px solid var(--red); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
 
         .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
         .chip {
             background: #121420;
             border: 1px solid var(--border-color);
             color: #fff;
-            padding: 4px 10px;
+            padding: 5px 10px;
             border-radius: 8px;
             font-size: 11px;
             cursor: pointer;
+            font-weight: 600;
         }
         .chip:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* FULL DETAIL MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 6, 10, 0.92);
+            backdrop-filter: blur(8px);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        .modal-card {
+            background: var(--card-bg);
+            border: 2px solid var(--gold);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9);
+        }
+        .modal-close {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: #07080f;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -311,14 +408,18 @@
         </div>
     </div>
 
+    <!-- HEADER WITH MENU BUTTON -->
     <header>
-        <div class="brand-title">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>POLTITAN <span style="color:var(--gold);">ADMIN PANEL</span></span>
+        <div class="header-left">
+            <i class="fa-solid fa-bars menu-btn" onclick="toggleSideMenu()"></i>
+            <div class="brand-title">
+                <i class="fa-solid fa-shield-halved" style="color:var(--gold);"></i>
+                <span>POLTITAN <span style="color:var(--gold);">ADMIN</span></span>
+            </div>
         </div>
         <div class="header-actions">
-            <div class="admin-badge" onclick="refreshAllAdminData()">
-                <i class="fa-solid fa-rotate" id="syncIcon"></i> Refresh
+            <div class="admin-badge" onclick="refreshCurrentView()">
+                <i class="fa-solid fa-rotate"></i> Refresh
             </div>
             <div class="logout-badge" onclick="adminLogout()">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -326,125 +427,178 @@
         </div>
     </header>
 
+    <!-- SIDE MENU BACKDROP & DRAWER -->
+    <div class="menu-backdrop" id="menuBackdrop" onclick="toggleSideMenu()"></div>
+    <div class="side-menu" id="sideMenu">
+        <div class="close-menu" onclick="toggleSideMenu()"><i class="fa-solid fa-times"></i></div>
+        <div class="menu-header">
+            <h2><i class="fa-solid fa-crown"></i> Master Admin</h2>
+            <p>Select any option below to open details</p>
+        </div>
+
+        <div class="menu-item active-menu" id="menu-dashboard" onclick="openMenuSection('viewDashboard', 'menu-dashboard')">
+            <i class="fa-solid fa-gauge-high"></i> System Dashboard
+        </div>
+        <div class="menu-item" id="menu-zero" onclick="openMenuSection('viewZeroIncome', 'menu-zero')">
+            <i class="fa-solid fa-hand-holding-dollar" style="color:var(--red);"></i> 0 Income / Claim List
+        </div>
+        <div class="menu-item" id="menu-search" onclick="openMenuSection('viewSearch', 'menu-search')">
+            <i class="fa-solid fa-magnifying-glass"></i> Master ID Search
+        </div>
+        <div class="menu-item" id="menu-latest" onclick="openMenuSection('viewLatest', 'menu-latest')">
+            <i class="fa-solid fa-users"></i> All / Latest Registered IDs
+        </div>
+        <div class="menu-item" id="menu-pools" onclick="openMenuSection('viewPools', 'menu-pools')">
+            <i class="fa-solid fa-globe"></i> Global Pools (Slot 3-7)
+        </div>
+        <div class="menu-item" id="menu-tx" onclick="openMenuSection('viewTx', 'menu-tx')">
+            <i class="fa-solid fa-receipt"></i> Live Contract Tx
+        </div>
+        <div class="menu-item" onclick="adminLogout()" style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.08); padding-top:18px;">
+            <i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> Logout Admin
+        </div>
+    </div>
+
+    <!-- CLICK-TO-OPEN USER DETAILS MODAL -->
+    <div class="modal-overlay" id="userDetailModal" onclick="closeUserDetailModal()">
+        <div class="modal-card" onclick="event.stopPropagation();">
+            <div class="modal-close" onclick="closeUserDetailModal()"><i class="fa-solid fa-times"></i></div>
+            <h3 style="color:var(--gold); font-size:16px; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-id-badge"></i> Complete ID Inspection Details
+            </h3>
+            <div id="modalLoading" style="text-align:center; padding:40px; color:var(--gold);">
+                <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                <p style="margin-top:10px; font-size:13px;">Reading complete blockchain data for this ID...</p>
+            </div>
+            <div id="modalContentArea" style="display:none;"></div>
+        </div>
+    </div>
+
     <div class="container">
 
-        <!-- LIVE SYSTEM OVERVIEW CARDS -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="label">Contract Live Balance</div>
-                <div class="val" id="statContractBal"><i class="fa-solid fa-spinner fa-spin"></i></div>
-                <div class="sub">Total Held / Pool POL in Contract</div>
-                <i class="fa-solid fa-vault bg-icon"></i>
+        <!-- 1. DASHBOARD SUMMARY VIEW -->
+        <div id="viewDashboard" class="admin-view active">
+            <div class="panel-card" style="margin-bottom:15px; padding:14px 18px;">
+                <p style="font-size:12px; color:var(--text-gray);">
+                    <i class="fa-solid fa-circle-info" style="color:var(--gold);"></i> <b>Tip:</b> Kisi bhi box ya menu option (`☰`) par click karke uski poori list kholein, aur list ke andar kisi bhi ID par click karke uska poora detail dekhein.
+                </p>
             </div>
 
-            <div class="stat-card">
-                <div class="label">Total System IDs</div>
-                <div class="val" id="statTotalIds"><i class="fa-solid fa-spinner fa-spin"></i></div>
-                <div class="sub" id="statIdSub">Scanning Blockchain...</div>
-                <i class="fa-solid fa-users bg-icon"></i>
-            </div>
-
-            <div class="stat-card">
-                <div class="label">ID #4 Priority Queue</div>
-                <div class="val" id="statId4Stage"><i class="fa-solid fa-spinner fa-spin"></i></div>
-                <div class="sub" id="statId4Target">Checking stage...</div>
-                <i class="fa-solid fa-bolt bg-icon"></i>
-            </div>
-
-            <div class="stat-card">
-                <div class="label">Smart Contract Status</div>
-                <div class="val" style="font-size:16px; color:var(--green); margin-top:10px;">
-                    <i class="fa-solid fa-circle-check"></i> ACTIVE ON-CHAIN
+            <div class="stats-grid">
+                <div class="stat-card" onclick="openMenuSection('viewTx', 'menu-tx')">
+                    <div class="label">Contract Live Balance</div>
+                    <div class="val" id="statContractBal"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                    <div class="sub">Click to view Contract Transactions</div>
+                    <i class="fa-solid fa-vault bg-icon"></i>
                 </div>
-                <div class="sub" style="color:var(--text-gray);" id="statContractAddr">0x5b6e...2b66a</div>
-                <i class="fa-solid fa-link bg-icon"></i>
+
+                <div class="stat-card" onclick="openMenuSection('viewLatest', 'menu-latest')">
+                    <div class="label">Total System IDs</div>
+                    <div class="val" id="statTotalIds"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                    <div class="sub" id="statIdSub">Click to view Registered IDs</div>
+                    <i class="fa-solid fa-users bg-icon"></i>
+                </div>
+
+                <div class="stat-card" onclick="openMenuSection('viewZeroIncome', 'menu-zero')" style="border-color: rgba(251, 113, 133, 0.45);">
+                    <div class="label" style="color:var(--red);">0 Income / Claim Eligible</div>
+                    <div class="val" id="statZeroCount" style="color:var(--red);">Check List</div>
+                    <div class="sub" style="color:var(--gold);">Click to scan all 0 POL Income IDs</div>
+                    <i class="fa-solid fa-hand-holding-dollar bg-icon"></i>
+                </div>
+
+                <div class="stat-card" onclick="openUserModalByQuery('4')">
+                    <div class="label">ID #4 Priority Queue</div>
+                    <div class="val" id="statId4Stage"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                    <div class="sub" id="statId4Target">Click to inspect ID #4</div>
+                    <i class="fa-solid fa-bolt bg-icon"></i>
+                </div>
             </div>
         </div>
 
-        <!-- NAVIGATION TABS -->
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchAdminTab('tabInspector', this)">
-                <i class="fa-solid fa-magnifying-glass"></i> Master ID Inspector
-            </button>
-            <button class="tab-btn" onclick="switchAdminTab('tabLatestIds', this)">
-                <i class="fa-solid fa-list-ol"></i> Latest Registered IDs
-            </button>
-            <button class="tab-btn" onclick="switchAdminTab('tabGlobalPools', this)">
-                <i class="fa-solid fa-globe"></i> Global Pools (Slot 3-7)
-            </button>
-            <button class="tab-btn" onclick="switchAdminTab('tabLiveTx', this)">
-                <i class="fa-solid fa-receipt"></i> Live Contract Tx
-            </button>
-        </div>
-
-        <!-- TAB 1: MASTER ANY-ID / WALLET INSPECTOR -->
-        <div id="tabInspector" class="tab-section active">
+        <!-- 2. ZERO (0) INCOME / REFUND CLAIM ELIGIBLE LIST VIEW -->
+        <div id="viewZeroIncome" class="admin-view">
             <div class="panel-card">
                 <div class="panel-title">
-                    <span><i class="fa-solid fa-user-secret"></i> Search Any ID or Wallet (Zero Restrictions)</span>
-                    <span style="font-size:11px; color:var(--text-gray);">Enter ID (1, 2, 4, 663...) or 0x Wallet</span>
+                    <span><i class="fa-solid fa-hand-holding-dollar" style="color:var(--red);"></i> Zero (0) Income IDs & 30 POL Claim Eligibility Tracker</span>
+                    <button class="btn-gold" id="scanZeroBtn" style="padding:7px 14px; font-size:11px;" onclick="scanZeroIncomeIds(true)">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i> Start / Refresh Scan
+                    </button>
                 </div>
 
-                <form class="search-bar" onsubmit="inspectAnyUser(event)">
-                    <input type="text" id="adminSearchInput" class="search-input" placeholder="Enter ID Number (e.g. 1) or Wallet Address (0x...)" required>
-                    <button type="submit" class="btn-gold" id="adminSearchBtn">
-                        <i class="fa-solid fa-magnifying-glass"></i> Inspect User
-                    </button>
-                </form>
+                <p style="font-size:12px; color:var(--text-gray); margin-bottom:14px; line-height:1.5;">
+                    Yahan un sabhi <b>Real IDs</b> ki list hai jinka <b>Total Earning abhi tak 0 POL</b> hai (ना wallet me aaya hai, ना hold box me). Agar system 180 din tak lagatar inactive rehta hai, to ye IDs apna <b>30 POL Refund Claim</b> kar sakti hain. Kisi bhi ID par click karke uski poori kundali dekhein.
+                </p>
 
-                <div id="inspectorResultArea" style="display:none;">
-                    <div class="detail-grid">
-                        <!-- Box 1: Profile & Genealogy -->
-                        <div class="detail-box">
-                            <h4><i class="fa-solid fa-id-card"></i> Profile & Placement</h4>
-                            <div class="d-row"><span class="d-label">User ID:</span> <span class="d-val" id="admId">--</span></div>
-                            <div class="d-row"><span class="d-label">ID Type:</span> <span class="d-val" id="admType">--</span></div>
-                            <div class="d-row"><span class="d-label">Real Joining Date:</span> <span class="d-val" id="admJoinDate" style="color:var(--blue);">--</span></div>
-                            <div class="d-row"><span class="d-label">Wallet Address:</span> <span class="d-val" id="admWallet">--</span></div>
-                            <div class="d-row"><span class="d-label">Sponsor / Upline:</span> <span class="d-val" id="admUpline">--</span></div>
-                            <div class="d-row"><span class="d-label">Current Active Slot:</span> <span class="d-val" id="admSlot" style="color:var(--gold);">--</span></div>
-                            <div class="d-row"><span class="d-label">Direct Count:</span> <span class="d-val" id="admDirects">--</span></div>
-                            <div class="d-row"><span class="d-label">Slot 1 Left / Right:</span> <span class="d-val" id="admLeftRight">--</span></div>
-                            <div class="d-row"><span class="d-label">Slot 2 Team (Max 4):</span> <span class="d-val" id="admSlot2Count">--</span></div>
-                        </div>
-
-                        <!-- Box 2: Complete Financials -->
-                        <div class="detail-box">
-                            <h4><i class="fa-solid fa-sack-dollar"></i> Financial & Hold Breakdown</h4>
-                            <div class="d-row"><span class="d-label">Total Overall Earning:</span> <span class="d-val" id="admTotalOverall" style="color:var(--gold); font-size:14px;">--</span></div>
-                            <div class="d-row"><span class="d-label">Paid to Wallet (totalEarned):</span> <span class="d-val" id="admWalletPaid" style="color:var(--green);">--</span></div>
-                            <div class="d-row"><span class="d-label">Total Hold / Queued POL:</span> <span class="d-val" id="admTotalHold" style="color:var(--gold);">--</span></div>
-                            <div class="d-row"><span class="d-label">• Slot 1 Box Hold:</span> <span class="d-val" id="admBoxHold">--</span></div>
-                            <div class="d-row"><span class="d-label">• Pending Slot 2-7 Hold:</span> <span class="d-val" id="admSlotHold">--</span></div>
-                            <div class="d-row"><span class="d-label">• Up/Downline Net Hold:</span> <span class="d-val" id="admNetHold">--</span></div>
-                            <div class="d-row"><span class="d-label">• Level 2-18 Hold:</span> <span class="d-val" id="admLvlHold">--</span></div>
-                            <div class="d-row"><span class="d-label">• ID #4 Priority Queue:</span> <span class="d-val" id="admId4Hold">--</span></div>
-                            <div class="d-row"><span class="d-label">Unlocked Claimable Now:</span> <span class="d-val" id="admClaimable" style="color:var(--green);">--</span></div>
-                        </div>
-
-                        <!-- Box 3: Rebirth & Directs -->
-                        <div class="detail-box">
-                            <h4><i class="fa-solid fa-recycle"></i> Rebirth Counters & Directs</h4>
-                            <div class="d-row"><span class="d-label">Generated (Completed) Rebirths:</span> <span class="d-val" id="admCompRb">--</span></div>
-                            <div class="d-row"><span class="d-label">Received Rebirths:</span> <span class="d-val" id="admRecRb" style="color:var(--green);">--</span></div>
-                            <div class="d-row"><span class="d-label">Pending Rebirths (Action Lock):</span> <span class="d-val" id="admPendRb" style="color:var(--red);">--</span></div>
-                            <div class="d-row"><span class="d-label">Flushed Rebirths:</span> <span class="d-val" id="admFlushRb">--</span></div>
-                            <div style="margin-top:10px;">
-                                <span class="d-label" style="font-size:11px; display:block; margin-bottom:5px;">Direct Referral IDs (Click to Inspect):</span>
-                                <div id="admDirectChips" class="chip-list">None</div>
-                            </div>
-                        </div>
+                <!-- Summary Counters for 0 Income -->
+                <div class="stats-grid" style="margin-bottom:15px;">
+                    <div class="stat-card" style="padding:12px;">
+                        <div class="label">Strict 0 POL Income IDs</div>
+                        <div class="val" id="zeroStrictCount" style="color:var(--red); font-size:20px;">--</div>
+                        <div class="sub">0 Wallet Paid + 0 Box Hold (100% Claim Eligible)</div>
+                    </div>
+                    <div class="stat-card" style="padding:12px;">
+                        <div class="label">Max Refund Claim Liability</div>
+                        <div class="val" id="zeroTotalPolLiability" style="color:var(--gold); font-size:20px;">--</div>
+                        <div class="sub">30 POL × Strict 0 Income IDs</div>
+                    </div>
+                    <div class="stat-card" style="padding:12px;">
+                        <div class="label">0 Wallet Paid (But 30 POL in Box 1)</div>
+                        <div class="val" id="zeroWalletOnlyCount" style="color:var(--blue); font-size:20px;">--</div>
+                        <div class="sub">1 Direct done (30 POL held for Slot 2 upgrade)</div>
                     </div>
                 </div>
+
+                <div id="zeroScanProgress" style="display:none; background:#07080f; border:1px solid var(--border-color); padding:12px; border-radius:10px; margin-bottom:15px; text-align:center; color:var(--gold); font-size:12px;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Scanning Blockchain IDs: <b id="zeroProgressText">0 / 0</b>...
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID No.</th>
+                                <th>Wallet Address</th>
+                                <th>Upline ID</th>
+                                <th>Directs</th>
+                                <th>Wallet Paid</th>
+                                <th>Hold POL</th>
+                                <th>Claim Status (If 180d Inactive)</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="zeroIncomeTableBody">
+                            <tr><td colspan="8" style="text-align:center; padding:25px; color:var(--text-gray);">Click "Start / Refresh Scan" to load all 0 Income IDs.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- TAB 2: LATEST REGISTERED IDs -->
-        <div id="tabLatestIds" class="tab-section">
+        <!-- 3. MASTER ID SEARCH VIEW -->
+        <div id="viewSearch" class="admin-view">
             <div class="panel-card">
                 <div class="panel-title">
-                    <span><i class="fa-solid fa-users-viewfinder"></i> Latest Registered & Rebirth IDs</span>
-                    <button class="btn-sm" onclick="loadLatestSystemIds()"><i class="fa-solid fa-rotate"></i> Reload List</button>
+                    <span><i class="fa-solid fa-user-secret"></i> Master ID / Wallet Search (No Crossline Restriction)</span>
+                </div>
+                <form class="search-bar" onsubmit="handleSearchSubmit(event)">
+                    <input type="text" id="adminSearchInput" class="search-input" placeholder="Enter ID Number (e.g. 1, 2, 4, 50) or Wallet Address (0x...)" required>
+                    <button type="submit" class="btn-gold">
+                        <i class="fa-solid fa-magnifying-glass"></i> Open Full Details
+                    </button>
+                </form>
+                <div id="inlineSearchResult"></div>
+            </div>
+        </div>
+
+        <!-- 4. ALL / LATEST REGISTERED IDs VIEW -->
+        <div id="viewLatest" class="admin-view">
+            <div class="panel-card">
+                <div class="panel-title">
+                    <span><i class="fa-solid fa-users-viewfinder"></i> Registered & Rebirth IDs (Click any row for details)</span>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-sm" onclick="loadIdRange('latest')">Latest 25 IDs</button>
+                        <button class="btn-sm" onclick="loadIdRange('first')">First 25 IDs (#1-25)</button>
+                    </div>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -457,22 +611,22 @@
                                 <th>Current Slot</th>
                                 <th>Directs</th>
                                 <th>Box Hold</th>
-                                <th>Action</th>
+                                <th>Open</th>
                             </tr>
                         </thead>
                         <tbody id="latestIdsTableBody">
-                            <tr><td colspan="8" style="text-align:center; padding:25px; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Loading Latest IDs...</td></tr>
+                            <tr><td colspan="8" style="text-align:center; padding:25px; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Loading IDs...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 3: GLOBAL POOLS (SLOTS 3 TO 7) -->
-        <div id="tabGlobalPools" class="tab-section">
+        <!-- 5. GLOBAL POOLS (SLOTS 3 TO 7) VIEW -->
+        <div id="viewPools" class="admin-view">
             <div class="panel-card">
                 <div class="panel-title">
-                    <span><i class="fa-solid fa-globe"></i> Global Pool Queues (Slot 3 to Slot 7)</span>
+                    <span><i class="fa-solid fa-globe"></i> Global Pool Queues (Click any ID chip to open details)</span>
                     <button class="btn-sm" onclick="loadAdminGlobalPools()"><i class="fa-solid fa-rotate"></i> Refresh Pools</button>
                 </div>
                 <div id="adminGlobalPoolsContainer">
@@ -481,11 +635,11 @@
             </div>
         </div>
 
-        <!-- TAB 4: LIVE CONTRACT TRANSACTIONS -->
-        <div id="tabLiveTx" class="tab-section">
+        <!-- 6. LIVE CONTRACT TRANSACTIONS VIEW -->
+        <div id="viewTx" class="admin-view">
             <div class="panel-card">
                 <div class="panel-title">
-                    <span><i class="fa-solid fa-bolt"></i> Recent Smart Contract Transactions</span>
+                    <span><i class="fa-solid fa-bolt"></i> Recent Smart Contract Transactions (Click wallet to inspect)</span>
                     <button class="btn-sm" onclick="loadContractTransactions()"><i class="fa-solid fa-rotate"></i> Refresh Tx</button>
                 </div>
                 <div class="table-wrap">
@@ -493,11 +647,11 @@
                         <thead>
                             <tr>
                                 <th>Date & Time</th>
-                                <th>From Wallet</th>
+                                <th>User Wallet</th>
                                 <th>Action / Type</th>
                                 <th>Amount</th>
                                 <th>Status</th>
-                                <th>TxHash</th>
+                                <th>PolygonScan</th>
                             </tr>
                         </thead>
                         <tbody id="contractTxTableBody">
@@ -511,45 +665,9 @@
     </div>
 
     <script>
-        // --- CUSTOM USERNAME & PASSWORD SET ---
+        // --- CUSTOM USERNAME & PASSWORD ---
         const ADMIN_USER = "Shreysthatovitt";
         const ADMIN_PASS = "03318129";
-
-        function verifyAdminLogin() {
-            const u = document.getElementById('loginUser').value.trim();
-            const p = document.getElementById('loginPass').value.trim();
-            const err = document.getElementById('loginError');
-
-            if (u === ADMIN_USER && p === ADMIN_PASS) {
-                document.getElementById('loginOverlay').style.display = 'none';
-                localStorage.setItem('poltitan_admin_logged', 'true');
-                document.getElementById('loginUser').value = '';
-                document.getElementById('loginPass').value = '';
-                refreshAllAdminData();
-                inspectByIdOrAddress("1");
-            } else {
-                err.innerText = "Galat Username ya Password hai!";
-                err.style.display = "block";
-            }
-        }
-
-        function adminLogout() {
-            localStorage.removeItem('poltitan_admin_logged');
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            document.getElementById('loginError').style.display = 'none';
-            document.getElementById('loginOverlay').style.display = 'flex';
-        }
-
-        window.addEventListener('load', () => {
-            if (localStorage.getItem('poltitan_admin_logged') === 'true') {
-                document.getElementById('loginOverlay').style.display = 'none';
-                refreshAllAdminData();
-                inspectByIdOrAddress("1");
-            } else {
-                document.getElementById('loginOverlay').style.display = 'flex';
-            }
-        });
 
         const CONTRACT_ADDRESS = "0x5b6e6f6562e9535cc179a37cfdc89e5ff322b66a";
         const OLD_CONTRACT_ADDRESS = "0x8F9afF47ea1448773Cf84f71C1Af65121275DC9f";
@@ -576,27 +694,114 @@
         const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, rpcProvider);
 
         let highestSystemId = 0;
+        let currentActiveSection = "viewDashboard";
+        let zeroScanDone = false;
+        const userMemoryCache = new Map();
 
-        window.switchAdminTab = function(tabId, btnEl) {
-            document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            btnEl.classList.add('active');
+        // --- AUTH FUNCTIONS ---
+        function verifyAdminLogin() {
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            const err = document.getElementById('loginError');
+
+            if (u === ADMIN_USER && p === ADMIN_PASS) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                localStorage.setItem('poltitan_admin_logged', 'true');
+                document.getElementById('loginUser').value = '';
+                document.getElementById('loginPass').value = '';
+                loadSystemOverview();
+            } else {
+                err.innerText = "Galat Username ya Password hai!";
+                err.style.display = "block";
+            }
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('poltitan_admin_logged');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('sideMenu').classList.remove('active');
+            document.getElementById('menuBackdrop').style.display = 'none';
+            document.getElementById('loginOverlay').style.display = 'flex';
+        }
+
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('poltitan_admin_logged') === 'true') {
+                document.getElementById('loginOverlay').style.display = 'none';
+                loadSystemOverview();
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
+            }
+        });
+
+        // --- SIDE MENU NAVIGATION ---
+        window.toggleSideMenu = function() {
+            const menu = document.getElementById('sideMenu');
+            const backdrop = document.getElementById('menuBackdrop');
+            menu.classList.toggle('active');
+            backdrop.style.display = menu.classList.contains('active') ? 'block' : 'none';
         };
 
-        async function isIdValid(idNum) {
+        window.openMenuSection = function(viewId, menuElId) {
+            document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active-menu'));
+
+            document.getElementById(viewId).classList.add('active');
+            if (menuElId && document.getElementById(menuElId)) {
+                document.getElementById(menuElId).classList.add('active-menu');
+            }
+            currentActiveSection = viewId;
+
+            // Close side menu if open
+            document.getElementById('sideMenu').classList.remove('active');
+            document.getElementById('menuBackdrop').style.display = 'none';
+
+            // Trigger section data load on first open
+            if (viewId === 'viewDashboard') loadSystemOverview();
+            if (viewId === 'viewZeroIncome' && !zeroScanDone) scanZeroIncomeIds(false);
+            if (viewId === 'viewLatest') loadIdRange('latest');
+            if (viewId === 'viewPools') loadAdminGlobalPools();
+            if (viewId === 'viewTx') loadContractTransactions();
+        };
+
+        window.refreshCurrentView = function() {
+            userMemoryCache.clear();
+            if (currentActiveSection === 'viewDashboard') loadSystemOverview();
+            else if (currentActiveSection === 'viewZeroIncome') scanZeroIncomeIds(true);
+            else if (currentActiveSection === 'viewLatest') loadIdRange('latest');
+            else if (currentActiveSection === 'viewPools') loadAdminGlobalPools();
+            else if (currentActiveSection === 'viewTx') loadContractTransactions();
+        };
+
+        // --- SAFE CACHED CONTRACT READERS (Prevents revert exceptions) ---
+        async function safeGetUser(addr) {
+            if (!addr || addr === "0x0000000000000000000000000000000000000000") return null;
+            const key = addr.toLowerCase();
+            if (userMemoryCache.has(key)) return userMemoryCache.get(key);
+            try {
+                const u = await readContract.users(addr);
+                userMemoryCache.set(key, u);
+                return u;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function safeIdToAddress(idNum) {
             try {
                 const addr = await readContract.idToAddress(idNum);
-                return (addr && addr !== "0x0000000000000000000000000000000000000000");
+                if (addr && addr !== "0x0000000000000000000000000000000000000000") return addr;
+                return null;
             } catch (e) {
-                return false;
+                return null;
             }
         }
 
         async function findHighestIdOnChain() {
             let low = 1;
             let high = 700;
-            while (await isIdValid(high)) {
+            while (await safeIdToAddress(high)) {
                 low = high;
                 high = high * 2;
                 if (high > 100000) break;
@@ -604,7 +809,7 @@
             let maxFound = low;
             while (low <= high) {
                 let mid = Math.floor((low + high) / 2);
-                if (await isIdValid(mid)) {
+                if (await safeIdToAddress(mid)) {
                     maxFound = mid;
                     low = mid + 1;
                 } else {
@@ -615,6 +820,7 @@
             return maxFound;
         }
 
+        // --- 1. SYSTEM DASHBOARD OVERVIEW ---
         async function loadSystemOverview() {
             try {
                 const [balBN, id4Target, id4StageBN, maxId] = await Promise.all([
@@ -627,7 +833,7 @@
                 const balPol = parseFloat(ethers.utils.formatEther(balBN)).toFixed(2);
                 document.getElementById('statContractBal').innerText = balPol + " POL";
                 document.getElementById('statTotalIds').innerText = maxId;
-                document.getElementById('statIdSub').innerText = `ID #1 to ID #${maxId} Active`;
+                document.getElementById('statIdSub').innerText = `ID #1 to ID #${maxId} Active (Tap to open)`;
 
                 const stg = id4StageBN.toNumber();
                 if (stg >= 1 && stg <= 5) {
@@ -637,13 +843,114 @@
                     document.getElementById('statId4Stage').innerText = "Completed";
                     document.getElementById('statId4Target').innerText = "All 5 Stages Done";
                 }
-
-                loadLatestSystemIds();
-            } catch (err) {
-                console.error("Overview error:", err);
-            }
+            } catch (err) {}
         }
 
+        // --- 2. ZERO (0) INCOME / REFUND ELIGIBLE SCANNER ---
+        window.scanZeroIncomeIds = async function(forceRescan) {
+            if (zeroScanDone && !forceRescan) return;
+
+            const btn = document.getElementById('scanZeroBtn');
+            const progBox = document.getElementById('zeroScanProgress');
+            const progText = document.getElementById('zeroProgressText');
+            const tbody = document.getElementById('zeroIncomeTableBody');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
+            progBox.style.display = 'block';
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:25px; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Scanning all IDs on blockchain...</td></tr>`;
+
+            try {
+                if (!highestSystemId) await findHighestIdOnChain();
+                const total = highestSystemId;
+
+                let strictZeroList = [];
+                let walletZeroWithHoldList = [];
+
+                const BATCH_SIZE = 25;
+                for (let start = 1; start <= total; start += BATCH_SIZE) {
+                    const end = Math.min(total, start + BATCH_SIZE - 1);
+                    progText.innerText = `${start} - ${end} / ${total}`;
+
+                    let batchPromises = [];
+                    for (let id = start; id <= end; id++) {
+                        batchPromises.push((async (idNum) => {
+                            const addr = await safeIdToAddress(idNum);
+                            if (!addr) return null;
+                            const [u, earnedBN] = await Promise.all([
+                                safeGetUser(addr),
+                                readContract.totalEarned(addr).catch(() => ethers.BigNumber.from(0))
+                            ]);
+                            if (!u || !u[6]) return null; // Only Real IDs (ignore Rebirth IDs)
+                            const walletPaid = parseFloat(ethers.utils.formatEther(earnedBN));
+                            const boxHold = parseFloat(ethers.utils.formatEther(u[5]));
+                            const directs = u[3].toNumber();
+                            const curSlot = u[4].toNumber();
+                            return {
+                                id: u[0].toNumber(),
+                                addr,
+                                uplineAddr: u[2],
+                                directs,
+                                curSlot,
+                                walletPaid,
+                                boxHold
+                            };
+                        })(id));
+                    }
+
+                    const results = await Promise.all(batchPromises);
+                    for (let item of results) {
+                        if (!item) continue;
+                        if (item.walletPaid === 0 && item.boxHold === 0 && item.curSlot === 1) {
+                            strictZeroList.push(item);
+                        } else if (item.walletPaid === 0 && item.boxHold > 0) {
+                            walletZeroWithHoldList.push(item);
+                        }
+                    }
+                }
+
+                // Update Counters
+                zeroScanDone = true;
+                document.getElementById('zeroStrictCount').innerText = strictZeroList.length + " IDs";
+                document.getElementById('zeroTotalPolLiability').innerText = (strictZeroList.length * 30) + " POL";
+                document.getElementById('zeroWalletOnlyCount').innerText = walletZeroWithHoldList.length + " IDs";
+                document.getElementById('statZeroCount').innerText = strictZeroList.length + " IDs";
+
+                const combinedList = [...strictZeroList, ...walletZeroWithHoldList];
+                if (combinedList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:25px; color:var(--green);">No 0-Income IDs found!</td></tr>`;
+                } else {
+                    let html = "";
+                    for (let item of combinedList) {
+                        const isStrictZero = (item.walletPaid === 0 && item.boxHold === 0);
+                        const statusBadge = isStrictZero
+                            ? `<span class="badge-claim">0 Income (30 POL Claim Eligible)</span>`
+                            : `<span class="badge-real">0 Wallet Paid (30 POL in Box 1)</span>`;
+
+                        html += `
+                            <tr class="clickable-row" onclick="openUserModalByQuery('${item.id}')">
+                                <td style="font-weight:800; color:var(--gold);">ID #${item.id}</td>
+                                <td>${item.addr.substring(0, 8)}...${item.addr.substring(36)}</td>
+                                <td>${item.uplineAddr.substring(0, 6)}...</td>
+                                <td>${item.directs}</td>
+                                <td style="color:var(--red); font-weight:700;">0.00 POL</td>
+                                <td>${item.boxHold.toFixed(1)} POL</td>
+                                <td>${statusBadge}</td>
+                                <td><button class="btn-sm">View Details</button></td>
+                            </tr>`;
+                    }
+                    tbody.innerHTML = html;
+                }
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--red);">Error scanning IDs. Please click Refresh Scan.</td></tr>`;
+            } finally {
+                progBox.style.display = 'none';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-magnifying-glass-chart"></i> Start / Refresh Scan';
+            }
+        };
+
+        // --- 3. CLICK-TO-OPEN COMPLETE USER DETAILS (MODAL & INLINE) ---
         async function fetchRealJoiningDate(addr) {
             const cleanAddr = addr.toLowerCase();
             const newC = CONTRACT_ADDRESS.toLowerCase();
@@ -669,39 +976,50 @@
             return "Migrated / On-Chain ID";
         }
 
-        window.inspectByIdOrAddress = async function(queryVal) {
-            document.getElementById('adminSearchInput').value = queryVal;
-            await inspectAnyUser();
+        window.closeUserDetailModal = function() {
+            document.getElementById('userDetailModal').style.display = 'none';
         };
 
-        window.inspectAnyUser = async function(e) {
-            if (e) e.preventDefault();
-            const input = document.getElementById('adminSearchInput').value.trim();
-            if (!input) return;
+        window.handleSearchSubmit = async function(e) {
+            e.preventDefault();
+            const q = document.getElementById('adminSearchInput').value.trim();
+            if (q) openUserModalByQuery(q);
+        };
 
-            const btn = document.getElementById('adminSearchBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
-            btn.disabled = true;
+        window.openUserModalByQuery = async function(queryVal) {
+            const modal = document.getElementById('userDetailModal');
+            const loading = document.getElementById('modalLoading');
+            const content = document.getElementById('modalContentArea');
+
+            modal.style.display = 'flex';
+            loading.style.display = 'block';
+            content.style.display = 'none';
 
             try {
-                let targetAddr = input;
-                if (!input.startsWith("0x")) {
-                    const idNum = parseInt(input);
-                    if (isNaN(idNum) || idNum <= 0) throw "Invalid ID number";
-                    targetAddr = await readContract.idToAddress(idNum);
+                let targetAddr = String(queryVal).trim();
+                if (!targetAddr.startsWith("0x")) {
+                    const idNum = parseInt(targetAddr);
+                    if (isNaN(idNum) || idNum <= 0) throw "Invalid ID Number";
+                    targetAddr = await safeIdToAddress(idNum);
                 }
 
                 if (!targetAddr || targetAddr === "0x0000000000000000000000000000000000000000") {
-                    alert("ID or Wallet not found in PolTitan contract!");
+                    loading.innerHTML = `<p style="color:var(--red);">ID or Wallet not found in PolTitan Contract!</p>`;
                     return;
                 }
 
-                const uInfo = await readContract.users(targetAddr);
-                const uId = uInfo[0].toNumber();
-                if (uId === 0) {
-                    alert("This wallet is not registered!");
+                const uInfo = await safeGetUser(targetAddr);
+                if (!uInfo || uInfo[0].toNumber() === 0) {
+                    loading.innerHTML = `<p style="color:var(--red);">This wallet is not registered in PolTitan!</p>`;
                     return;
                 }
+
+                const uId = uInfo[0].toNumber();
+                const dCount = uInfo[3].toNumber();
+                const curSlot = uInfo[4].toNumber();
+                const boxHold = parseFloat(ethers.utils.formatEther(uInfo[5]));
+                const isReal = uInfo[6];
+                const s2Count = uInfo[9].toNumber();
 
                 const [
                     totalEarnedBN, pendingNetBN, pendingLvlBN,
@@ -722,16 +1040,10 @@
                     readContract.completedRebirths(targetAddr).catch(() => ethers.BigNumber.from(0)),
                     readContract.receivedRebirths(targetAddr).catch(() => ethers.BigNumber.from(0)),
                     readContract.flushedRebirths(targetAddr).catch(() => ethers.BigNumber.from(0)),
-                    (uInfo[2] !== "0x0000000000000000000000000000000000000000") ? readContract.users(uInfo[2]) : Promise.resolve(null),
-                    (uInfo[7] !== "0x0000000000000000000000000000000000000000") ? readContract.users(uInfo[7]) : Promise.resolve(null),
-                    (uInfo[8] !== "0x0000000000000000000000000000000000000000") ? readContract.users(uInfo[8]) : Promise.resolve(null)
+                    safeGetUser(uInfo[2]),
+                    safeGetUser(uInfo[7]),
+                    safeGetUser(uInfo[8])
                 ]);
-
-                const dCount = uInfo[3].toNumber();
-                const curSlot = uInfo[4].toNumber();
-                const boxHold = parseFloat(ethers.utils.formatEther(uInfo[5]));
-                const isReal = uInfo[6];
-                const s2Count = uInfo[9].toNumber();
 
                 const walletPaid = parseFloat(ethers.utils.formatEther(totalEarnedBN));
                 const netHold = parseFloat(ethers.utils.formatEther(pendingNetBN));
@@ -763,97 +1075,133 @@
                 const slot1Credit = (curSlot >= 2) ? 60 : boxHold;
                 const totalOverall = walletPaid + slot1Credit + slotHold + netHold + lvlHold;
 
-                document.getElementById('admId').innerText = "ID #" + uId;
-                document.getElementById('admType').innerHTML = isReal ? '<span class="badge-real">REAL ID</span>' : '<span class="badge-rb">REBIRTH (R/B)</span>';
-                document.getElementById('admWallet').innerHTML = `<a href="https://polygonscan.com/address/${targetAddr}" target="_blank" style="color:var(--green); text-decoration:none;">${targetAddr.substring(0, 10)}...${targetAddr.substring(34)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`;
-                document.getElementById('admUpline').innerHTML = uplineInfo ? `<span class="chip" onclick="inspectByIdOrAddress('${uplineInfo[0].toNumber()}')">ID #${uplineInfo[0].toNumber()}</span>` : "Root (None)";
-                document.getElementById('admSlot').innerText = "Slot " + curSlot;
-                document.getElementById('admDirects').innerText = dCount;
-                document.getElementById('admLeftRight').innerText = `L: ${leftInfo ? 'ID #' + leftInfo[0].toNumber() : 'Empty'} | R: ${rightInfo ? 'ID #' + rightInfo[0].toNumber() : 'Empty'}`;
-                document.getElementById('admSlot2Count').innerText = `${s2Count} / 4 Nodes`;
+                // Safe Directs Reader (Never crashes even if migrated array length mismatches)
+                let directSet = new Set();
+                if (uInfo[7] && uInfo[7] !== "0x0000000000000000000000000000000000000000") directSet.add(uInfo[7]);
+                if (uInfo[8] && uInfo[8] !== "0x0000000000000000000000000000000000000000") directSet.add(uInfo[8]);
 
-                document.getElementById('admTotalOverall').innerText = totalOverall.toFixed(2) + " POL";
-                document.getElementById('admWalletPaid').innerText = walletPaid.toFixed(2) + " POL";
-                document.getElementById('admTotalHold').innerText = totalHold.toFixed(2) + " POL";
-                document.getElementById('admBoxHold').innerText = boxHold.toFixed(2) + " POL";
-                document.getElementById('admSlotHold').innerText = slotHold.toFixed(2) + " POL";
-                document.getElementById('admNetHold').innerText = netHold.toFixed(2) + " POL";
-                document.getElementById('admLvlHold').innerText = lvlHold.toFixed(2) + " POL";
-                document.getElementById('admId4Hold').innerText = "0.00 POL";
-                document.getElementById('admClaimable').innerText = claimableNow.toFixed(2) + " POL";
-
-                document.getElementById('admCompRb').innerText = compRbBN.toNumber();
-                document.getElementById('admRecRb').innerText = recRbBN.toNumber();
-                document.getElementById('admPendRb').innerText = pendRbBN.toNumber();
-                document.getElementById('admFlushRb').innerText = flushRbBN.toNumber();
-
-                document.getElementById('admJoinDate').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                fetchRealJoiningDate(targetAddr).then(d => {
-                    document.getElementById('admJoinDate').innerText = d;
-                });
-
-                const chipBox = document.getElementById('admDirectChips');
-                if (dCount === 0) {
-                    chipBox.innerText = "No Direct Partners";
-                } else {
-                    chipBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading Directs...';
+                if (dCount > 0) {
                     let dPromises = [];
                     for (let i = 0; i < Math.min(dCount, 30); i++) {
-                        dPromises.push(readContract.userDirects(targetAddr, i).then(a => readContract.users(a)));
+                        dPromises.push(readContract.userDirects(targetAddr, i).catch(() => null));
                     }
-                    const dUsers = await Promise.all(dPromises);
-                    chipBox.innerHTML = dUsers.map(du => `<span class="chip" onclick="inspectByIdOrAddress('${du[0].toNumber()}')">ID #${du[0].toNumber()}</span>`).join("");
+                    const dAddrs = await Promise.all(dPromises);
+                    dAddrs.forEach(a => {
+                        if (a && a !== "0x0000000000000000000000000000000000000000") directSet.add(a);
+                    });
                 }
 
-                document.getElementById('inspectorResultArea').style.display = 'block';
+                const directUsers = (await Promise.all(Array.from(directSet).map(a => safeGetUser(a)))).filter(Boolean);
+                const directChipsHtml = directUsers.length > 0
+                    ? directUsers.map(du => `<span class="chip" onclick="openUserModalByQuery('${du[0].toNumber()}')">ID #${du[0].toNumber()}</span>`).join("")
+                    : `<span style="color:var(--text-gray); font-size:11px;">No Direct Partners found</span>`;
+
+                const isZeroRefundEligible = (isReal && walletPaid === 0 && totalHold === 0);
+                const refundBadgeHtml = isZeroRefundEligible
+                    ? `<span class="badge-claim">YES - 0 POL Income (Eligible if 180d Inactive)</span>`
+                    : `<span class="badge-rb">NO - Has Earnings / Hold Activity</span>`;
+
+                content.innerHTML = `
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <h4><i class="fa-solid fa-id-card"></i> Profile & Genealogy</h4>
+                            <div class="d-row"><span class="d-label">User ID:</span> <span class="d-val" style="color:var(--gold); font-size:15px;">ID #${uId}</span></div>
+                            <div class="d-row"><span class="d-label">ID Type:</span> <span class="d-val">${isReal ? '<span class="badge-real">REAL ID</span>' : '<span class="badge-rb">REBIRTH (R/B)</span>'}</span></div>
+                            <div class="d-row"><span class="d-label">Real Joining Date:</span> <span class="d-val" id="modalJoinDate" style="color:var(--blue);"><i class="fa-solid fa-spinner fa-spin"></i></span></div>
+                            <div class="d-row"><span class="d-label">Wallet Address:</span> <span class="d-val"><a href="https://polygonscan.com/address/${targetAddr}" target="_blank" style="color:var(--green); text-decoration:none;">${targetAddr.substring(0, 10)}...${targetAddr.substring(34)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a></span></div>
+                            <div class="d-row"><span class="d-label">Invited By (Upline):</span> <span class="d-val">${uplineInfo ? `<span class="chip" onclick="openUserModalByQuery('${uplineInfo[0].toNumber()}')">ID #${uplineInfo[0].toNumber()}</span>` : 'Root (None)'}</span></div>
+                            <div class="d-row"><span class="d-label">Current Active Slot:</span> <span class="d-val" style="color:var(--gold);">Slot ${curSlot}</span></div>
+                            <div class="d-row"><span class="d-label">Direct Count:</span> <span class="d-val">${dCount}</span></div>
+                            <div class="d-row"><span class="d-label">Slot 1 Left / Right:</span> <span class="d-val">L: ${leftInfo ? `<span class="chip" onclick="openUserModalByQuery('${leftInfo[0].toNumber()}')">ID #${leftInfo[0].toNumber()}</span>` : 'Empty'} | R: ${rightInfo ? `<span class="chip" onclick="openUserModalByQuery('${rightInfo[0].toNumber()}')">ID #${rightInfo[0].toNumber()}</span>` : 'Empty'}</span></div>
+                            <div class="d-row"><span class="d-label">Slot 2 Team Filled:</span> <span class="d-val">${s2Count} / 4 Nodes</span></div>
+                        </div>
+
+                        <div class="detail-box">
+                            <h4><i class="fa-solid fa-sack-dollar"></i> Earnings, Hold & Claim</h4>
+                            <div class="d-row"><span class="d-label">Total Overall Earning:</span> <span class="d-val" style="color:var(--gold); font-size:14px;">${totalOverall.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">Paid to Wallet:</span> <span class="d-val" style="color:var(--green);">${walletPaid.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">Total Hold / Queued:</span> <span class="d-val" style="color:var(--gold);">${totalHold.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">• Slot 1 Box Hold:</span> <span class="d-val">${boxHold.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">• Slot 2-7 Reward Hold:</span> <span class="d-val">${slotHold.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">• Up/Downline Hold:</span> <span class="d-val">${netHold.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">• Level 2-18 Hold:</span> <span class="d-val">${lvlHold.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">Unlocked Claimable Now:</span> <span class="d-val" style="color:var(--green);">${claimableNow.toFixed(2)} POL</span></div>
+                            <div class="d-row"><span class="d-label">30 POL Refund Eligible:</span> <span class="d-val">${refundBadgeHtml}</span></div>
+                        </div>
+
+                        <div class="detail-box">
+                            <h4><i class="fa-solid fa-recycle"></i> Rebirths & Direct Partners</h4>
+                            <div class="d-row"><span class="d-label">Generated Rebirths:</span> <span class="d-val">${compRbBN.toNumber()}</span></div>
+                            <div class="d-row"><span class="d-label">Received Rebirths:</span> <span class="d-val" style="color:var(--green);">${recRbBN.toNumber()}</span></div>
+                            <div class="d-row"><span class="d-label">Pending Rebirths Lock:</span> <span class="d-val" style="color:var(--red);">${pendRbBN.toNumber()}</span></div>
+                            <div class="d-row"><span class="d-label">Flushed Rebirths:</span> <span class="d-val">${flushRbBN.toNumber()}</span></div>
+                            <div style="margin-top:10px;">
+                                <span class="d-label" style="font-size:11px; display:block; margin-bottom:5px;">Direct / Placed Partners (Click any ID to open):</span>
+                                <div class="chip-list">${directChipsHtml}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                loading.style.display = 'none';
+                content.style.display = 'block';
+
+                fetchRealJoiningDate(targetAddr).then(dStr => {
+                    const el = document.getElementById('modalJoinDate');
+                    if (el) el.innerText = dStr;
+                });
             } catch (err) {
-                alert("Error inspecting user: " + err);
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Inspect User';
-                btn.disabled = false;
+                loading.innerHTML = `<p style="color:var(--red);">Could not load user details: ${err}</p>`;
             }
         };
 
-        window.loadLatestSystemIds = async function() {
+        // --- 4. REGISTERED IDs LIST ---
+        window.loadIdRange = async function(mode) {
             const tbody = document.getElementById('latestIdsTableBody');
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:25px; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Latest IDs...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:25px; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Loading IDs...</td></tr>`;
 
             try {
                 if (!highestSystemId) await findHighestIdOnChain();
-                const startId = highestSystemId;
-                const endId = Math.max(1, startId - 14);
+                let idList = [];
+                if (mode === 'first') {
+                    for (let i = 1; i <= Math.min(25, highestSystemId); i++) idList.push(i);
+                } else {
+                    for (let i = highestSystemId; i >= Math.max(1, highestSystemId - 24); i--) idList.push(i);
+                }
 
                 let rowsHtml = "";
-                for (let id = startId; id >= endId; id--) {
-                    const addr = await readContract.idToAddress(id);
-                    if (!addr || addr === "0x0000000000000000000000000000000000000000") continue;
-                    const u = await readContract.users(addr);
+                for (let id of idList) {
+                    const addr = await safeIdToAddress(id);
+                    if (!addr) continue;
+                    const u = await safeGetUser(addr);
+                    if (!u) continue;
                     let upId = "None";
                     if (u[2] !== "0x0000000000000000000000000000000000000000") {
-                        const upU = await readContract.users(u[2]);
-                        upId = "ID #" + upU[0].toNumber();
+                        const upU = await safeGetUser(u[2]);
+                        if (upU) upId = "ID #" + upU[0].toNumber();
                     }
                     const typeBadge = u[6] ? '<span class="badge-real">Real</span>' : '<span class="badge-rb">Rebirth</span>';
                     const holdPol = parseFloat(ethers.utils.formatEther(u[5])).toFixed(1);
 
                     rowsHtml += `
-                        <tr>
-                            <td style="font-weight:700; color:var(--gold);">ID #${u[0].toNumber()}</td>
+                        <tr class="clickable-row" onclick="openUserModalByQuery('${u[0].toNumber()}')">
+                            <td style="font-weight:800; color:var(--gold);">ID #${u[0].toNumber()}</td>
                             <td>${typeBadge}</td>
                             <td>${addr.substring(0, 8)}...${addr.substring(36)}</td>
                             <td>${upId}</td>
                             <td>Slot ${u[4].toNumber()}</td>
                             <td>${u[3].toNumber()}</td>
                             <td>${holdPol} POL</td>
-                            <td><button class="btn-sm" onclick="switchAdminTab('tabInspector', document.querySelectorAll('.tab-btn')[0]); inspectByIdOrAddress('${u[0].toNumber()}');">Inspect</button></td>
+                            <td><button class="btn-sm">Details</button></td>
                         </tr>`;
                 }
                 tbody.innerHTML = rowsHtml || `<tr><td colspan="8" style="text-align:center;">No IDs found</td></tr>`;
             } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--red);">Failed to load latest IDs</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--red);">Failed to load IDs</td></tr>`;
             }
         };
 
+        // --- 5. GLOBAL POOLS (SLOTS 3 TO 7) ---
         window.loadAdminGlobalPools = async function() {
             const container = document.getElementById('adminGlobalPoolsContainer');
             container.innerHTML = `<div style="text-align:center; padding:25px; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Reading Global Pools from Blockchain...</div>`;
@@ -862,12 +1210,12 @@
                 let html = `<div class="detail-grid">`;
                 for (let s = 3; s <= 7; s++) {
                     let queueIds = [];
-                    for (let idx = 0; idx < 30; idx++) {
+                    for (let idx = 0; idx < 35; idx++) {
                         try {
                             const qAddr = await readContract.slotQueues(s, idx);
                             if (!qAddr || qAddr === "0x0000000000000000000000000000000000000000") break;
-                            const u = await readContract.users(qAddr);
-                            queueIds.push({ pos: idx + 1, id: u[0].toNumber(), slot: u[4].toNumber() });
+                            const u = await safeGetUser(qAddr);
+                            if (u) queueIds.push({ pos: idx + 1, id: u[0].toNumber(), slot: u[4].toNumber() });
                         } catch (err) { break; }
                     }
 
@@ -877,7 +1225,7 @@
                         html += `<p style="font-size:12px; color:var(--text-gray);">No IDs in Slot ${s} yet.</p>`;
                     } else {
                         html += `<div class="chip-list">` +
-                            queueIds.map(item => `<span class="chip" onclick="switchAdminTab('tabInspector', document.querySelectorAll('.tab-btn')[0]); inspectByIdOrAddress('${item.id}');">#${item.pos}: ID ${item.id}</span>`).join("") +
+                            queueIds.map(item => `<span class="chip" onclick="openUserModalByQuery('${item.id}')">#${item.pos}: ID ${item.id}</span>`).join("") +
                             `</div>`;
                     }
                     html += `</div>`;
@@ -889,6 +1237,7 @@
             }
         };
 
+        // --- 6. LIVE CONTRACT TRANSACTIONS ---
         window.loadContractTransactions = async function() {
             const tbody = document.getElementById('contractTxTableBody');
             tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:25px; color:var(--gold);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching Contract Transactions...</td></tr>`;
@@ -905,13 +1254,13 @@
                         const status = tx.isError === "0" ? '<span style="color:var(--green);">Success</span>' : '<span style="color:var(--red);">Failed</span>';
 
                         html += `
-                            <tr>
-                                1<td>${dt}</td>
-                                <td><span class="chip" onclick="switchAdminTab('tabInspector', document.querySelectorAll('.tab-btn')[0]); inspectByIdOrAddress('${tx.from}');">${tx.from.substring(0, 8)}...${tx.from.substring(36)}</span></td>
+                            <tr class="clickable-row" onclick="openUserModalByQuery('${tx.from}')">
+                                <td>${dt}</td>
+                                <td><span class="chip">${tx.from.substring(0, 8)}...${tx.from.substring(36)}</span></td>
                                 <td style="color:var(--gold); font-weight:600;">${action}</td>
                                 <td>${valPol} POL</td>
                                 <td>${status}</td>
-                                <td><a href="https://polygonscan.com/tx/${tx.hash}" target="_blank" style="color:var(--blue);">View Tx</a></td>
+                                <td onclick="event.stopPropagation();"><a href="https://polygonscan.com/tx/${tx.hash}" target="_blank" style="color:var(--blue);">View Tx</a></td>
                             </tr>`;
                     }
                     tbody.innerHTML = html;
@@ -921,12 +1270,6 @@
             } catch (e) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--red);">Error fetching transactions.</td></tr>`;
             }
-        };
-
-        window.refreshAllAdminData = function() {
-            loadSystemOverview();
-            loadAdminGlobalPools();
-            loadContractTransactions();
         };
     </script>
 </body>
